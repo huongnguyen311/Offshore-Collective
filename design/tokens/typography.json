@@ -1,0 +1,128 @@
+{
+  "global": {
+    "fontFamily": {
+      "display": { "value": "'IBM Plex Mono', 'SF Mono', 'Roboto Mono', monospace", "type": "fontFamilies", "$description": "Technical/monospace face — echoes the wordmark's tracked-out uppercase character. Used for Titles, Labels, and ALL numeral/data display (points balance, dates, booking codes)." },
+      "body": { "value": "'Fraunces', 'SF Pro Text', system-ui, serif", "type": "fontFamilies", "$description": "Humanist companion serif for paragraph reading comfort — never used for data/numerals." }
+    },
+    "fontSize": {
+      "40": { "value": "40", "type": "fontSizes" },
+      "32": { "value": "32", "type": "fontSizes" },
+      "28": { "value": "28", "type": "fontSizes" },
+      "24": { "value": "24", "type": "fontSizes" },
+      "20": { "value": "20", "type": "fontSizes" },
+      "17": { "value": "17", "type": "fontSizes" },
+      "15": { "value": "15", "type": "fontSizes" },
+      "14": { "value": "14", "type": "fontSizes" },
+      "13": { "value": "13", "type": "fontSizes" },
+      "12": { "value": "12", "type": "fontSizes" },
+      "11": { "value": "11", "type": "fontSizes" },
+      "10": { "value": "10", "type": "fontSizes" }
+    },
+    "fontWeight": {
+      "regular":  { "value": "400", "type": "fontWeights" },
+      "medium":   { "value": "500", "type": "fontWeights" },
+      "semibold": { "value": "600", "type": "fontWeights" },
+      "bold":     { "value": "700", "type": "fontWeights" }
+    },
+    "lineHeight": {
+      "tight":   { "value": "1.1",  "type": "lineHeights" },
+      "snug":    { "value": "1.2",  "type": "lineHeights" },
+      "normal":  { "value": "1.35", "type": "lineHeights" },
+      "relaxed": { "value": "1.5",  "type": "lineHeights" },
+      "loose":   { "value": "1.65", "type": "lineHeights" }
+    },
+    "letterSpacing": {
+      "tight":    { "value": "-0.01em",  "type": "letterSpacing" },
+      "none":     { "value": "0em",      "type": "letterSpacing" },
+      "tabular":  { "value": "0.01em",   "type": "letterSpacing", "$description": "Slight opening for monospace numerals — improves scanability of the points balance and calendar dates" },
+      "wide":     { "value": "0.02em",   "type": "letterSpacing" },
+      "wider":    { "value": "0.05em",   "type": "letterSpacing" },
+      "widest":   { "value": "0.08em",   "type": "letterSpacing", "$description": "Matches the wordmark's own tracking — reserved for the eyebrow label and Label styles" }
+    }
+  },
+  "typography": {
+    "dataHero": {
+      "value": {
+        "fontFamily": "{global.fontFamily.display}",
+        "fontWeight": "{global.fontWeight.medium}",
+        "fontSize": "{global.fontSize.40}",
+        "lineHeight": "{global.lineHeight.tight}",
+        "letterSpacing": "{global.letterSpacing.tabular}"
+      },
+      "type": "typography",
+      "$description": "SIGNATURE — the Home screen points-balance number ONLY (Signature Moment #1 in 06-art-direction.md). One per app session's first view. Tabular figures via the monospace face make the number feel measured/counted, not decorated."
+    },
+    "eyebrowLabel": {
+      "value": {
+        "fontFamily": "{global.fontFamily.display}",
+        "fontWeight": "{global.fontWeight.semibold}",
+        "fontSize": "{global.fontSize.11}",
+        "lineHeight": "{global.lineHeight.snug}",
+        "letterSpacing": "{global.letterSpacing.widest}",
+        "textCase": "uppercase"
+      },
+      "type": "typography",
+      "$description": "The small tracked-out uppercase label directly above dataHero (e.g. 'POINTS BALANCE') — deliberately echoes the wordmark's own tracking to tie the brand mark to the app's single most important number."
+    },
+    "displayLarge": {
+      "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.semibold}", "fontSize": "{global.fontSize.32}", "lineHeight": "{global.lineHeight.tight}", "letterSpacing": "{global.letterSpacing.none}" },
+      "type": "typography",
+      "$description": "Secondary hero data only — e.g. 'Days to departure' countdown. Never compete with dataHero on the same screen."
+    },
+    "titleLarge": {
+      "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.semibold}", "fontSize": "{global.fontSize.24}", "lineHeight": "{global.lineHeight.snug}", "letterSpacing": "{global.letterSpacing.tight}" },
+      "type": "typography",
+      "$description": "Screen titles (e.g. 'Booking Calendar', 'Boat Rules')"
+    },
+    "titleMedium": {
+      "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.semibold}", "fontSize": "{global.fontSize.20}", "lineHeight": "{global.lineHeight.snug}", "letterSpacing": "{global.letterSpacing.none}" },
+      "type": "typography",
+      "$description": "Card headings, section headers within a screen"
+    },
+    "titleSmall": {
+      "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.medium}", "fontSize": "{global.fontSize.17}", "lineHeight": "{global.lineHeight.normal}", "letterSpacing": "{global.letterSpacing.none}" },
+      "type": "typography",
+      "$description": "List-group labels, widget headers"
+    },
+    "bodyLarge": {
+      "value": { "fontFamily": "{global.fontFamily.body}", "fontWeight": "{global.fontWeight.regular}", "fontSize": "{global.fontSize.17}", "lineHeight": "{global.lineHeight.loose}", "letterSpacing": "{global.letterSpacing.none}" },
+      "type": "typography",
+      "$description": "Boat Rules body copy, checklist disclaimer text, T&C/Privacy — long-form reading"
+    },
+    "bodyMedium": {
+      "value": { "fontFamily": "{global.fontFamily.body}", "fontWeight": "{global.fontWeight.regular}", "fontSize": "{global.fontSize.15}", "lineHeight": "{global.lineHeight.relaxed}", "letterSpacing": "{global.letterSpacing.none}" },
+      "type": "typography",
+      "$description": "Default UI text — form fields, descriptions, list rows"
+    },
+    "bodySmall": {
+      "value": { "fontFamily": "{global.fontFamily.body}", "fontWeight": "{global.fontWeight.regular}", "fontSize": "{global.fontSize.13}", "lineHeight": "{global.lineHeight.relaxed}", "letterSpacing": "{global.letterSpacing.wide}" },
+      "type": "typography",
+      "$description": "Secondary/helper text"
+    },
+    "dataInline": {
+      "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.medium}", "fontSize": "{global.fontSize.15}", "lineHeight": "{global.lineHeight.snug}", "letterSpacing": "{global.letterSpacing.tabular}" },
+      "type": "typography",
+      "$description": "SIGNATURE — calendar date numerals (M04) and the points-cost breakdown numbers on Booking Review (M08). Same monospace/tabular treatment as dataHero, at UI scale — every number a partner needs to trust (points, dates, litres readings) uses this style, never bodyMedium, so numerals are visually consistent app-wide."
+    },
+    "labelLarge": {
+      "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.semibold}", "fontSize": "{global.fontSize.14}", "lineHeight": "{global.lineHeight.snug}", "letterSpacing": "{global.letterSpacing.widest}", "textCase": "uppercase" },
+      "type": "typography",
+      "$description": "Primary buttons, active tab-bar label"
+    },
+    "labelMedium": {
+      "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.semibold}", "fontSize": "{global.fontSize.12}", "lineHeight": "{global.lineHeight.snug}", "letterSpacing": "{global.letterSpacing.widest}", "textCase": "uppercase" },
+      "type": "typography",
+      "$description": "Secondary buttons, status badges (Pending Approval, Booking Blocked, etc.)"
+    },
+    "labelSmall": {
+      "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.bold}", "fontSize": "{global.fontSize.10}", "lineHeight": "{global.lineHeight.snug}", "letterSpacing": "{global.letterSpacing.widest}", "textCase": "uppercase" },
+      "type": "typography",
+      "$description": "Micro-badges only"
+    },
+    "caption": {
+      "value": { "fontFamily": "{global.fontFamily.body}", "fontWeight": "{global.fontWeight.regular}", "fontSize": "{global.fontSize.12}", "lineHeight": "{global.lineHeight.relaxed}", "letterSpacing": "{global.letterSpacing.wide}" },
+      "type": "typography",
+      "$description": "Timestamps, metadata, fine print"
+    }
+  }
+}

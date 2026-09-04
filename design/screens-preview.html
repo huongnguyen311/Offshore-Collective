@@ -1,0 +1,1629 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0}img{max-width:100%}</style></head><body>
+<title>Offshore Collective Screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ---- Offshore Collective design tokens (sampled from client brand assets) ---- */
+    --navy-50:#f2f6f9; --navy-100:#e2e9ef; --navy-200:#c3cfdb; --navy-300:#a1b4c5;
+    --navy-400:#7b92a7; --navy-500:#5b758c; --navy-600:#3d5871; --navy-700:#284055;
+    --navy-800:#142a3d; --navy-900:#010c18;
+    --gold-50:#faf5e7; --gold-100:#f0e8d1; --gold-200:#dccda4; --gold-300:#c6af6f;
+    --gold-400:#b8972e; --gold-500:#8e6d00; --gold-700:#533800;
+    --neutral-50:#f2f6f9; --neutral-100:#e5e8ec; --neutral-200:#cbced1; --neutral-300:#aeb1b5;
+    --neutral-400:#8c9093; --neutral-500:#6f7275; --neutral-600:#535658; --neutral-700:#3b3d40;
+    --neutral-800:#2b2e31; --neutral-900:#090b0e;
+    --success-100:#d0f3d0; --success-700:#095717;
+    --warning-100:#fee3c5; --warning-500:#bb7400; --warning-700:#783b00;
+    --error-100:#ffdcd7; --error-500:#cb4644; --error-700:#861118;
+    --info-100:#e0e6ff; --info-700:#373e87;
+
+    --font-mono:'IBM Plex Mono', 'SF Mono', 'Roboto Mono', monospace;
+    --font-body:'Fraunces', 'SF Pro Text', system-ui, serif;
+    --font-soft:'Quicksand', 'SF Pro Rounded', system-ui, sans-serif;
+
+    /* page chrome tokens (light) */
+    --page-bg: var(--neutral-50);
+    --page-surface: #ffffff;
+    --page-text: var(--neutral-900);
+    --page-text-soft: var(--neutral-600);
+    --page-border: var(--navy-100);
+    --page-accent: var(--gold-400);
+    --page-accent-ink: var(--navy-900);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --page-bg: var(--navy-900);
+      --page-surface: #0c1826;
+      --page-text: var(--neutral-50);
+      --page-text-soft: var(--navy-300);
+      --page-border: var(--navy-700);
+    }
+  }
+  :root[data-theme="dark"]{
+    --page-bg: var(--navy-900);
+    --page-surface: #0c1826;
+    --page-text: var(--neutral-50);
+    --page-text-soft: var(--navy-300);
+    --page-border: var(--navy-700);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--page-bg); color:var(--page-text);
+    font-family:var(--font-body); line-height:1.6;
+  }
+  .wrap{ max-width:1400px; margin:0 auto; padding:56px 32px 96px; }
+
+  .masthead{ margin-bottom:8px; }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:11px; font-weight:600;
+    letter-spacing:0.14em; text-transform:uppercase; color:var(--gold-500);
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .eyebrow{ color:var(--gold-400); } }
+  :root[data-theme="dark"] .eyebrow{ color:var(--gold-400); }
+
+  h1{
+    font-family:var(--font-mono); font-weight:600; font-size:32px; letter-spacing:-0.01em;
+    margin:10px 0 14px; text-wrap:balance; color:var(--page-text);
+  }
+  .lede{ max-width:640px; color:var(--page-text-soft); font-size:17px; margin:0 0 40px; }
+  .lede b{ color:var(--page-text); font-weight:600; }
+
+  .legend{
+    display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center;
+    padding:18px 22px; margin-bottom:52px;
+    background:var(--page-surface); border:1px solid var(--page-border); border-radius:16px;
+  }
+  .legend-item{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--page-text-soft); }
+  .legend-chip{ width:16px; height:16px; border-radius:5px; flex:none; border:1.5px solid transparent; }
+
+  /* ---- gallery quick-jump nav (sticky category chips, replaces drag-to-scroll) ---- */
+  .gallery-nav{
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; padding:12px 14px;
+    position:sticky; top:0; z-index:20; background:var(--page-bg);
+    border-bottom:1px solid var(--page-border);
+  }
+  .gallery-nav a{
+    font-family:var(--font-mono); font-size:11.5px; font-weight:600; letter-spacing:0.02em;
+    padding:7px 14px; border-radius:999px; border:1px solid var(--page-border);
+    background:var(--page-surface); color:var(--page-text-soft); text-decoration:none;
+    white-space:nowrap; transition:border-color 120ms ease, color 120ms ease;
+  }
+  .gallery-nav a span{ opacity:0.55; margin-left:5px; }
+  .gallery-nav a:hover{ border-color:var(--gold-400); color:var(--page-text); }
+
+  /* ---- gallery grid (wraps to fit — nothing requires horizontal dragging) ---- */
+  .gallery{
+    display:grid; grid-template-columns:repeat(auto-fill, 230px); justify-content:center;
+    gap:4px 22px; padding:28px 0 48px;
+  }
+  .gallery-section-header{
+    grid-column:1/-1; display:flex; align-items:baseline; gap:10px;
+    padding-top:26px; margin-top:26px; border-top:1px solid var(--page-border);
+    scroll-margin-top:64px;
+  }
+  .gallery-section-header:first-child{ border-top:none; margin-top:0; padding-top:0; }
+  .gallery-section-header h2{
+    font-family:var(--font-mono); font-weight:600; font-size:15px; letter-spacing:0.01em;
+    color:var(--page-text); margin:0;
+  }
+  .gallery-section-count{ font-size:12px; color:var(--page-text-soft); }
+
+  .screen-card{ width:230px; }
+  /* real device frame is 390x844 — scaled down to a 230-wide thumbnail so many fit per row */
+  .gallery .phone{
+    transform:scale(0.58974); transform-origin:top left;
+    margin-bottom:-346px;
+  }
+  .screen-caption{
+    margin-top:14px; padding:0 2px; max-width:230px;
+  }
+  .screen-id{
+    font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.08em;
+    color:var(--gold-500); text-transform:uppercase;
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .screen-id{ color:var(--gold-400); } }
+  :root[data-theme="dark"] .screen-id{ color:var(--gold-400); }
+  .screen-name{ font-family:var(--font-mono); font-weight:600; font-size:15px; margin:3px 0 6px; color:var(--page-text); }
+  .screen-note{ font-size:13px; color:var(--page-text-soft); line-height:1.55; }
+
+  /* ============ PHONE FRAME (fixed light-mode app render — a device screenshot, not page-themed) ============ */
+  .phone{
+    /* 390x844 — iPhone 14/15 standard viewport size, the current mainstream design-frame default */
+    width:390px; height:844px; border-radius:52px; background:#0c1116;
+    padding:5px; box-shadow:0 24px 56px -14px rgba(3,10,18,0.38), 0 3px 8px rgba(3,10,18,0.2);
+  }
+  .screen{
+    width:100%; height:100%; border-radius:47px; overflow:hidden; position:relative;
+    background:var(--navy-50);
+    display:flex; flex-direction:column;
+    font-family:var(--font-body); color:var(--neutral-900);
+  }
+  .screen::after{
+    /* thin notch/speaker detail, standing in for a slimmer bezel's device cue */
+    content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:100px; height:22px; background:#0c1116; border-radius:0 0 14px 14px; z-index:5;
+  }
+  .screen::before{
+    /* horizon-line accent, replacing the earlier top glow — a quiet nautical touch, not a diffuse wash */
+    content:''; position:absolute; top:34px; left:22px; right:22px; height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold-300) 45%, var(--gold-300) 55%, transparent);
+    opacity:0.55; z-index:1; pointer-events:none;
+  }
+  .statusbar{
+    height:30px; flex:none; display:flex; align-items:center; justify-content:space-between;
+    padding:0 20px; font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--navy-800);
+  }
+  .navbar{
+    height:44px; flex:none; display:flex; align-items:center; justify-content:center; position:relative;
+    padding:0 16px; font-family:var(--font-soft); font-weight:700; font-size:16px; color:var(--navy-800);
+    border-bottom:1px solid var(--navy-100);
+  }
+  .navbar .back{ position:absolute; left:14px; font-size:18px; color:var(--navy-600); }
+  .content{ flex:1; overflow-y:auto; padding:20px 18px 18px; }
+  .content.pad-0{ padding:0; }
+
+  .tabbar{
+    height:auto; flex:none; display:flex; align-items:center; justify-content:space-around;
+    margin:0 14px 14px; padding:7px; border-radius:26px; background:#fff;
+    box-shadow:0 16px 34px -12px rgba(20,42,61,0.28), 0 2px 10px -3px rgba(20,42,61,0.12);
+    border:1px solid var(--navy-100);
+  }
+  .tab{ display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 16px; border-radius:16px; transition:background 150ms ease; }
+  .tab svg{ width:20px; height:20px; transition:color 150ms ease; }
+  .tab-label{ font-family:var(--font-soft); font-size:9px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase; transition:color 150ms ease; }
+  .tab.active{ background:var(--navy-800); }
+  .tab.active .tab-label{ color:var(--navy-50); }
+  .tab.active svg{ color:var(--gold-400); }
+  .tab:not(.active) .tab-label, .tab:not(.active) svg{ color:var(--navy-400); }
+
+  /* ---- shared app components ---- */
+  .eyebrow-label{
+    font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--neutral-600); text-align:center; display:block;
+  }
+  .data-hero{
+    font-family:var(--font-mono); font-weight:500; font-size:40px; letter-spacing:0.01em;
+    color:var(--navy-800); text-align:center; margin:10px 0 4px; font-variant-numeric:tabular-nums;
+  }
+  .hero-support{ text-align:center; font-size:13px; color:var(--neutral-600); margin-bottom:26px; }
+  .hero-support b{ color:var(--navy-800); font-family:var(--font-mono); font-weight:600; font-variant-numeric:tabular-nums; }
+
+  .quicklinks{ display:flex; gap:10px; margin-bottom:26px; }
+  .quicklink{
+    flex:1; background:#fff; border:1px solid var(--navy-100); border-radius:16px;
+    padding:14px 8px; text-align:center; font-family:var(--font-soft); font-size:10.5px;
+    font-weight:700; letter-spacing:0.01em; color:var(--navy-700);
+    box-shadow:0 6px 16px -8px rgba(20,42,61,0.16);
+  }
+  .quicklink svg{ width:18px; height:18px; display:block; margin:0 auto 6px; padding:6px; box-sizing:content-box; border-radius:10px; background:var(--gold-100); color:var(--gold-700); }
+
+  .card{ background:#fff; border-radius:20px; padding:18px; box-shadow:0 10px 28px -12px rgba(20,42,61,0.14); }
+  .section-title{ font-family:var(--font-soft); font-weight:700; font-size:15px; color:var(--navy-800); margin:0 0 4px; display:flex; align-items:center; gap:6px; }
+  .section-title svg{ width:14px; height:14px; flex:none; color:var(--gold-500); }
+  .section-sub{ font-size:12px; color:var(--neutral-600); margin:0 0 14px; }
+
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:999px;
+    font-family:var(--font-soft); font-size:11.5px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase;
+  }
+  .badge.pending{ background:var(--warning-100); color:var(--warning-700); }
+  .badge.blocked{ background:var(--error-100); color:var(--error-700); }
+  .badge.confirmed{ background:var(--success-100); color:var(--success-700); }
+  .badge.qualifying{ background:var(--info-100); color:var(--info-700); }
+
+  .btn{
+    display:flex; align-items:center; justify-content:center; height:52px; border-radius:16px;
+    font-family:var(--font-soft); font-weight:600; font-size:12.5px; letter-spacing:0.02em; text-transform:uppercase;
+    border:none; width:100%; cursor:pointer; transition:transform 120ms ease, box-shadow 120ms ease;
+  }
+  .btn-primary{ background:linear-gradient(180deg, var(--navy-700), var(--navy-800)); color:var(--navy-50); box-shadow:0 8px 20px -6px rgba(20,42,61,0.45); }
+  .btn-accent{ background:linear-gradient(180deg, #c9a63f, var(--gold-400)); color:var(--navy-900); box-shadow:0 8px 20px -6px rgba(184,151,46,0.45); }
+  .btn-ghost{ background:transparent; color:var(--navy-700); border:1.5px solid var(--navy-200); }
+  .btn:active{ transform:scale(0.98); }
+
+  /* calendar grid */
+  .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
+  .cal-dow{ font-family:var(--font-mono); font-size:9px; font-weight:600; color:var(--neutral-500); text-align:center; padding-bottom:6px; text-transform:uppercase; }
+  .cal-cell{
+    aspect-ratio:1; border-radius:6px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:12px; font-weight:500; font-variant-numeric:tabular-nums;
+    position:relative; color:var(--navy-700);
+  }
+  .cal-cell.available{ background:var(--navy-50); border:1px solid var(--navy-100); }
+  .cal-cell.booked{ background:var(--navy-100); border:1.5px solid var(--navy-500); color:var(--navy-800); font-weight:600; cursor:pointer; }
+  .cal-cell.held{ background:var(--warning-100); border:1.5px solid var(--warning-500); color:var(--warning-700); font-weight:600; cursor:pointer; }
+  .cal-cell.blocked{ background:var(--neutral-200); color:var(--neutral-500); cursor:pointer; }
+  .cal-cell.xmas{ background:var(--gold-100); border:1.5px solid var(--gold-400); color:var(--navy-900); font-weight:600; }
+  .cal-cell.selected{ box-shadow:inset 0 0 0 2px var(--navy-500); }
+
+  .cal-note{ margin-top:10px; padding:10px 12px; border-radius:12px; font-size:12px; line-height:1.5; display:flex; align-items:flex-start; gap:8px; }
+  .cal-note svg{ width:15px; height:15px; flex:none; margin-top:1px; }
+  .cal-note.blocked{ background:var(--neutral-200); color:var(--neutral-700); }
+  .cal-note.booked{ background:var(--navy-100); color:var(--navy-700); }
+  .cal-note.held{ background:var(--warning-100); color:var(--warning-700); }
+  .cal-note.capped{ background:var(--warning-100); color:var(--warning-700); }
+  .cal-note.invalid-range{ background:var(--error-100); color:var(--error-700); }
+  .cal-glyph{ position:absolute; bottom:2px; right:2px; width:5px; height:5px; border-radius:1.5px; }
+  .cal-glyph.booked{ background:var(--navy-500); }
+  .cal-glyph.held{ background:var(--warning-500); }
+  .cal-glyph.xmas{ background:var(--gold-400); }
+
+  .row{ display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--navy-100); }
+  .row:last-child{ border-bottom:none; }
+  .row-label{ font-size:14px; color:var(--neutral-700); }
+  .row-value{ font-family:var(--font-mono); font-size:14px; font-weight:500; color:var(--navy-800); font-variant-numeric:tabular-nums; }
+  .row-value.big{ font-size:17px; font-weight:600; }
+  .row-value.negative{ color:var(--error-700); }
+
+  .divider{ height:1px; background:var(--navy-100); margin:16px 0; }
+
+  .rule-group{ margin-bottom:20px; }
+  .rule-group h4{ font-family:var(--font-soft); font-size:12.5px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase; color:var(--gold-500); margin:0 0 8px; display:flex; align-items:center; gap:7px; }
+  .rule-group h4 svg{ width:15px; height:15px; flex:none; }
+  .rule-group p{ font-size:13.5px; color:var(--neutral-700); margin:0; line-height:1.65; }
+
+  /* ---- Boat Rules — visual redesign (cards/stats instead of paragraphs) ---- */
+  .rule-section-label{ font-family:var(--font-soft); font-size:11.5px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--gold-500); margin:22px 0 10px; }
+  .rule-section-label:first-child{ margin-top:0; }
+
+  .rule-highlight{ display:flex; align-items:center; gap:14px; background:var(--gold-100); border-radius:18px; padding:16px; margin-bottom:6px; }
+  .rule-highlight-icon{ width:44px; height:44px; border-radius:14px; background:var(--navy-800); color:var(--gold-400); display:flex; align-items:center; justify-content:center; flex:none; }
+  .rule-highlight-icon svg{ width:22px; height:22px; }
+  .rule-highlight-value{ font-family:var(--font-mono); font-weight:600; font-size:22px; color:var(--navy-800); font-variant-numeric:tabular-nums; }
+  .rule-highlight-value span{ font-family:var(--font-soft); font-weight:600; font-size:12px; color:var(--neutral-600); text-transform:uppercase; letter-spacing:0.02em; margin-left:4px; }
+  .rule-highlight-note{ font-size:12px; color:var(--neutral-600); line-height:1.5; margin-top:2px; }
+
+  .rule-cost-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .rule-cost-card{ background:#fff; border:1px solid var(--navy-100); border-radius:14px; padding:12px 14px; box-shadow:0 6px 16px -10px rgba(20,42,61,0.12); }
+  .rule-cost-card.highlight{ background:var(--gold-50); border-color:var(--gold-200); }
+  .rule-cost-label{ display:block; font-size:12px; color:var(--neutral-600); margin-bottom:6px; }
+  .rule-cost-value{ font-family:var(--font-mono); font-weight:600; font-size:19px; color:var(--gold-700); font-variant-numeric:tabular-nums; }
+  .rule-cost-value small{ font-family:var(--font-soft); font-weight:600; font-size:10.5px; color:var(--neutral-500); text-transform:uppercase; }
+
+  .rule-stat-row{ display:flex; gap:10px; }
+  .rule-stat{ flex:1; text-align:center; background:#fff; border:1px solid var(--navy-100); border-radius:14px; padding:14px 6px; }
+  .rule-stat-value{ font-family:var(--font-mono); font-weight:600; font-size:20px; color:var(--navy-800); font-variant-numeric:tabular-nums; }
+  .rule-stat-label{ font-size:10.5px; color:var(--neutral-600); margin-top:3px; line-height:1.3; }
+
+  .rule-compare{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .rule-compare-card{ border-radius:14px; padding:14px; text-align:center; }
+  .rule-compare-card.good{ background:var(--success-100); }
+  .rule-compare-card.bad{ background:var(--error-100); }
+  .rule-compare-icon{ width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
+  .rule-compare-card.good .rule-compare-icon{ background:var(--success-700); color:#fff; }
+  .rule-compare-card.bad .rule-compare-icon{ background:var(--error-700); color:#fff; }
+  .rule-compare-icon svg{ width:16px; height:16px; }
+  .rule-compare-title{ font-family:var(--font-soft); font-weight:700; font-size:12.5px; color:var(--navy-800); margin-bottom:2px; }
+  .rule-compare-desc{ font-size:11.5px; color:var(--neutral-600); }
+
+  .rule-checklist{ display:flex; flex-direction:column; gap:8px; }
+  .rule-check-item{ display:flex; align-items:flex-start; gap:10px; background:#fff; border:1px solid var(--navy-100); border-radius:12px; padding:11px 13px; box-shadow:0 5px 14px -10px rgba(20,42,61,0.12); }
+  .rule-check-icon{ width:20px; height:20px; border-radius:50%; background:var(--success-100); color:var(--success-700); display:flex; align-items:center; justify-content:center; flex:none; margin-top:1px; }
+  .rule-check-icon svg{ width:11px; height:11px; }
+  .rule-check-text{ font-size:12.5px; color:var(--neutral-700); line-height:1.5; }
+
+  .notif-row{ display:flex; gap:12px; padding:14px 0; border-bottom:1px solid var(--navy-100); align-items:flex-start; }
+  .notif-icon{ width:36px; height:36px; border-radius:12px; background:var(--navy-100); display:flex; align-items:center; justify-content:center; flex:none; }
+  .notif-icon svg{ width:17px; height:17px; color:var(--navy-700); }
+  .notif-icon.tint-gold{ background:var(--gold-100); }
+  .notif-icon.tint-gold svg{ color:var(--gold-700); }
+  .notif-icon.tint-warning{ background:var(--warning-100); }
+  .notif-icon.tint-warning svg{ color:var(--warning-700); }
+  .notif-icon.tint-info{ background:var(--info-100); }
+  .notif-icon.tint-info svg{ color:var(--info-700); }
+  .notif-title{ font-size:13.5px; font-weight:600; color:var(--navy-800); margin-bottom:2px; }
+  .notif-time{ font-family:var(--font-mono); font-size:11px; color:var(--neutral-500); }
+
+  .login-wordmark{ text-align:center; font-family:var(--font-mono); font-weight:600; font-size:14px; letter-spacing:0.16em; color:var(--navy-800); margin-bottom:10px; }
+  .login-tagline{ text-align:center; font-family:var(--font-body); font-style:italic; font-size:13.5px; color:var(--neutral-600); margin:0; line-height:1.55; padding:0 14px; }
+
+  .field-label{ font-family:var(--font-soft); font-size:11.5px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase; color:var(--neutral-600); margin-bottom:8px; display:block; }
+  .field-box{ background:#fff; border:1.5px solid var(--navy-200); border-radius:14px; padding:13px 14px; font-size:14px; color:var(--navy-800); margin-bottom:16px; font-family:var(--font-body); box-shadow:inset 0 1px 2px rgba(20,42,61,0.04); }
+  .toggle-row{ display:flex; gap:10px; margin-bottom:16px; }
+  .toggle{ flex:1; text-align:center; padding:12px; border-radius:14px; font-family:var(--font-soft); font-size:12.5px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; border:1.5px solid var(--navy-200); color:var(--navy-600); }
+  .toggle.on{ background:var(--navy-800); color:var(--navy-50); border-color:var(--navy-800); box-shadow:0 6px 14px -6px rgba(20,42,61,0.4); }
+
+  .empty-illo{ width:64px; height:64px; margin:40px auto 20px; }
+  .center-block{ text-align:center; }
+
+  .profile-avatar{ width:60px; height:60px; border-radius:20px; background:linear-gradient(160deg, var(--navy-700), var(--navy-900)); color:var(--gold-400); font-family:var(--font-soft); font-weight:700; font-size:20px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; box-shadow:0 10px 22px -8px rgba(20,42,61,0.5); }
+  .profile-name{ text-align:center; font-family:var(--font-soft); font-weight:700; font-size:18px; color:var(--navy-800); margin-bottom:3px; }
+  .profile-role{ text-align:center; font-size:12px; color:var(--neutral-500); margin-bottom:22px; }
+  .menu-row{ display:flex; align-items:center; justify-content:space-between; padding:15px 4px; border-bottom:1px solid var(--navy-100); font-size:14px; color:var(--navy-700); }
+  .menu-row svg{ width:16px; height:16px; color:var(--neutral-400); }
+  .menu-row.danger{ color:var(--error-700); }
+  .menu-row.danger svg{ color:var(--error-500); }
+
+  .sheet{ position:absolute; left:0; right:0; bottom:0; background:#fff; border-radius:24px 24px 0 0; padding:22px 20px 28px; box-shadow:0 -12px 32px -8px rgba(3,10,18,0.18); }
+  .sheet-handle{ width:36px; height:4px; background:var(--navy-200); border-radius:4px; margin:0 auto 18px; }
+
+  .gate-icon{ width:60px; height:60px; margin:8px auto 22px; border-radius:18px; background:var(--info-100); display:flex; align-items:center; justify-content:center; }
+  .gate-icon svg{ width:28px; height:28px; color:var(--info-700); }
+
+  /* ---- Payments & Invoices ---- */
+  .invoice-row{ display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid var(--navy-100); }
+  .invoice-icon{ width:36px; height:36px; border-radius:12px; background:var(--navy-100); display:flex; align-items:center; justify-content:center; flex:none; }
+  .invoice-icon svg{ width:17px; height:17px; color:var(--navy-700); }
+  .invoice-info{ flex:1; min-width:0; }
+  .invoice-title{ font-size:13.5px; font-weight:600; color:var(--navy-800); margin-bottom:2px; }
+  .invoice-date{ font-family:var(--font-mono); font-size:11px; color:var(--neutral-500); }
+  .invoice-amount{ text-align:right; flex:none; }
+  .invoice-value{ font-family:var(--font-mono); font-weight:600; font-size:14px; color:var(--navy-800); font-variant-numeric:tabular-nums; margin-bottom:4px; }
+
+  /* ---- Christmas Window ---- */
+  .xmas-year-card{ background:#fff; border:1px solid var(--navy-100); border-radius:16px; padding:14px; margin-bottom:12px; box-shadow:0 6px 16px -10px rgba(20,42,61,0.12); }
+  .xmas-year-label{ font-family:var(--font-soft); font-weight:700; font-size:12.5px; color:var(--navy-800); margin-bottom:10px; }
+  .xmas-window-row{ display:flex; gap:8px; }
+  .xmas-window{ flex:1; border-radius:12px; padding:10px; text-align:center; background:var(--navy-50); border:1px solid var(--navy-100); }
+  .xmas-window.assigned{ background:var(--gold-100); border-color:var(--gold-400); }
+  .xmas-window-name{ display:block; font-family:var(--font-soft); font-weight:700; font-size:10.5px; color:var(--neutral-600); text-transform:uppercase; letter-spacing:0.02em; margin-bottom:4px; }
+  .xmas-window.assigned .xmas-window-name{ color:var(--gold-700); }
+  .xmas-window-dates{ display:block; font-family:var(--font-mono); font-size:12px; color:var(--navy-800); font-variant-numeric:tabular-nums; }
+
+  /* ---- Modals (Sign out / Delete account) ---- */
+  .modal-overlay{ position:absolute; inset:0; background:rgba(9,11,14,0.5); display:flex; align-items:center; justify-content:center; padding:24px; z-index:60; }
+  .modal-overlay[hidden]{ display:none; }
+  .modal-box{ background:#fff; border-radius:22px; padding:26px 22px 22px; width:100%; max-width:290px; box-shadow:0 28px 56px -14px rgba(3,10,18,0.4); }
+  .modal-icon{ width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+  .modal-title{ font-family:var(--font-soft); font-weight:700; font-size:16.5px; color:var(--navy-800); text-align:center; margin-bottom:8px; }
+  .modal-body{ font-size:12.5px; color:var(--neutral-600); text-align:center; line-height:1.6; margin-bottom:20px; }
+  .modal-actions{ display:flex; flex-direction:column; gap:8px; }
+  .modal-actions .btn{ height:46px; }
+
+  /* ---- view toggle + interactive prototype ---- */
+  .view-toggle{ display:flex; gap:8px; margin-bottom:36px; }
+  .view-btn{
+    font-family:var(--font-soft); font-weight:700; font-size:13px; letter-spacing:0.01em;
+    padding:10px 18px; border-radius:999px; border:1.5px solid var(--page-border);
+    background:var(--page-surface); color:var(--page-text-soft); cursor:pointer;
+  }
+  .view-btn.active{ background:var(--navy-800); border-color:var(--navy-800); color:var(--navy-50); }
+
+  .proto-wrap{ display:flex; flex-direction:column; align-items:center; }
+  .proto-hint{ max-width:320px; text-align:center; font-size:12.5px; color:var(--page-text-soft); margin-top:18px; line-height:1.55; }
+
+  .proto-screen{ width:100%; flex:1; min-height:0; display:flex; flex-direction:column; }
+  .proto-screen[hidden]{ display:none; }
+  .back-btn{ position:absolute; left:14px; font-size:18px; color:var(--navy-600); background:none; border:none; padding:6px; cursor:pointer; font-family:inherit; line-height:1; }
+  .bell-btn{ position:absolute; right:14px; background:none; border:none; padding:6px; cursor:pointer; color:var(--navy-600); display:flex; }
+  .bell-btn svg{ width:20px; height:20px; }
+  .bell-dot{ position:absolute; top:5px; right:6px; width:7px; height:7px; border-radius:50%; background:var(--gold-400); border:1.5px solid #fff; }
+  .support-btn{ position:absolute; right:50px; background:none; border:none; padding:6px; cursor:pointer; color:var(--navy-600); display:flex; }
+  .support-btn svg{ width:19px; height:19px; }
+  .home-topbar{ display:flex; justify-content:flex-end; align-items:center; gap:2px; margin:-4px 0 2px; }
+  .home-topbar .bell-btn, .home-topbar .support-btn{ position:static; }
+  .cal-cell.selectable{ cursor:pointer; transition:box-shadow 120ms ease; }
+  .cal-cell.selectable:hover{ box-shadow:inset 0 0 0 1.5px var(--navy-300); }
+  button.tab, button.quicklink, .menu-row[onclick]{ cursor:pointer; background:none; border:none; font:inherit; }
+  button.tab{ flex-direction:column; }
+</style>
+
+<div class="wrap">
+  <div class="masthead">
+    <span class="eyebrow">Offshore Collective — Partner Mobile App</span>
+    <h1>Screen Design</h1>
+  </div>
+  <p class="lede">Twenty-one screens from the Partner Mobile App, rendered against the finished design system — <b>navy #142a3d + brass #b8972e</b> sampled from the client's own mark, IBM&nbsp;Plex&nbsp;Mono for every number, Quicksand for buttons and labels, Fraunces for reading copy. Try the click-through prototype below, or browse every screen and state in Gallery view.</p>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-chip" style="background:var(--navy-50);border-color:var(--navy-100)"></span>Available</span>
+    <span class="legend-item"><span class="legend-chip" style="background:var(--navy-100);border-color:var(--navy-500)"></span>Your booking</span>
+    <span class="legend-item"><span class="legend-chip" style="background:var(--warning-100);border-color:var(--warning-500)"></span>Held — pending approval</span>
+    <span class="legend-item"><span class="legend-chip" style="background:var(--neutral-200)"></span>Out of service</span>
+    <span class="legend-item"><span class="legend-chip" style="background:var(--gold-100);border-color:var(--gold-400)"></span>Christmas Window</span>
+  </div>
+
+  <div class="view-toggle">
+    <button class="view-btn active" data-view="prototype" onclick="setView('prototype')">▸ Prototype</button>
+    <button class="view-btn" data-view="gallery" onclick="setView('gallery')">Gallery — all 21 screens, grouped by stage</button>
+  </div>
+
+  <div id="prototypeView" class="proto-wrap">
+    <div class="phone proto-phone">
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+
+
+        <!-- PROTO: LOGIN -->
+        <div class="proto-screen" data-screen="login">
+          <div class="content" style="display:flex;flex-direction:column;padding:60px 28px 32px;">
+            <img src="data:image/png;base64,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" width="96" height="87" alt="Offshore Collective" style="display:block;margin:0 auto 18px;">
+            <div class="login-wordmark">OFFSHORE&nbsp;&nbsp;COLLECTIVE</div>
+            <p class="login-tagline">Your share of the water — booked fairly, every time.</p>
+            <span class="field-label" style="margin-top:48px;">Email</span>
+            <div class="field-box" style="color:var(--neutral-500)">david@kearneygroup.co.nz</div>
+            <span class="field-label">Password</span>
+            <div class="field-box" style="color:var(--neutral-500)">••••••••••</div>
+            <button class="btn btn-primary" style="margin-top:8px;" onclick="showScreen(&#39;home&#39;)">Sign In</button>
+          </div>
+        </div>
+
+        <!-- PROTO: HOME -->
+        <div class="proto-screen" data-screen="home" hidden>
+          <div class="content">
+            <div class="home-topbar">
+              <button class="support-btn" onclick="showScreen('support')" aria-label="Support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M6.5 6.5l2.7 2.7M17.5 6.5l-2.7 2.7M6.5 17.5l2.7-2.7M17.5 17.5l-2.7-2.7"/></svg></button>
+              <button class="bell-btn" onclick="showScreen('alerts')" aria-label="Notifications" style="position:relative;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/><path d="M10 20a2 2 0 004 0"/></svg>
+                <span class="bell-dot"></span>
+              </button>
+            </div>
+            <span class="eyebrow-label">Points Balance</span>
+            <div class="data-hero">5</div>
+            <svg width="48" height="10" viewBox="0 0 48 10" style="display:block;margin:0 auto 10px;color:var(--gold-400)" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 6c4-5 7-5 11 0s7 5 11 0 7-5 11 0 7 5 11 0 7-5 11 0"/></svg>
+            <div class="hero-support">Next: <b>Halcyon</b> · Fri 6 – Sun 8 Mar · 5 days away</div>
+            <div class="quicklinks">
+              <button class="quicklink" onclick="showScreen('calendar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Book</button>
+              <button class="quicklink" onclick="showScreen('checklist')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/></svg>Checklist</button>
+              <button class="quicklink" onclick="showScreen('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Invoices</button>
+            </div>
+            <div class="card" style="cursor:pointer" onclick="showScreen('confirmed')">
+              <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg>Upcoming — Halcyon</div>
+              <div class="section-sub">Rayglass 3000 · Weekend block</div>
+              <div class="row"><span class="row-label">Fri 6 Mar → Sun 8 Mar</span><span class="badge confirmed">Confirmed</span></div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <button class="tab active" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></button>
+            <button class="tab" onclick="showScreen('calendar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tab-label">Book</span></button>
+            <button class="tab" onclick="showScreen('rules')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><span class="tab-label">Rules</span></button>
+            <button class="tab" onclick="showScreen('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="tab-label">Profile</span></button>
+          </div>
+        </div>
+
+        <!-- PROTO: BOOKING CALENDAR -->
+        <div class="proto-screen" data-screen="calendar" hidden>
+          <div class="navbar"><button class="back-btn" onclick="showScreen('home')">‹</button>Booking Calendar</div>
+          <div class="content">
+            <div class="section-title" style="margin-bottom:14px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg>Halcyon · March</div>
+            <div class="cal-grid" id="booking-cal-grid">
+              <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+              <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell blocked" onclick="explainDate('blocked')">4</div><div class="cal-cell blocked" onclick="explainDate('blocked')">5</div>
+              <div class="cal-cell booked" onclick="explainDate('booked')">6<span class="cal-glyph booked"></span></div><div class="cal-cell booked" onclick="explainDate('booked')">7<span class="cal-glyph booked"></span></div>
+              <div class="cal-cell booked" onclick="explainDate('booked')">8<span class="cal-glyph booked"></span></div><div class="cal-cell available">9</div><div class="cal-cell available">10</div>
+              <div class="cal-cell available">11</div><div class="cal-cell held" onclick="explainDate('held')">12<span class="cal-glyph held"></span></div><div class="cal-cell held" onclick="explainDate('held')">13<span class="cal-glyph held"></span></div>
+              <div class="cal-cell available selectable" onclick="selectDate(this)">14</div><div class="cal-cell available selectable" onclick="selectDate(this)">15</div><div class="cal-cell available selectable" onclick="selectDate(this)">16</div><div class="cal-cell available selectable" onclick="selectDate(this)">17</div>
+              <div class="cal-cell available selectable" onclick="selectDate(this)">18</div><div class="cal-cell available selectable" onclick="selectDate(this)">19</div><div class="cal-cell available selectable" onclick="selectDate(this)">20</div>
+              <div class="cal-cell available selectable" onclick="selectDate(this)">21</div><div class="cal-cell available selectable" onclick="selectDate(this)">22</div><div class="cal-cell available selectable" onclick="selectDate(this)">23</div><div class="cal-cell available selectable" onclick="selectDate(this)">24</div>
+              <div class="cal-cell available selectable" onclick="selectDate(this)">25</div><div class="cal-cell available selectable" onclick="selectDate(this)">26</div><div class="cal-cell available selectable" onclick="selectDate(this)">27</div>
+            </div>
+            <div class="cal-note" id="cal-note" hidden></div>
+            <div class="divider"></div>
+            <div class="row"><span class="row-label">Selected</span><span class="row-value" id="cal-selected-label">Tap a date</span></div>
+            <div class="row"><span class="row-label">Points required</span><span class="row-value" id="cal-points-label">—</span></div>
+          </div>
+          <div style="padding:0 18px 18px;"><button class="btn btn-primary" onclick="goToReview()">Review Booking</button></div>
+        </div>
+
+        <!-- PROTO: REVIEW & CONFIRM -->
+        <div class="proto-screen" data-screen="review" hidden>
+          <div class="navbar"><button class="back-btn" onclick="showScreen('calendar')">‹</button>Review &amp; Confirm</div>
+          <div class="content">
+            <div class="card" style="margin-bottom:18px;">
+              <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg><span id="review-title">Halcyon — Single Day</span></div>
+              <div class="section-sub" id="review-dates">Sat 14 Mar</div>
+              <div class="divider"></div>
+              <div class="row"><span class="row-label">Points available</span><span class="row-value big" id="review-points-avail">5</span></div>
+              <div class="row"><span class="row-label">This booking uses</span><span class="row-value big" id="review-points-used">1</span></div>
+              <div class="row"><span class="row-label">Balance after</span><span class="row-value big" id="review-points-balance">4</span></div>
+            </div>
+            <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.6;">Points are deducted immediately on confirming. This trip won't refund points just because it isn't used.</p>
+          </div>
+          <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:8px;">
+            <button class="btn btn-accent" onclick="showScreen('confirmed')">Lock In These Dates</button>
+            <button class="btn btn-ghost" onclick="showScreen('home')">Cancel, Don't Book</button>
+          </div>
+        </div>
+
+        <!-- PROTO: CONFIRMED (post-booking detail) -->
+        <div class="proto-screen" data-screen="confirmed" hidden>
+          <div class="navbar"><button class="back-btn" onclick="showScreen('home')">‹</button>Booking</div>
+          <div class="content">
+            <svg width="44" height="10" viewBox="0 0 48 10" style="display:block;margin:12px auto 18px;color:var(--gold-400)" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 5h30l-6-4M32 5l-6 4"/></svg>
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+                <div><div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg>Halcyon</div><div class="section-sub">Rayglass 3000</div></div>
+                <span class="badge confirmed">Confirmed</span>
+              </div>
+              <div class="divider"></div>
+              <div class="row"><span class="row-label">Date</span><span class="row-value">Sat 14 Mar</span></div>
+              <div class="row"><span class="row-label">Points used</span><span class="row-value">1</span></div>
+              <div class="row"><span class="row-label">New balance</span><span class="row-value big">4</span></div>
+            </div>
+            <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.6;margin-top:14px;text-align:center;">Booked — see you on the water.</p>
+          </div>
+        </div>
+
+        <!-- PROTO: BOAT RULES -->
+        <div class="proto-screen" data-screen="rules" hidden>
+          <div class="navbar">Boat Rules<button class="support-btn" onclick="showScreen('support')" aria-label="Support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M6.5 6.5l2.7 2.7M17.5 6.5l-2.7 2.7M6.5 17.5l2.7-2.7M17.5 17.5l-2.7-2.7"/></svg></button><button class="bell-btn" onclick="showScreen('alerts')" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/><path d="M10 20a2 2 0 004 0"/></svg><span class="bell-dot"></span></button></div>
+          <div class="content">
+            <div class="rule-highlight">
+              <div class="rule-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
+              <div>
+                <div class="rule-highlight-value">58<span>pts / year</span></div>
+                <div class="rule-highlight-note">Resets on Halcyon's delivery anniversary — same date for all 6 owners</div>
+              </div>
+            </div>
+
+            <div class="rule-section-label">Booking Types &amp; Cost</div>
+            <div class="rule-cost-grid">
+              <div class="rule-cost-card"><span class="rule-cost-label">Regular day</span><span class="rule-cost-value">1 <small>pt</small></span></div>
+              <div class="rule-cost-card"><span class="rule-cost-label">Weekend block</span><span class="rule-cost-value">5 <small>pts</small></span></div>
+              <div class="rule-cost-card"><span class="rule-cost-label">Long weekend</span><span class="rule-cost-value">7 <small>pts</small></span></div>
+              <div class="rule-cost-card highlight"><span class="rule-cost-label">Christmas Window</span><span class="rule-cost-value">21 <small>pts</small></span></div>
+            </div>
+
+            <div class="rule-section-label">Timing Limits</div>
+            <div class="rule-stat-row">
+              <div class="rule-stat"><div class="rule-stat-value">60</div><div class="rule-stat-label">days advance</div></div>
+              <div class="rule-stat"><div class="rule-stat-value">2</div><div class="rule-stat-label">max held</div></div>
+              <div class="rule-stat"><div class="rule-stat-value">7</div><div class="rule-stat-label">days / trip</div></div>
+            </div>
+            <div class="rule-checklist" style="margin-top:10px;">
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Bookings open 60 days ahead, first-confirmed — there's no priority order or rotation.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">No new booking within 7 days after finishing a 7-day trip.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Long weekends are capped at 2 per rolling 12 months.</span></div>
+            </div>
+
+            <div class="rule-section-label">Fairness</div>
+            <div class="rule-checklist">
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Named public holidays prioritise partners who haven't had that holiday yet.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">An unclaimed weekend reopens to everyone at midnight Friday, priced day-by-day instead of the block rate.</span></div>
+            </div>
+
+            <div class="rule-section-label">Cancellation</div>
+            <div class="rule-compare">
+              <div class="rule-compare-card good">
+                <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></div>
+                <div class="rule-compare-title">48h+ before</div>
+                <div class="rule-compare-desc">Full refund</div>
+              </div>
+              <div class="rule-compare-card bad">
+                <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+                <div class="rule-compare-title">Under 48h / no-show</div>
+                <div class="rule-compare-desc">Points forfeited</div>
+              </div>
+            </div>
+
+            <div class="rule-section-label">Christmas Window</div>
+            <div class="rule-compare">
+              <div class="rule-compare-card good">
+                <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></div>
+                <div class="rule-compare-title">14 days+ before</div>
+                <div class="rule-compare-desc">Full refund</div>
+              </div>
+              <div class="rule-compare-card bad">
+                <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+                <div class="rule-compare-title">Under 14 days</div>
+                <div class="rule-compare-desc">Points forfeited</div>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--neutral-600);line-height:1.55;margin:10px 2px 0;">A longer window than a regular booking's 48-hour rule, since releasing early gives the boat's other 5 partners time to book the reopened dates.</p>
+
+            <div class="rule-section-label">Towing — Rayglass 2400 Only</div>
+            <div class="rule-checklist">
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Your dates are held, pending Matt's approval of the destination, before the booking confirms.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">A towing disclaimer must be acknowledged in the pre-departure checklist.</span></div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <button class="tab" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></button>
+            <button class="tab" onclick="showScreen('calendar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tab-label">Book</span></button>
+            <button class="tab active" onclick="showScreen('rules')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><span class="tab-label">Rules</span></button>
+            <button class="tab" onclick="showScreen('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="tab-label">Profile</span></button>
+          </div>
+        </div>
+
+        <!-- PROTO: NOTIFICATIONS -->
+        <div class="proto-screen" data-screen="alerts" hidden>
+          <div class="navbar"><button class="back-btn" onclick="showScreen('home')">‹</button>Notifications</div>
+          <div class="content">
+            <div class="notif-row">
+              <div class="notif-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/></svg></div>
+              <div><div class="notif-title">Booking confirmed — Halcyon, 6–8 Mar</div><div class="notif-time">2 hours ago</div></div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-icon tint-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6L4 10l6-1z"/></svg></div>
+              <div><div class="notif-title">Halcyon is ready — TMP confirmed launch</div><div class="notif-time">Yesterday</div></div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-icon tint-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+              <div><div class="notif-title">Payment due — Q1 management fee</div><div class="notif-time">3 days ago</div></div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-icon tint-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/></svg></div>
+              <div><div class="notif-title">A weekend just reopened on Halcyon</div><div class="notif-time">5 days ago</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROTO: PROFILE -->
+        <div class="proto-screen" data-screen="profile" hidden>
+          <div class="navbar">Profile<button class="support-btn" onclick="showScreen('support')" aria-label="Support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M6.5 6.5l2.7 2.7M17.5 6.5l-2.7 2.7M6.5 17.5l2.7-2.7M17.5 17.5l-2.7-2.7"/></svg></button><button class="bell-btn" onclick="showScreen('alerts')" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/><path d="M10 20a2 2 0 004 0"/></svg><span class="bell-dot"></span></button></div>
+          <div class="content">
+            <div class="profile-avatar">DK</div>
+            <div class="profile-name">David Kearney</div>
+            <div class="profile-role">Halcyon · Rayglass 3000</div>
+            <div class="card" style="margin-bottom:20px;">
+              <div class="row"><span class="row-label">Qualification</span><span class="badge confirmed">Approved</span></div>
+              <div class="row"><span class="row-label">Secondary operator</span><span class="row-value" style="font-family:var(--font-body);font-weight:400;color:var(--neutral-500);">Not set</span></div>
+            </div>
+            <div class="menu-row" onclick="showScreen('payments')" style="cursor:pointer;">Payments &amp; Invoices <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            <div class="menu-row" onclick="showScreen('christmas')" style="cursor:pointer;">Christmas Window <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            <div class="menu-row" onclick="showScreen('support')" style="cursor:pointer;">Support <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            <div class="menu-row" onclick="showScreen('legal')" style="cursor:pointer;">Terms &amp; Privacy <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            <div class="menu-row" onclick="openModal('logout')" style="cursor:pointer;">Sign out <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            <div class="menu-row danger" onclick="openModal('delete')" style="cursor:pointer;">Delete Account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+          </div>
+          <div class="tabbar">
+            <button class="tab" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></button>
+            <button class="tab" onclick="showScreen('calendar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tab-label">Book</span></button>
+            <button class="tab" onclick="showScreen('rules')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><span class="tab-label">Rules</span></button>
+            <button class="tab active" onclick="showScreen('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="tab-label">Profile</span></button>
+          </div>
+        </div>
+
+        <!-- PROTO: CHECKLIST -->
+        <div class="proto-screen" data-screen="checklist" hidden>
+          <div class="navbar"><button class="back-btn" onclick="showScreen('home')">‹</button>Pre-Departure Checklist</div>
+          <div class="content">
+            <span class="field-label">Is the tank full?</span>
+            <div class="toggle-row"><div class="toggle">Yes</div><div class="toggle on">No</div></div>
+            <span class="field-label">Litres reading</span>
+            <div class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">142</div>
+            <span class="field-label">Photo of fuel gauge</span>
+            <div style="height:90px;border:1.5px dashed var(--navy-300);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;color:var(--navy-400);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+            </div>
+            <span class="field-label">Any damage?</span>
+            <div class="toggle-row"><div class="toggle on">No</div><div class="toggle">Yes</div></div>
+          </div>
+          <div style="padding:0 18px 18px;"><button class="btn btn-primary" onclick="showScreen('home')">Submit Checklist</button></div>
+        </div>
+
+        <!-- PROTO: PAYMENTS & INVOICES -->
+        <div class="proto-screen" data-screen="payments" hidden>
+          <div class="navbar"><button class="back-btn" onclick="showScreen('profile')">‹</button>Payments &amp; Invoices</div>
+          <div class="content">
+            <div class="invoice-row">
+              <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+              <div class="invoice-info"><div class="invoice-title">Q1 2026 Management Fee</div><div class="invoice-date">Invoiced 3 Jan 2026</div></div>
+              <div class="invoice-amount"><div class="invoice-value">$1,850.00</div><span class="badge confirmed">Paid</span></div>
+            </div>
+            <div class="invoice-row">
+              <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22c5-4 8-8 8-12a8 8 0 10-16 0c0 4 3 8 8 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+              <div class="invoice-info"><div class="invoice-title">Fuel Reimbursement</div><div class="invoice-date">Invoiced 14 Feb 2026</div></div>
+              <div class="invoice-amount"><div class="invoice-value">$42.00</div><span class="badge confirmed">Paid</span></div>
+            </div>
+            <div class="invoice-row">
+              <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+              <div class="invoice-info"><div class="invoice-title">Q2 2026 Management Fee</div><div class="invoice-date">Invoiced 2 Apr 2026</div></div>
+              <div class="invoice-amount"><div class="invoice-value">$1,850.00</div><span class="badge pending">Due</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROTO: CHRISTMAS WINDOW -->
+        <div class="proto-screen" data-screen="christmas" hidden>
+          <div class="navbar"><button class="back-btn" onclick="showScreen('profile')">‹</button>Christmas Window</div>
+          <div class="content">
+            <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.65;margin:0 0 18px;">Your assignment for each year of your term — set once by Matt at delivery. 21 points are deducted upfront and the dates appear as your confirmed booking.</p>
+            <div class="xmas-year-card">
+              <div class="xmas-year-label">Year 1 · 2026</div>
+              <div class="xmas-window-row">
+                <div class="xmas-window assigned"><span class="xmas-window-name">Window 1</span><span class="xmas-window-dates">20–27 Dec</span></div>
+                <div class="xmas-window"><span class="xmas-window-name">Window 2</span><span class="xmas-window-dates">27 Dec–3 Jan</span></div>
+              </div>
+            </div>
+            <div class="xmas-year-card">
+              <div class="xmas-year-label">Year 2 · 2027</div>
+              <div class="xmas-window-row">
+                <div class="xmas-window"><span class="xmas-window-name">Window 1</span><span class="xmas-window-dates">20–27 Dec</span></div>
+                <div class="xmas-window assigned"><span class="xmas-window-name">Window 2</span><span class="xmas-window-dates">27 Dec–3 Jan</span></div>
+              </div>
+            </div>
+            <div class="xmas-year-card">
+              <div class="xmas-year-label">Year 3 · 2028</div>
+              <div class="xmas-window-row">
+                <div class="xmas-window assigned"><span class="xmas-window-name">Window 1</span><span class="xmas-window-dates">20–27 Dec</span></div>
+                <div class="xmas-window"><span class="xmas-window-name">Window 2</span><span class="xmas-window-dates">27 Dec–3 Jan</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROTO: SUPPORT -->
+        <div class="proto-screen" data-screen="support" hidden>
+          <div class="navbar"><button class="back-btn" onclick="showScreen('profile')">‹</button>Support</div>
+          <div class="content">
+            <div class="card" style="text-align:center;padding:24px 18px;">
+              <div class="profile-avatar" style="background:var(--gold-100);color:var(--navy-800);box-shadow:none;">MF</div>
+              <div class="profile-name">Matt Flanagan</div>
+              <div class="profile-role">Offshore Collective</div>
+              <div class="divider"></div>
+              <div class="row"><span class="row-label">Phone</span><span class="row-value">021 555 0142</span></div>
+              <div class="row"><span class="row-label">Email</span><span class="row-value" style="font-size:11.5px;">matt@offshorecollective.co.nz</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROTO: TERMS & PRIVACY -->
+        <div class="proto-screen" data-screen="legal" hidden>
+          <div class="navbar"><button class="back-btn" onclick="showScreen('profile')">‹</button>Terms &amp; Privacy</div>
+          <div class="content">
+            <div class="rule-section-label" style="margin-top:0;">Terms &amp; Conditions</div>
+            <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.65;">Legal text provided by Offshore Collective — placeholder until final copy is supplied by the client.</p>
+            <div class="rule-section-label">Privacy Policy</div>
+            <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.65;">Legal text provided by Offshore Collective — placeholder until final copy is supplied by the client.</p>
+          </div>
+        </div>
+
+        <!-- MODAL: SIGN OUT -->
+        <div class="modal-overlay" id="modal-logout" hidden>
+          <div class="modal-box">
+            <div class="modal-icon" style="background:var(--navy-100);color:var(--navy-700);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></div>
+            <div class="modal-title">Sign out?</div>
+            <div class="modal-body">You'll need to sign back in to book trips or check your points.</div>
+            <div class="modal-actions">
+              <button class="btn btn-primary" onclick="showScreen('login'); closeModal('logout');">Sign Out</button>
+              <button class="btn btn-ghost" onclick="closeModal('logout')">Stay Signed In</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODAL: DELETE ACCOUNT -->
+        <div class="modal-overlay" id="modal-delete" hidden>
+          <div class="modal-box">
+            <div class="modal-icon" style="background:var(--error-100);color:var(--error-700);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.5 17a2 2 0 001.7 3h15.6a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></div>
+            <div class="modal-title">Delete your account?</div>
+            <div class="modal-body">Since you co-own a share in Halcyon, account closure can't happen instantly here — this sends a request to Matt, who'll confirm the financial and legal steps with you directly.</div>
+            <div class="modal-actions">
+              <button class="btn" style="background:var(--error-700);color:#fff;" onclick="closeModal('delete')">Send Closure Request</button>
+              <button class="btn btn-ghost" onclick="closeModal('delete')">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <p class="proto-hint">Tap the tab bar, Book, or Review &amp; Confirm to navigate — this is a working click-through of the primary booking flow. Other states (blocked, pending, error, offline…) are in Gallery view.</p>
+  </div>
+
+  <div id="galleryNav" class="gallery-nav" hidden></div>
+  <div id="galleryView" class="gallery" hidden>
+
+    <!-- ============ M02 LOGIN ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content" style="display:flex;flex-direction:column;padding:60px 28px 32px;">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAAoMElEQVR42u2de5ydVXX3f2vtfeaae2aG+0UMJDMhQBmQQCY5CRflJlbrSWt9qVRrC4Ja22rft684jNq3rdTaCiJva6uorZqjr1WRi7fkJAPlNkUS5iTBiETRQGYm5DL3s/de7x/PM8kEAvOcyczJzJn1/XyiIknmnP08v73WXntdAEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEU5MlTe3y3DSO+eft+xoUGQbRKgTQCIvqbKzNiMMhmDdNqW2ffi6DtlTJlvuMrMtMAZgwyAbNaP/n8XLr7kRLbmdPFyKgwdLwHzQEhBZGp+Z6JAhEEB9yCE3zD5ncOp1HP7nsrtPez3pdMWuVwAEPT1VWhaCxfZMOJizmlaviAllauIwhUCXAyRM5nNLDBPv68mApEAiOwGkBeiTYzwYFedeRS5nIu+fsYgmxUVsgp4+rmUaAXQFgCgfmnLiiB8A0iuZTLHgwiQAAkySgnT7hxJIDIgAhGDiCAhQCB5CNYRua92dT7881FCDnpWVgFPA6ObMSOu8oIlq65gpg8TyRVgAwkekOAhEBAYICqDI4JEuxEERIaIiZgRvO8Twn+A3ad7tjy8fZRH4vWVVgFP1c9JAMKCpasaWeivifFWgCDBC0Q8iGZCkCdAJIDIkrEQ7/tB+GwYGvybPTse2z96g1NmBmZ6nHXzAYAsbFr15wz8BxlzjgQXEEKIfUyeIRFair+rIHgPQiWbVIsY/p2qhlN/Nrjh/p8BrQzk9M1WCzwFiCKu7rhzLm5wLvVvxthrgneRqxxZ3JmOQMQTGwsCQgh/3ZPf9NFDsQINcKmAj7F465suOU9gv0nGvF5cwc0QV7lYHQeAwCbFIbjviHPX92x/+ICei8sfnsriXbj0kjVCdj0xjYjXqniPuA8zAA6uUCA2byFrf3T8opb6SLytrOujFrj04m26+FKiinsJUi1BXeYi7pAd2ZQV77bYYbnshR3tXZGI29SdVgGjFMkZfuHSVRcS4SckmCUSPKDiHaeIHyfwpV35XH98T6x3xepCT+ZnyfoFZy4/iYD/JKFZElS840zLtOJcgUzqwoDwNQAB6bTGDqDXSJNZiMCorze1g3w/sWmS4I/WbR7JwoqylIimSQ4lPIAAghxVMgrBIIQC21Rjdd2JqYEnNv0I6bTFzp3qSqsLPTnn3rqmltvJVPyFuOGRgNV4ROAhAJgNUZyQJTiY0DSlHwRRHI+KtRw8IOLiu18e9zWTsdbL8Jv2dD78A032UAFPSnpk3ZKWNFmzQYJ3wHjEKyGKx1oGEcS7HgEeJchjEN4KCS+K4f6pa3uFEMJcw3RyEFpGhOUQNJO1FQgBsUcyjoQVCUSGJMjzhQo6Z99Tq/drnbEKeAJ/fistWvRoam+q90kyplGCD4fMUOK33xMbAyKIhPYA/EtFKtz/wk/bu6bzw6lb0nIWDL8dgveQMWdI8MB4IvIijmyFFTf8ue6t7beoFVYBT6j1Xdi48i/Y2ttH3fUWkewPIWNZgn86ED625+mN3z70r1sZ6Q3RZpBrmPoWJwNgd9xBJJfzI1ayvik9K1C4iUB/RcTzxLvxrFMAEUjogq587qea5KECxgREwOWEs9ILCyZsB9O8uNieEgd8wCBmCiH8Y0V13//e1dHRfzAgVh4ldox0mkdqgOsaV50Jxt3E5tKiNzsRTzZlxA0/0L31oavQ2spo07thaBQa4w1cGezcGSobTv1LtvZK+GKiziKIAlQuQN69J7/xU727dhWQyRjk8wH5vJRNrnMUNSak07b/iY3d/V07v1pTd0o92dRFEO8SHzeIGOIDsT2ztuGUH/Vnv/LLeL30LKz3wOOw/Lmcm3/G5XMJuFGClzhAk9AdJAHgAf+2PZ0bvxz3waIyPtdJZIWjtMju/KabxRX+lkzKQsQV8bcEMEMEHwYANDWpeNUCj/PaaOfOUHvCSTewtb8L70MR1tcTWwPx/6M73/7/0Nycwn/9l5sZjysnI+vX/8SmH9bUnXIc2dRFCN4l2gCj1h4A+PU1dad9vf+bX+4ZOcqoFNQCF/Ee5gIAIpF3Q0QSn8RFPJmUDd59ojvf/jU0N6fQ0VHATCshzOU8MhnTnT/+/cG7h8hYCxGfyPMR8WRMSij8QbwZaLGDCrgYWhlAmL941dlgvkCCR6J0ySghwQRf+K+ere2tSKctOjocZmodcLZJgKx3DteLhAMgpkSWlIgRAkgoEyfQaCRaBVyM+xxd6xiS3yY2nNByCIhIJDiH8L7ICjXM8GSEtoB02u57ZtMvRHwbGcNx6uiYz1wkBGJevGC3b47WMKP55irgotxnCMmVEAEogQMdWV8WCV/el3/4p8joHeahu+JWnj88+87g3M/JGB7JSBtjPQOYQZCrok11txY5qIAT/7xQt2TlCQDOiwzGmMEXAZGR4Icp4O+iaLNGTw+uTXoD79jxwBCAvwcxQRK00SFQtHnSmtGbqqICxhiZV/FOL81sbA1CCGMmbkTWlyTID7q3tT+DTEaL019hhUGugr8uvtANZjv20YJYJIAE58xpWr4grthSK6wCHoM4TVBILojL+0KybDEBgb4CgA6mGiqHrHAmw/ueyu2F0PeIDRLEFQgiQmzmVVJqSby7ajRaBTyWtYjykYloWeKXk9mI9/sHPf3k4BWKcqSNkQT4DkSSpciK+CipQ5bqOVgFnJBsFMASOmOkkeLYpXAMCP6795lctyYdvGZgUJj40eBdH5hN4nUSWqwLqAJGwsIJqW9KzwLkeBGJK9hfuxw9KnKXJzTpAK89sQGgrnzuBRCeiXu/S8K81NMARDOJFRXwWJVP3mAeQHOLsaMB1KmPCmMFCDlerGfiLiQhWSRajouco6wKWAWcRI0ymwhViTw8AkMEJPKraVPTe2zPwSDGL5NvqAIC5o2y4ooK+NVojX6gDzUgGkn7o7Hy/uLrjr36qJC00LK7CP1CBNWjMrE0kKUCfjXy0b0Rk6Hk7wlBBB5+KPpHTeBIIMvBortXNnVqKqUKOLGJoHFMDlHhJm4JXXSUnpp02VTAiqKogBVFUQErigpYURQVsKIoKmBFUVTAiqICVhRFBawoigpYUVTAiqJMP6wuAaZwXUKGD2t109AQN3Rve+Xv7upioJVFfkzFJpv39fVxvJnT0XU8aQWQp8PGpDY0SFxrrOWKKuAZ4BGl04zc6hB13sx65BL+yXx+GGgD08qhIhUoO3fuHJyYjx9vLFm8+kysXIPErZW0QEUFXC6M1ONmfdTfKof5zZfPTQ0NN0mQs7zIEgZOAaFaBLUEpEAkL6vsIhB5D5xKwSPBsDiKBzmcUNfY8hMQhXFVisVl2xCh6O/AgJAMEKgHRNsR8IxJybYXN2/6xcic40NiPjTEXFEBT1PhZsPIlInjFqdPDwZvFgqXS//QG4T5eBhz2AhJGqPVFYmMTFgZS4wUq76KjFkzkZ7/YT48CbzzQ3VNK7cI8UZI+H7P0uNzyGZd3ArIlMkwdhXwzAoetgJo8wBQ17jqapC8x1F4o2E7C8IAe4gEgfP+CN2sXrVDXdztpKjgpATnJ6hD9Sv/F4EBqiQ2FzDRBSL4s7rOF7ZQU/prEsKXurPZXaOErC2DVcBTvvlc/KK2oa5x1dVC+Agxp0EEeI/gCi42Yxz/d/JnNO6GOGQmrm3hq01jciKCACJDxMvAvAyQDy1cuuruikLfZ3dls92j/ga1xnqNhKkYVTbIZn3dkpaz6pauypLh7zNzWoIL4goeEAGRjc+vVF7fnTjejEjEB3EFB0K9YXNrIVXbUd+08oZYuDotUQU81WiNG9Jn/cLGlTeSMU8Qm7dLcCFyX4nLULSv2SMJRBYiElzBEehUGPvFhU2rvrdg0RtOBrIe6bR6hyrgqRKoagv1TelZdUtXfZWt/byIzI4sLvGEua/T1TITWZEg4gqOjbmWK6serW9quRK5nFMRq4CnQpTZz29acaoAPyG27xRXcLGrrG7iy4UcWeMTQea+hY0tN40Ssba7VQEfg2AVovOuIbOJmC4UN+xGzoG6QEe8T7YiPogEYZu6a+HSlo/HItbNTgVcYsubzfq5Z618HQw/SMSnineuqIjyzFUxAyBxBcecurWuceVH1Z1WAZd4TbP++EUt9TaFB4n4dPHOq3iLdqmNuIIjaz/xMndaUQFP4ouXyRCam1OFCnyT2Z4ZW14zYcO8k/2arL9XJvEzHFnE3nlic+f8pSvfhFzORUcTRQU8GaTTBtmsX9hf8zk2FavEucJRWt4AEQcRf3DuAiX4VfzZkyb0VzR4KfrskKPJdx75u8iA1jUsazkjSrts1fcWmok1GRlWrq5x5e+Ste+NA1apcRpaDwGIjYFhjtIdPURkgAT9Ahk+gg0lEIRAtQDmFPOzJEgXaAKsppAhQjUgtcSWQcQQgQQPiLhx3nUzQvBkUnO8D18EsAaZPCF7tKWPKmBl9EuWzcrCxZecCKLPS/AhToUsVgFRFQJbE4t2J7y/n0CPImBzMOgKLL0V3hRe/ieHK2CrpKLgCoM3sbW3R5lOr2n9AxFzEP98rcVvDXhTCL5AbFLjFkUIBeJUVU1ww3MBd4YInw+SywGkyaaseB/tRMUeKYiM+IJjW7FqYePKP+/JZm/X3GkV8ERaX0I264n5b8iY+QnEc6RsYU9sDIgQQsgJyR0G/GBXPteb8BRL+whS37RyoNhd46Il7fuzWUyUGA4AeBHAMwAeAPB/5i9etYzJ3UCg95BNzRXvwiH3uBgRuwBC67zGi9ftzWZ/GR8Bg56BlaMuTliwZMVysLl+fBFn8WRTJkCegfi39+Q3rt7TuelbXflcL9JpG0VfW0d3zXjlrwua4zxjKTrI8+STi0bupl/97y/uFyOTMSNJGC9t37ilp3PTnxc8nReC/yIxM4hopO4x+ajZIGxsrSHzKQCCTIbU9VOOjmw0s5hBnyAmgkix0d9AJmVC8P8iQ4MXdnVu+lYczY7Oi7mciwrh20JsbY4c9Z01SwDIOMaLoqKiYqIj0AHZrI8L+CXuNGL3bc8919O58d1B3HUQ7CZj+VCALrkVJuK1C89OXxC50DM7Kq0CPupsq7ZQv3jlJWTMZZGLl/h8FwmODUtwH+rp3PjHe3Y8tj+2WhKf78olSBNiMTPSadvT+dD3CMMrRMLTZK0pSsQigciAvP+r6BmoBVbGS1NkfcXIR8BMkMTnMQHgiQ0H72/q7tz0jwdzfke3nSk/wkhCRlf+kR0kdIWE0EnGmsTuNJGV4ARE181vXLE02uhm7rWSCvho1q6tLcw9a+XrQHSleJe8QEHEk7FWgrutZ+umu9HcnBrlbpY/B0Wce8FDrhIJLxAbGonCJ1w/w0TvjaxwnlTACopM2mAAsEb+kNhWxm4gJXr5bMqKL3ynO9/ehubmFDo63Ixbv1jEL3Vu+pXAv0NGGmgl2cSITHS3TL83/4zL58bHDVIBK8W8gB7IGAL9DiQg4b2vgJnEux6CuREAoaNj5nZmjEXc0/nQBgn+n4pwpQkheDbmOKoeuOxgFpwKWEERHTYazt61FExLJARJtJYigdiwiNzalc+9EL90QTfCVmYyt4p3vwGbpHe7AiLhQG8GEDWQVwErydznDXF6I11DbBJehUggY1hcYdtxdMK/AuC4L/JMR5DewF35XC8CbidmgkgSN5olBAJw+QnNzTUz1Y1WAY/LaqwO0Zsn6fjeN8HZFwHEBMI/5PPZ4fgMrd0XD1phUHBD/ybO7QazSbA2DAlCbE4eGqg5O/q/MqwCVhJUyLSFk09eXg3gbBFJcv4VMFvxrquQMtn4ukit72FWOG327Hhsv5D8B7FBIq9GxIMZJNIceUa71QIrY55/CQCG5vBiEJ8ICTKmBY7ynBGAB/c9lduLTEat7yuscIMAIAnyDQmJg4IjO+pF0GskpbjzLy8hNpQ4ahr5fPcBoIOT+5RRRONVFrjZT0oIzxLx2MEswkjqauMoV1wFPKn+pwleijI+BEs2NdUWTphOTzhFQOIc3iEn/mEAEg0wmxyCUGWRNbw+X18fpogbbXfseGAIQA7MGHtzPJh7fsKiRVdWjgyXUQFPClHaYXAymDjwAwlEBAl+bvTPUyfjhgSvSywRYgjkN3trhn8z6aNDCPMTZ3MSQITBUembU8Otp9CZ+DGIQAj1e6oH6tWFnlTa4rcZBwAZSvTCCAKYIcwnTZkgRXRWgwAnxp9+rPOvgAgEehYdHYV4zWXy3n2cgmIUDNl/tJOVJoz4LpfEbIXIa41xG3U0ERBxlfGoGx2jUAFPhosEgIZq9wpoP4pp3SRhydRZssiTIEJVQh1K/F13jU7BnKSrGAjLmYlefjn4/ndhqlzBxKWZEHkh8p6TZbcRCD64qqnmpZXlGfilZ3+0n4DdUe+zMS/sKf7P80ffvx5bYk9CUFWk3do/uVdbkLnLWuaT0OKEL79E+sUvp84VTLy2KdsXJ3NQshgDQCZ+HupCT6YFzpjo3ZfnAAbGimYRcZS0jgsXLr5kdlzUTsc82BK1h6gsLrgkBzB5dckMgKzD+WR4PiQkXicmPIMpdykc+gQYTPYVIp0bb1IzsT64tBY43uUJ1Bk/G0nQRiWwsQ3BmkviThVT5eqLivzNk+c9RNdSAtA1IEaiumQCQwRBkB99tp8KmyMGBvYD0pdshYkgAY5C5OFkVcAleEzUkVgE0VBomCDv0OSHV5FiLudPOy1dRSRvQ7IkCAGYg3f9JJSPD6BTRcC8Z8dj+yG0nYhljKskAQgiYV8NuZ+Nuk9WAU9SoCUAANvwhHhXiAvgJVHtJ9Fb65vSx0eNvTUB5bBm8oD0zwrXENvTJHg/9vqIUNRXLt+9bdOueCMNU6nOGpB/BzEBFF67sN+QgH7wfP6RPXEfMVEBYxJbqgC0e0v7cyLYGiXbjJnJRAjBkbFzAtwt8YW/ChiHXb2QBPlIYsc+8mpEBBunXC1tFE3nipqBe8QVtpOxKYgUjiBeB2YjwQ8K5DYAdDCKrQKedIsRCPhhfF5L1oHB+0Aw719w7qUnjTxktb5pi2zW1zWuypBNvUG884kGhkfnXxLI/VOwllaAVuzq6OhnI2shYRfZVOpg8UJU5CBkrCWQILgb9uTb89E1WFtQAZfost6zfDtKWk/0GQgShIyZQ4XCZ9QKx88utzrMb758Lgh/LyFIwrlIAcQswf26smbg4ejYONXOjW0BaOXdT7dvHh72LRL8fwJUIGMNmZQhYpIgj4v3l3ZvffgbI4PU9RqpFMSF1y/VmUcR/HaihB0YonGTno3JLFiy4l3I5Ryam1MzVr7NzQZoC6Z/8C4y5hQEH4roCgKAvrOro6P/YBvbKUdbAMD7ftb+bHfnxreKd8sI4W3iCu8Q5gu687k3dG9rz81k8QLHarRKOm2Qyzk0tnwFzJ+ESzhLiIjFe8/Gfn5BY8u2PR3tj8ZN4QozTLwpdHQU6pa0fIhs6veLGuUSdbIQIfrSFLo+eq2YCQNAz/aHtwPYjle0Nmrz2he69IGKAAChwn0peNeXsAPDSO4fEVBNxN+d37hiKTo6CjPIEhPSaYuOjsKCJSv+gKz5h3iUiyli/hJJCA/3dG58PBLAlLde4aCQD45raeWRxgrQ0SrH6KFkMmbPU4/8mgT/HtfVJnyRiCX4wEwNhs2PGpasWI6OjkJ8hcDlPQUCglzO1TetvNlYe4+EEEbNM0o+Cxi4fXRtM6ZLU/iD41raguYEHOuC/ijkT8T2U+LdUOxCS2I30PtAoOODMT+pa1z5nvhsHUbt0OVhcTMZA7Qysll/wgnNNXVLV90JNnfG4i1iwl/UDD34wn/3nL3p3ripnlMJqIDHH6TIZLirc/3PBXL3OAZdsYgPEFSTNV+oa1r5rQVNLU2jdujI3RwRwMRM3aOix2IeXrtH6O197al+aOVDn3tkRlJbqGtcdVVhfs0jxObm6LqoyM8hB4cC/xWy8DrZr2watB3zn08nNy2fN4DUViKqiwuUuDhtSCCTMuLdIITuEUNf6Hk698RkfvC6xpbHyNgLJYxx9yriyKZs8MN/3ZN/6KPF/IyTT15ePTC34nIS3EzMbwIE4n3xA7KjaRBGXOF73Vvbr9Ph2CrgCZ+vu7Bp5TvZ2K+Oazj2yCU/kSFjEVUwyeMg+rEEeSQg7LBke4aNHzrajyveERkr1uPHzPa3EgvYuc84K5/wBtZ4uCP9vYZStQw6XkSaiLACgkuZzeujkmgvUfklcfFBIBIhGbCOl724PbdzSqVOKtNcwKNEXNfY8k2yqd8Zt4iBKPmdyBAbgCgqXgweItJLoAm8bpI5xVhCgQyS0MBrVXgIUSURVUf3tABCQHxMkKKt7ss2ECkU/qR7W/s/q/VVAU/aWXxO0/J5Faj4byI6TcSHcVibw9p4RDm/cbk3TfBXFSl+qSnJOVVGKnAkDuzxUXzGEev/9Z6tm96BdNpq4EoFPFlm2ABZv3DpxRcSUu0Q2ChlesKUJ8d47aSkz0TERSNMw2YCrejKr+4H2kSvX1TAk0jaAjlXt6Tl98jar40qjdOIabFBK2OMiPzauKGWF7c/+ly8jnruhV4jTSLRuMnube1fD97fRGzi6X2iL17x4t3DhXD1i9sffS6+ktI1LEOm3kzVnTsD0mk78MTGx6rrTnqB2V4XVSOJL2bcxgwVb+Q2i7wAL1d2bW//qQatVMDHUMSbHq+tOzkP4muIuRIhOBXxq0bfPdmUFQl5+HBl97b2p5FOW9x3n4pXXehjN729K9+eFQyvliDb2aZslK2lLvVh998gYpuy4sO3Cxxaure1P4NMxmjEGRrEwlToOpHLubmnpeelZslniPiG+G7XHfU1y/RWbog6U6SMeN8HhFu78+2fwaEyO93kVMCYUldMALCwseW3ifmTxGYpQoAE7+O7Xp4hrnIAgYgtA0AI4ftB/F++tPWhzlFjW/SqSAU8FT9rhoGsP/nk5dWDc+yNIP4AsTl9JNsKIm6UmKmsRBtVUkYZZhBICA+JyO09Wzd9Z7Snoq+0Cnj6WOPFl8wmY98BkhsAujie7B697yLhZT2FJ/a7UtGbRIjHhSRN9iBQlEFGZKLO8MH1kuAHEPpC99aN978sjqEuswp4WtXJ8ujrkbplK8+Hp2sFcjkBy4h4HpgnLRcriqVJcXo/WPJMiZ5G7FX8GkRPiMj9XuwDe7eu33mkzUxRAU9nIR/WoaHh7EuPC254CZgXQ+QMQE4A0WyBVEzUIDEStIB57qghXK81nZAkhJ8DtBUkR0qqiEajCAbBtIeEfi2QHRSwlZif6crnenFYH6g8qXAVoKxSFFsZ6Q0c94ye9CBOXdOKR4hTFxVRTtjWs3XTbeM+NqR3U9xLTF1lBce2KyUmqcNH7uDLHQW8Ro/MbGiQiRl8tZuABoHsskVGoiqBjMGiAxY7Zh852JQ5OKgMh8aptgmQ9cjpy6qUtYBfftqdtJc+ngTYIkX+oegznZQm7HjgyO7vKzYYVa2CaZqJpSiKClhRVMCKoqiAFUVRASuKogJWFBWwoigqYEVRVMCKogJWFEUFrCiKCnjKQuSL++1lm3euqICnXwmmAINF/Smhubp0igr4mNMaq1iGiunyIcAcAFFZo6KogI8RmfyIBe5LNHeNQFHrHTkVAOLuIYoCrQc+FhwquN+ZrNMWUdzL7owTmptrdnV09B+qKS4/1q07FtM+Mli7dma2GFIBj/cgLPhFYi9HghBRg++tfT2ALeUs4LVrcQyElIVaYCUZ8RlWWH5BIpGLnGRioE3ZIMOXAnga6TTH/a3KAmkFUxvCg3cta05V8N8MDYdBKsEMK4FIpWEueHnmTTdt/pAIGAShGdTYXgVc9Gafldis5sX7AohSr90rdiTmJQDoagD/FPW6KqN2OW2Q1lbwwIHhZzCn8pT6+RVLegc8DNNk902CBMHs2fbq+z53Ti/R5lvXr09brJk5De51cPa4e2JlTF3jC53EvFgkhDECgiMWYYjIn93V+fCzQCuV0/yidRmYtVn479+xbFlVFT/mvbAXYZLJfceEIAxIVaVJ7e/zb3nz+7d8d31r2q5pmxki1ij0eDb+TNRQXUieAjNeNgHi1SywJ2OrJPAfARCkN5TV2q/Nwq9vTdtr3r9ly9Cw//tZNaYi8kvITOYvAlkBmYKXUF3FX7r3rmVnrGnLOWmdGe+2Chjjj0ST0A8SezJERoIXEP9Jw9mXHhefgctq/Ve35fy6dTCL3OAn9/f5rVWVxoqUpI81FwpBUpbmp4i+sW5dU0V2aYZEyt/DVAFjXLOLAwB4xg+CdwPR8KIxAyeEEAIZM9/5oY8BCEinuczOFgJkcNYHdwyJyJ+IAEylCSgRkekb8G52rblgVhd/bu3arN9wW9qogBUccVAZwC91bvoVII8TG0ngRkdW2DvPbG6sP6tlBXI5F7nj5XSNlPXrW9P2qvdt2TQwGO6aVWuMBCnJ1RIT2X19zs2dlfqj79+x7I/WtOXc+ta0VQErOMLgcY7d6C+DiIoJuxCIJUVfmrusZX6UmdVaXq70bTkvrWDyVf+rd8D/srKCWUo1EkbI9A96X1XFd37/jrMvWNOWc+vWZYwKWHm5G+0BoNDP3xJf6AYzJ5tbRCzBe2K7yHr+CgCJ06u5fAq1INmlGbr6g4/t9w63GEtEkFCin03OCzFTZaqCv7H+M+fO6+zMSmuZBrVUwEcTjU6n7b6dub1C9BViQ4nc6BFX2hUcG3NNXeOqr6KtLRpaVkbu9IgrffXNm7/X1x++NqvG2lK50kTEA0Pe1VSZM4Yq5UttbQirkWa9B1aOtAHKvMY1pxpyeQKq4jWlhEOGHdmUleC/4wf63vXSsx37kE7bUk1YnGxGrN4lx51TxwZPM9PC4YIQUWneOxFxc2dbu2efu/XaW7Z8shzvh9UC4yiDWZkM7926ficF3EPGcjT5O7GpsOIKjti8xVTXPlTflG5BLudGrHs0wHv6brJtbQhLl2boTe/bvLvgwp9VVjCDxJfQlzcH+ryrrTaf+N4d57xpTVvOSZmdh9UCT5AVXnDu8hO5kOoEaDYgVNTaingyxohIEMFnxdCn92zJPX/w32cy5mAV1ISNSUUpioTiCupO05bNF+69c9kDc2fbN/b2OU9EpkRjKkPKEAHS3d/vLrjuT/O/HMndVgEriCPSFrmcW9i48sNsU58SN+xAVOT1hQSAmIyFBL8HwL+T0LquejwSW+XpnnsKeX7JwvYfVnQODFOD94ISutK+tsaawUH/0N4Fi9PRnpgNRNP/mKICnqh1zGR40ZMH7EsVvQ8z2/PFO4/xWBkRD2ZDbIAQIBK2CfBTiDwJol9TwF5hDECEplFYWmoqgvlVjxn8+O/2vveyZeH6/X3BE5WudjiIuHmzrd2733326pu3fLBczsMq4IkL2TDQFuY3rlhq2DwBQQoQHucaC0Q8iAwRE5hHC3wax7cIw4WAj6/txXmnF9A3ePhXK4EtdrXV1u7bX7j+2g88/dVyELEKeELPfBmDbNbXNa58D1n7BXGuAELqqANlo6+nCATQtHxuTMBAgfiMBo+/e+eBkv98EUjKIhDR0OBgWH7N+7dsGamiUgErLz8P/4OxqQ8FV5gIEZcNhoF9/YTrVw3iXekB7OsnmBJa4SASaioNDxXC1grn3rC6K9OP29pkup6Hjb5SE8zOnYJ02g48sfH+qrqTl7BNnYsQCiBd65ETQIUFtj5vce5pDsfPCyh4KplPQUQ07IKbU2uP6yvg9Wd+ZF12NdL2ntzOoAJWDokYrTzQNfDtmrp955KtaFIRj3KlGRgsEJ7vMVhzdiE61pc0pkY8VAhuzix7TubyhgNXfOSxh9aty5hsNi/qQiuHrW1zc7PdOVDzDTKpt8bXS0bX/ZAr/ceXD+DtFw2id4jAVNrzsGEEawjDw7jiypufWj8d74dVwCVI8gAgdU0rP0fGvk+8w0iEeabvbi4As6sFd/zhflRXAF5K+0KKiK+pNtw/ELZf+eLmpbgN0+4srKmUk183DADcnd90cygUbgaoj4w1EHGYQd0TX82NXrlkGHNrBC6U3poQk0QdguVvqQ0Bt7WS5kIrR2yeiEzG9Gxrv4tduAQSNpJNWSKimShkImBgmHB6vcfvtwyWNIg1OrFjTq2x/QP+jqvft+WedZmMobbp12RQXWiU/ooJABY2rryRmD7KbE4KwQMh+OhpEJf7c2EC+ocJH3t7L5afWcCBgdJeJYmIr602ZmAwPFzxwvz06qUNgmmaWqkWGCVtAuDi7hvUs3XT3YMFOi+EcCuA35BNGWJr4g6WLq5qCuVmnQ0DBwYIbzxnCBcfC/ECIWWZhwuhW4L/vTVtOYfO7LS9B1YLjGObtQUAs5dctrCS3dsE8k6CrIzKEqP6hjgJK0CmdQ7lQde54InnzxL+9PUHMLta4HxJ88qECL4yxXZwIFx15S2bH5ju6ZQq4ClQBDEiZACYvyR9NkNWEeFSEM4HwgnEpgrEZeA6E3oHAj587QFctmwY+0vvOru5s6x9aX/hY9fc8vQnNBdambjnkE6bl3fiWLToysru1NDxVgqng82JoFALj1kyDVMzrSXe149C5qLB9HuvGL6ubyAEotId4aKglbUH+t29V9205c1ajaRg0qqa0hsYuQYBymtkZk0F8MN/PnvzYMEuK7hQssb2IhIqKww7H54b9nL+4y9u2QdEHUNUwMpkPx8CMoT07mn7rN51Ouw99+QGv3vHOf9cN8++d9/+gicuUUcOgViDwIZCb19Y9ZYPbnlk3bqMKZd5wipgBZM78DsSy713LltVU2VyhULwUsIcfIG4OTXW7u31N11z8+a7y62xnV4jKZN5ZUMAcN99iyqtobuJgFImXI2ce/f3uS+Xo3hVwMqksqE1bdauzXp5tubWObW2cWDQeyrdudfXVhnb1++fOjBQe+O6dRmz+rach/aFVpQk84IzZm026++989zzqqvkMe/AQVCSLDMRiLUkBPT3D/oLr/vA09vKqROlWmClBPfbgLSCrZHPW8MpH6RkBoNYfGWKedCFd1/3gae3tbambTmKFwCsvmvKhFvAdRmmtVl/3x3L/nRurVm+v885KrrN7lF0n5yVsnv3Fz597c1bsuV47lUXWpk88baC0Qb50V3LXkeWN4tItfMoyTgVEfGzaqzpH/Qb3rhr82UbkObVt+V8OfR/VhdaKQnZpRkiQArA5yoruNZ5kZKIFwgVKebBofDiQMG8k9ogG5AL5SxeFbCCybjzve+uZe+aU2uv7B1wrhQjVAQQJggRUCiEd/72+5/8zbp1GW4r03OvnoEVTMYkwrVrs/6+fz2vPuXC7YND3pOABJPbpkYEBIibXWtTe3vd/7z6li0/Xt+atmvWZt1MWHcVsDIhLM1nCMgShvzdc+am6vcecEileNJjLT4I5tSmUi8dcP959fu2/F25B62gQSxlMgJX1Ibw4P895yJD9F3vZSiImEl/w6L7XkbAL0Cpqy//4479cd2xqIAVpUjWfzFdNd+8ZDa/CBxXop9ZUe1ozS353pHUTZrBjQIVZTpPfKAZ23xcUaazkOKWPGp5FUVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRFEVRlEnj/wPlrU1FMZDFVgAAAABJRU5ErkJggg==" width="96" height="87" alt="Offshore Collective" style="display:block;margin:0 auto 18px;">
+          <div class="login-wordmark">OFFSHORE&nbsp;&nbsp;COLLECTIVE</div>
+          <p class="login-tagline">Your share of the water — booked fairly, every time.</p>
+          <span class="field-label" style="margin-top:48px;">Email</span>
+          <div class="field-box" style="color:var(--neutral-500)">david@kearneygroup.co.nz</div>
+          <span class="field-label">Password</span>
+          <div class="field-box" style="color:var(--neutral-500)">••••••••••</div>
+          <button class="btn btn-primary" style="margin-top:8px;">Sign In</button>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M02 · Entry</div>
+        <div class="screen-name">Login</div>
+        <div class="screen-note">Credentials only, no biometric per current scope. Sign-in failure shows a plain-language error without naming which field was wrong.</div>
+      </div>
+    </div>
+
+    <!-- ============ M03 HOME ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content">
+          <div class="home-topbar">
+            <button class="support-btn" aria-label="Support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M6.5 6.5l2.7 2.7M17.5 6.5l-2.7 2.7M6.5 17.5l2.7-2.7M17.5 17.5l-2.7-2.7"/></svg></button>
+            <button class="bell-btn" aria-label="Notifications" style="position:relative;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/><path d="M10 20a2 2 0 004 0"/></svg>
+              <span class="bell-dot"></span>
+            </button>
+          </div>
+          <span class="eyebrow-label">Points Balance</span>
+          <div class="data-hero">5</div>
+          <svg width="48" height="10" viewBox="0 0 48 10" style="display:block;margin:0 auto 10px;color:var(--gold-400)" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 6c4-5 7-5 11 0s7 5 11 0 7-5 11 0 7 5 11 0 7-5 11 0"/></svg>
+          <div class="hero-support">Next: <b>Halcyon</b> · Fri 6 – Sun 8 Mar · 5 days away</div>
+          <div class="quicklinks">
+            <div class="quicklink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Book</div>
+            <div class="quicklink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/></svg>Checklist</div>
+            <div class="quicklink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Invoices</div>
+          </div>
+          <div class="card">
+            <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg>Upcoming — Halcyon</div>
+            <div class="section-sub">Rayglass 3000 · Weekend block</div>
+            <div class="row"><span class="row-label">Fri 6 Mar → Sun 8 Mar</span><span class="badge confirmed">Confirmed</span></div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tab-label">Book</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><span class="tab-label">Rules</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="tab-label">Profile</span></div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M03 · Core</div>
+        <div class="screen-name">Home / Dashboard</div>
+        <div class="screen-note">Signature Moment #1 — Data Hero + Eyebrow Label. Balance is the first thing seen, zero taps, per persona David.</div>
+      </div>
+    </div>
+
+    <!-- ============ M21 HOME — EMPTY (NO UPCOMING BOOKING) ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content">
+          <div class="home-topbar">
+            <button class="support-btn" aria-label="Support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M6.5 6.5l2.7 2.7M17.5 6.5l-2.7 2.7M6.5 17.5l2.7-2.7M17.5 17.5l-2.7-2.7"/></svg></button>
+            <button class="bell-btn" aria-label="Notifications" style="position:relative;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/><path d="M10 20a2 2 0 004 0"/></svg>
+            </button>
+          </div>
+          <span class="eyebrow-label">Points Balance</span>
+          <div class="data-hero">5</div>
+          <svg width="48" height="10" viewBox="0 0 48 10" style="display:block;margin:0 auto 10px;color:var(--gold-400)" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 6c4-5 7-5 11 0s7 5 11 0 7-5 11 0 7 5 11 0 7-5 11 0"/></svg>
+          <div class="center-block">
+            <svg class="empty-illo" viewBox="0 0 64 64" fill="none" stroke="var(--navy-300)" stroke-width="1.8" stroke-linejoin="round">
+              <rect x="10" y="10" width="30" height="30" rx="9"/>
+              <rect x="24" y="24" width="30" height="30" rx="9" stroke="var(--navy-500)"/>
+              <path d="M40 46l10 10M50 56v-9h-9" stroke="var(--gold-400)" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+            <div style="font-family:var(--font-mono);font-weight:600;font-size:16px;color:var(--navy-800);margin-bottom:8px;">Nothing booked yet</div>
+            <p style="font-size:13.5px;color:var(--neutral-600);line-height:1.6;margin:0 0 22px;padding:0 8px;">Your next trip starts here.</p>
+            <button class="btn btn-primary" style="margin-bottom:26px;">Book a Trip</button>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tab-label">Book</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><span class="tab-label">Rules</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="tab-label">Profile</span></div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M21 · Core</div>
+        <div class="screen-name">Home — Empty (No Upcoming Booking)</div>
+        <div class="screen-note">Signature Moment #2 — line-art rendering of the icon's interlocking squares with its gold chevron breaking free toward the Book tab, instead of a generic "no bookings" icon. Points balance still renders normally; only the next-booking line and card are replaced.</div>
+      </div>
+    </div>
+
+    <!-- ============ M04 BOOKING CALENDAR ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar">Booking Calendar</div>
+        <div class="content">
+          <div class="section-title" style="margin-bottom:14px;">Halcyon · March</div>
+          <div class="cal-grid">
+            <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+            <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell blocked">4</div><div class="cal-cell blocked">5</div>
+            <div class="cal-cell booked">6<span class="cal-glyph booked"></span></div><div class="cal-cell booked">7<span class="cal-glyph booked"></span></div>
+            <div class="cal-cell booked">8<span class="cal-glyph booked"></span></div><div class="cal-cell available">9</div><div class="cal-cell available">10</div>
+            <div class="cal-cell available">11</div><div class="cal-cell held">12<span class="cal-glyph held"></span></div><div class="cal-cell held">13<span class="cal-glyph held"></span></div>
+            <div class="cal-cell available selected">14</div><div class="cal-cell available selected">15</div><div class="cal-cell available">16</div><div class="cal-cell available">17</div>
+            <div class="cal-cell available">18</div><div class="cal-cell available">19</div><div class="cal-cell available">20</div>
+            <div class="cal-cell available">21</div><div class="cal-cell available">22</div><div class="cal-cell available">23</div><div class="cal-cell available">24</div>
+            <div class="cal-cell available">25</div><div class="cal-cell available">26</div><div class="cal-cell available">27</div>
+          </div>
+          <div class="divider"></div>
+          <div class="row"><span class="row-label">Selected</span><span class="row-value">14–15 Mar</span></div>
+          <div class="row"><span class="row-label">Points required</span><span class="row-value">1</span></div>
+        </div>
+        <div style="padding:0 18px 18px;"><button class="btn btn-primary">Review Booking</button></div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M04 · Core</div>
+        <div class="screen-name">Booking Calendar</div>
+        <div class="screen-note">Signature Moment #3 — rounded-square date-state glyphs echo the brand mark. 5 states shown: available, your booking, held, blocked, and the gold Christmas Window treatment (see legend).</div>
+      </div>
+    </div>
+
+    <!-- ============ M08 BOOKING REVIEW ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="back">‹</span>Review &amp; Confirm</div>
+        <div class="content">
+          <div class="card" style="margin-bottom:18px;">
+            <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg>Halcyon — Weekend Block</div>
+            <div class="section-sub">Fri 6 Mar → Sun 8 Mar</div>
+            <div class="divider"></div>
+            <div class="row"><span class="row-label">Points available</span><span class="row-value big">10</span></div>
+            <div class="row"><span class="row-label">This booking uses</span><span class="row-value big">5</span></div>
+            <div class="row"><span class="row-label">Balance after</span><span class="row-value big">5</span></div>
+          </div>
+          <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.6;">Points are deducted immediately on confirming. This trip won't refund points just because it isn't used.</p>
+        </div>
+        <div style="padding:0 18px 18px;"><button class="btn btn-accent">Lock In These Dates</button></div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M08 · Detail</div>
+        <div class="screen-name">Booking Review &amp; Confirm</div>
+        <div class="screen-note">The one CTA per screen allowed to use the rare gold accent (component.button-accent). Numbers use typography.dataInline for tabular alignment.</div>
+      </div>
+    </div>
+
+    <!-- ============ M22 BOOKING BLOCKED ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content" style="background:var(--navy-50);opacity:0.5;">
+          <div class="section-title" style="margin-bottom:14px;">Halcyon · March</div>
+          <div class="cal-grid">
+            <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+            <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell available">4</div><div class="cal-cell available">5</div><div class="cal-cell available">6</div><div class="cal-cell available">7</div>
+          </div>
+        </div>
+        <div class="sheet" style="top:520px;">
+          <div class="sheet-handle"></div>
+          <span class="badge blocked" style="margin-bottom:14px;">Blocked</span>
+          <div style="font-family:var(--font-mono);font-weight:600;font-size:16px;color:var(--navy-800);margin-bottom:8px;">Not enough points</div>
+          <p style="font-size:14px;color:var(--neutral-700);line-height:1.6;margin:0 0 20px;">This booking needs <b style="font-family:var(--font-mono);color:var(--navy-800)">7 points</b>, but you only have <b style="font-family:var(--font-mono);color:var(--navy-800)">5</b> left.</p>
+          <button class="btn btn-ghost">Choose Different Dates</button>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M22 · System</div>
+        <div class="screen-name">Booking Blocked — Insufficient Points</div>
+        <div class="screen-note">Every block names the specific rule and the exact shortfall — never a generic "can't book this," per the WBS requirement.</div>
+      </div>
+    </div>
+
+    <!-- ============ M22 BOOKING BLOCKED — 60-DAY WINDOW ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content" style="background:var(--navy-50);opacity:0.5;">
+          <div class="section-title" style="margin-bottom:14px;">Halcyon · March</div>
+          <div class="cal-grid">
+            <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+            <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell available">4</div><div class="cal-cell available">5</div><div class="cal-cell available">6</div><div class="cal-cell available">7</div>
+          </div>
+        </div>
+        <div class="sheet" style="top:520px;">
+          <div class="sheet-handle"></div>
+          <span class="badge blocked" style="margin-bottom:14px;">Blocked</span>
+          <div style="font-family:var(--font-mono);font-weight:600;font-size:16px;color:var(--navy-800);margin-bottom:8px;">Too far ahead</div>
+          <p style="font-size:14px;color:var(--neutral-700);line-height:1.6;margin:0 0 20px;">These dates are more than <b style="font-family:var(--font-mono);color:var(--navy-800)">60 days</b> away. You can book them once they're within the 60-day window.</p>
+          <button class="btn btn-ghost">Choose Different Dates</button>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M22 · System</div>
+        <div class="screen-name">Booking Blocked — 60-Day Window</div>
+        <div class="screen-note">Names the rule and tells the partner exactly when they can try again, per `14-ux-writing.md` — actionable, not just a block.</div>
+      </div>
+    </div>
+
+    <!-- ============ M22 BOOKING BLOCKED — 2-BOOKING / 7-DAY CAP ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content" style="background:var(--navy-50);opacity:0.5;">
+          <div class="section-title" style="margin-bottom:14px;">Halcyon · March</div>
+          <div class="cal-grid">
+            <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+            <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell available">4</div><div class="cal-cell available">5</div><div class="cal-cell available">6</div><div class="cal-cell available">7</div>
+          </div>
+        </div>
+        <div class="sheet" style="top:520px;">
+          <div class="sheet-handle"></div>
+          <span class="badge blocked" style="margin-bottom:14px;">Blocked</span>
+          <div style="font-family:var(--font-mono);font-weight:600;font-size:16px;color:var(--navy-800);margin-bottom:8px;">Booking limit reached</div>
+          <p style="font-size:14px;color:var(--neutral-700);line-height:1.6;margin:0 0 20px;">You can hold up to <b style="font-family:var(--font-mono);color:var(--navy-800)">2 bookings</b> at a time, or one booking of up to <b style="font-family:var(--font-mono);color:var(--navy-800)">7 days</b>. Cancel or complete an existing booking first.</p>
+          <button class="btn btn-ghost">Choose Different Dates</button>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M22 · System</div>
+        <div class="screen-name">Booking Blocked — 2-Booking / 7-Day Cap</div>
+        <div class="screen-note">States both halves of the rule since either can trigger this block (2 held bookings, or 7 consecutive days), plus the specific unblocking action.</div>
+      </div>
+    </div>
+
+    <!-- ============ M22 BOOKING BLOCKED — 7-DAY BACK-TO-BACK ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content" style="background:var(--navy-50);opacity:0.5;">
+          <div class="section-title" style="margin-bottom:14px;">Halcyon · March</div>
+          <div class="cal-grid">
+            <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+            <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell available">4</div><div class="cal-cell available">5</div><div class="cal-cell available">6</div><div class="cal-cell available">7</div>
+          </div>
+        </div>
+        <div class="sheet" style="top:520px;">
+          <div class="sheet-handle"></div>
+          <span class="badge blocked" style="margin-bottom:14px;">Blocked</span>
+          <div style="font-family:var(--font-mono);font-weight:600;font-size:16px;color:var(--navy-800);margin-bottom:8px;">Too soon after your last trip</div>
+          <p style="font-size:14px;color:var(--neutral-700);line-height:1.6;margin:0 0 20px;">You can't book again until <b style="font-family:var(--font-mono);color:var(--navy-800)">7 days</b> after your last trip ends, to give the boat a break between long bookings.</p>
+          <button class="btn btn-ghost">Choose Different Dates</button>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M22 · System</div>
+        <div class="screen-name">Booking Blocked — 7-Day Back-to-Back</div>
+        <div class="screen-note">Names the rule and briefly explains its purpose — the "why" reduces the feeling of an arbitrary block, matching the calm, explain-don't-just-block tone.</div>
+      </div>
+    </div>
+
+    <!-- ============ M22 BOOKING BLOCKED — LONG-WEEKEND CAP ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content" style="background:var(--navy-50);opacity:0.5;">
+          <div class="section-title" style="margin-bottom:14px;">Halcyon · March</div>
+          <div class="cal-grid">
+            <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+            <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell available">4</div><div class="cal-cell available">5</div><div class="cal-cell available">6</div><div class="cal-cell available">7</div>
+          </div>
+        </div>
+        <div class="sheet" style="top:520px;">
+          <div class="sheet-handle"></div>
+          <span class="badge blocked" style="margin-bottom:14px;">Blocked</span>
+          <div style="font-family:var(--font-mono);font-weight:600;font-size:16px;color:var(--navy-800);margin-bottom:8px;">Long weekend limit reached</div>
+          <p style="font-size:14px;color:var(--neutral-700);line-height:1.6;margin:0 0 20px;">You've already used your <b style="font-family:var(--font-mono);color:var(--navy-800)">2 long weekends</b> for this rolling 12-month period.</p>
+          <button class="btn btn-ghost">Choose Different Dates</button>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M22 · System</div>
+        <div class="screen-name">Booking Blocked — Long-Weekend Cap</div>
+        <div class="screen-note">Precise about the cap (2) and the timeframe (rolling 12 months) — no ambiguity about when it resets.</div>
+      </div>
+    </div>
+
+    <!-- ============ M22 BOOKING BLOCKED — NAMED-HOLIDAY FAIRNESS ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content" style="background:var(--navy-50);opacity:0.5;">
+          <div class="section-title" style="margin-bottom:14px;">Halcyon · March</div>
+          <div class="cal-grid">
+            <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+            <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell available">4</div><div class="cal-cell available">5</div><div class="cal-cell available">6</div><div class="cal-cell available">7</div>
+          </div>
+        </div>
+        <div class="sheet" style="top:520px;">
+          <div class="sheet-handle"></div>
+          <span class="badge blocked" style="margin-bottom:14px;">Blocked</span>
+          <div style="font-family:var(--font-mono);font-weight:600;font-size:16px;color:var(--navy-800);margin-bottom:8px;">Not your turn for this holiday yet</div>
+          <p style="font-size:14px;color:var(--neutral-700);line-height:1.6;margin:0 0 20px;">Named public holidays are held for a partner who hasn't had them yet. Check back closer to the date, or pick different ones.</p>
+          <button class="btn btn-ghost">Choose Different Dates</button>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M22 · System</div>
+        <div class="screen-name">Booking Blocked — Named-Holiday Fairness</div>
+        <div class="screen-note">Newly authored for this pass — no prior copy existed for this rule in `14-ux-writing.md`. Applies the same named-rule, explain-don't-just-block pattern as the other 5 variants.</div>
+      </div>
+    </div>
+
+    <!-- ============ M20 QUALIFICATION PENDING ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content center-block" style="display:flex;flex-direction:column;justify-content:center;height:100%;">
+          <div class="gate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <div style="font-family:var(--font-mono);font-weight:600;font-size:19px;color:var(--navy-800);margin-bottom:12px;">Almost there</div>
+          <p style="font-size:14.5px;color:var(--neutral-700);line-height:1.7;padding:0 8px;margin:0 0 28px;">Matt is confirming your Powerboat Training NZ certification. Booking opens automatically the moment he does — no action needed from you.</p>
+          <button class="btn btn-ghost">Read the Boat Rules</button>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M20 · System</div>
+        <div class="screen-name">Qualification Pending Gate</div>
+        <div class="screen-note">Written for persona Priya's first session — reassures rather than blocks; info-blue, not warning-amber, per the deliberate color decision in the color system.</div>
+      </div>
+    </div>
+
+    <!-- ============ M09 BOOKING DETAIL (towing, pending) ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="back">‹</span>Booking</div>
+        <div class="content">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+              <div><div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg>Windward</div><div class="section-sub">Rayglass 2400 · Towing</div></div>
+              <span class="badge pending">Pending Approval</span>
+            </div>
+            <div class="divider"></div>
+            <div class="row"><span class="row-label">Dates</span><span class="row-value">22–23 Mar</span></div>
+            <div class="row"><span class="row-label">Destination</span><span class="row-value">Kawau Island</span></div>
+          </div>
+          <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.6;margin-top:14px;">Your dates are held while Matt reviews the destination. You'll be notified the moment it's approved.</p>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M09 · Detail</div>
+        <div class="screen-name">Booking Detail — Towing</div>
+        <div class="screen-note">Written for persona Grant's edge case: an unambiguous "held, not lost" status so it never reads as rejected.</div>
+      </div>
+    </div>
+
+    <!-- ============ M05 BOAT RULES ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar">Boat Rules<button class="support-btn" aria-label="Support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M6.5 6.5l2.7 2.7M17.5 6.5l-2.7 2.7M6.5 17.5l2.7-2.7M17.5 17.5l-2.7-2.7"/></svg></button><button class="bell-btn" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/><path d="M10 20a2 2 0 004 0"/></svg><span class="bell-dot"></span></button></div>
+        <div class="content">
+          <div class="rule-highlight">
+            <div class="rule-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
+            <div>
+              <div class="rule-highlight-value">58<span>pts / year</span></div>
+              <div class="rule-highlight-note">Resets on Halcyon's delivery anniversary — same date for all 6 owners</div>
+            </div>
+          </div>
+
+          <div class="rule-section-label">Booking Types &amp; Cost</div>
+          <div class="rule-cost-grid">
+            <div class="rule-cost-card"><span class="rule-cost-label">Regular day</span><span class="rule-cost-value">1 <small>pt</small></span></div>
+            <div class="rule-cost-card"><span class="rule-cost-label">Weekend block</span><span class="rule-cost-value">5 <small>pts</small></span></div>
+            <div class="rule-cost-card"><span class="rule-cost-label">Long weekend</span><span class="rule-cost-value">7 <small>pts</small></span></div>
+            <div class="rule-cost-card highlight"><span class="rule-cost-label">Christmas Window</span><span class="rule-cost-value">21 <small>pts</small></span></div>
+          </div>
+
+          <div class="rule-section-label">Timing Limits</div>
+          <div class="rule-stat-row">
+            <div class="rule-stat"><div class="rule-stat-value">60</div><div class="rule-stat-label">days advance</div></div>
+            <div class="rule-stat"><div class="rule-stat-value">2</div><div class="rule-stat-label">max held</div></div>
+            <div class="rule-stat"><div class="rule-stat-value">7</div><div class="rule-stat-label">days / trip</div></div>
+          </div>
+          <div class="rule-checklist" style="margin-top:10px;">
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Bookings open 60 days ahead, first-confirmed — there's no priority order or rotation.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">No new booking within 7 days after finishing a 7-day trip.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Long weekends are capped at 2 per rolling 12 months.</span></div>
+          </div>
+
+          <div class="rule-section-label">Fairness</div>
+          <div class="rule-checklist">
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Named public holidays prioritise partners who haven't had that holiday yet.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">An unclaimed weekend reopens to everyone at midnight Friday, priced day-by-day instead of the block rate.</span></div>
+          </div>
+
+          <div class="rule-section-label">Cancellation</div>
+          <div class="rule-compare">
+            <div class="rule-compare-card good">
+              <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></div>
+              <div class="rule-compare-title">48h+ before</div>
+              <div class="rule-compare-desc">Full refund</div>
+            </div>
+            <div class="rule-compare-card bad">
+              <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+              <div class="rule-compare-title">Under 48h / no-show</div>
+              <div class="rule-compare-desc">Points forfeited</div>
+            </div>
+          </div>
+
+          <div class="rule-section-label">Christmas Window</div>
+          <div class="rule-compare">
+            <div class="rule-compare-card good">
+              <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></div>
+              <div class="rule-compare-title">14 days+ before</div>
+              <div class="rule-compare-desc">Full refund</div>
+            </div>
+            <div class="rule-compare-card bad">
+              <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+              <div class="rule-compare-title">Under 14 days</div>
+              <div class="rule-compare-desc">Points forfeited</div>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--neutral-600);line-height:1.55;margin:10px 2px 0;">A longer window than a regular booking's 48-hour rule, since releasing early gives the boat's other 5 partners time to book the reopened dates.</p>
+
+          <div class="rule-section-label">Towing — Rayglass 2400 Only</div>
+          <div class="rule-checklist">
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Your dates are held, pending Matt's approval of the destination, before the booking confirms.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">A towing disclaimer must be acknowledged in the pre-departure checklist.</span></div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tab-label">Book</span></div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><span class="tab-label">Rules</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="tab-label">Profile</span></div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M05 · Core</div>
+        <div class="screen-name">Boat Rules</div>
+        <div class="screen-note">Grouped by topic per the WBS, so a partner finds the relevant rule without reading everything. Gold used only as the section-label accent.</div>
+      </div>
+    </div>
+
+    <!-- ============ M06 NOTIFICATION CENTER ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="back">‹</span>Notifications</div>
+        <div class="content">
+          <div class="notif-row">
+            <div class="notif-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/></svg></div>
+            <div><div class="notif-title">Booking confirmed — Halcyon, 6–8 Mar</div><div class="notif-time">2 hours ago</div></div>
+          </div>
+          <div class="notif-row">
+            <div class="notif-icon tint-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6L4 10l6-1z"/></svg></div>
+            <div><div class="notif-title">Halcyon is ready — TMP confirmed launch</div><div class="notif-time">Yesterday</div></div>
+          </div>
+          <div class="notif-row">
+            <div class="notif-icon tint-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+            <div><div class="notif-title">Payment due — Q1 management fee</div><div class="notif-time">3 days ago</div></div>
+          </div>
+          <div class="notif-row">
+            <div class="notif-icon tint-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/></svg></div>
+            <div><div class="notif-title">A weekend just reopened on Halcyon</div><div class="notif-time">5 days ago</div></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M06 · Core</div>
+        <div class="screen-name">Notification Center</div>
+        <div class="screen-note">Every notification type from the WBS is listed here even if push was missed — icons drawn in the rounded, navy line style from the icon spec.</div>
+      </div>
+    </div>
+
+    <!-- ============ M07 PROFILE ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar">Profile<button class="support-btn" aria-label="Support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M6.5 6.5l2.7 2.7M17.5 6.5l-2.7 2.7M6.5 17.5l2.7-2.7M17.5 17.5l-2.7-2.7"/></svg></button><button class="bell-btn" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/><path d="M10 20a2 2 0 004 0"/></svg><span class="bell-dot"></span></button></div>
+        <div class="content">
+          <div class="profile-avatar">DK</div>
+          <div class="profile-name">David Kearney</div>
+          <div class="profile-role">Halcyon · Rayglass 3000</div>
+          <div class="card" style="margin-bottom:20px;">
+            <div class="row"><span class="row-label">Qualification</span><span class="badge confirmed">Approved</span></div>
+            <div class="row"><span class="row-label">Secondary operator</span><span class="row-value" style="font-family:var(--font-body);font-weight:400;color:var(--neutral-500);">Not set</span></div>
+          </div>
+          <div class="menu-row">Payments &amp; Invoices <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="menu-row">Christmas Window <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="menu-row">Support <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="menu-row">Terms &amp; Privacy <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="menu-row">Sign out <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="menu-row danger">Delete Account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+        <div class="tabbar">
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tab-label">Book</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><span class="tab-label">Rules</span></div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="tab-label">Profile</span></div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M07 · Core</div>
+        <div class="screen-name">Profile</div>
+        <div class="screen-note">Secondary-menu hub for Payments, Christmas Window, and legal pages — keeps the tab bar at 5 items per the IA's navigation decision.</div>
+      </div>
+    </div>
+
+    <!-- ============ M15 PRE-DEPARTURE CHECKLIST ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="back">‹</span>Pre-Departure Checklist</div>
+        <div class="content">
+          <span class="field-label">Is the tank full?</span>
+          <div class="toggle-row">
+            <div class="toggle">Yes</div>
+            <div class="toggle on">No</div>
+          </div>
+          <span class="field-label">Litres reading</span>
+          <div class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">142</div>
+          <span class="field-label">Why isn't it full?</span>
+          <div class="field-box" style="color:var(--neutral-500)">Used half a tank on the way out</div>
+          <span class="field-label">Photo of fuel gauge</span>
+          <div style="height:90px;border:1.5px dashed var(--navy-300);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;color:var(--navy-400);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+          </div>
+          <span class="field-label">Any damage?</span>
+          <div class="toggle-row"><div class="toggle on">No</div><div class="toggle">Yes</div></div>
+        </div>
+        <div style="padding:0 18px 18px;"><button class="btn btn-primary">Submit Checklist</button></div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M15 · Action</div>
+        <div class="screen-name">Pre-Departure Checklist</div>
+        <div class="screen-note">Progressive disclosure — litres/reason/photo only appear once "No" is selected. Litres numeral uses the same tabular-figure treatment as the points balance.</div>
+      </div>
+    </div>
+
+    <!-- ============ M11 PAYMENTS & INVOICES ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="back">‹</span>Payments &amp; Invoices</div>
+        <div class="content">
+          <div class="invoice-row">
+            <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+            <div class="invoice-info"><div class="invoice-title">Q1 2026 Management Fee</div><div class="invoice-date">Invoiced 3 Jan 2026</div></div>
+            <div class="invoice-amount"><div class="invoice-value">$1,850.00</div><span class="badge confirmed">Paid</span></div>
+          </div>
+          <div class="invoice-row">
+            <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22c5-4 8-8 8-12a8 8 0 10-16 0c0 4 3 8 8 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+            <div class="invoice-info"><div class="invoice-title">Fuel Reimbursement</div><div class="invoice-date">Invoiced 14 Feb 2026</div></div>
+            <div class="invoice-amount"><div class="invoice-value">$42.00</div><span class="badge confirmed">Paid</span></div>
+          </div>
+          <div class="invoice-row">
+            <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+            <div class="invoice-info"><div class="invoice-title">Q2 2026 Management Fee</div><div class="invoice-date">Invoiced 2 Apr 2026</div></div>
+            <div class="invoice-amount"><div class="invoice-value">$1,850.00</div><span class="badge pending">Due</span></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M11 · Detail</div>
+        <div class="screen-name">Payments &amp; Invoices</div>
+        <div class="screen-note">Read-only — all fees are invoiced and paid outside the app via Xero/bank transfer. No in-app payment action exists.</div>
+      </div>
+    </div>
+
+    <!-- ============ M13 CHRISTMAS WINDOW ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="back">‹</span>Christmas Window</div>
+        <div class="content">
+          <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.65;margin:0 0 18px;">Your assignment for each year of your term — set once by Matt at delivery. 21 points are deducted upfront and the dates appear as your confirmed booking.</p>
+          <div class="xmas-year-card">
+            <div class="xmas-year-label">Year 1 · 2026</div>
+            <div class="xmas-window-row">
+              <div class="xmas-window assigned"><span class="xmas-window-name">Window 1</span><span class="xmas-window-dates">20–27 Dec</span></div>
+              <div class="xmas-window"><span class="xmas-window-name">Window 2</span><span class="xmas-window-dates">27 Dec–3 Jan</span></div>
+            </div>
+          </div>
+          <div class="xmas-year-card">
+            <div class="xmas-year-label">Year 2 · 2027</div>
+            <div class="xmas-window-row">
+              <div class="xmas-window"><span class="xmas-window-name">Window 1</span><span class="xmas-window-dates">20–27 Dec</span></div>
+              <div class="xmas-window assigned"><span class="xmas-window-name">Window 2</span><span class="xmas-window-dates">27 Dec–3 Jan</span></div>
+            </div>
+          </div>
+          <div class="xmas-year-card">
+            <div class="xmas-year-label">Year 3 · 2028</div>
+            <div class="xmas-window-row">
+              <div class="xmas-window assigned"><span class="xmas-window-name">Window 1</span><span class="xmas-window-dates">20–27 Dec</span></div>
+              <div class="xmas-window"><span class="xmas-window-name">Window 2</span><span class="xmas-window-dates">27 Dec–3 Jan</span></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M13 · Detail</div>
+        <div class="screen-name">Christmas Window Display</div>
+        <div class="screen-note">Read-only, all 3 years of the term. The assigned window is highlighted in gold — the one deliberate everyday use of the accent as a fill.</div>
+      </div>
+    </div>
+
+    <!-- ============ SUPPORT ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="back">‹</span>Support</div>
+        <div class="content">
+          <div class="card" style="text-align:center;padding:24px 18px;">
+            <div class="profile-avatar" style="background:var(--gold-100);color:var(--navy-800);box-shadow:none;">MF</div>
+            <div class="profile-name">Matt Flanagan</div>
+            <div class="profile-role">Offshore Collective</div>
+            <div class="divider"></div>
+            <div class="row"><span class="row-label">Phone</span><span class="row-value">021 555 0142</span></div>
+            <div class="row"><span class="row-label">Email</span><span class="row-value" style="font-size:11.5px;">matt@offshorecollective.co.nz</span></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">Support</div>
+        <div class="screen-name">Support Contact</div>
+        <div class="screen-note">Static contact block, configurable from the Admin Portal — the partner can't edit it here.</div>
+      </div>
+    </div>
+
+    <!-- ============ TERMS & PRIVACY ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="back">‹</span>Terms &amp; Privacy</div>
+        <div class="content">
+          <div class="rule-section-label" style="margin-top:0;">Terms &amp; Conditions</div>
+          <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.65;">Legal text provided by Offshore Collective — placeholder until final copy is supplied by the client.</p>
+          <div class="rule-section-label">Privacy Policy</div>
+          <p style="font-size:12.5px;color:var(--neutral-600);line-height:1.65;">Legal text provided by Offshore Collective — placeholder until final copy is supplied by the client.</p>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">Legal</div>
+        <div class="screen-name">Terms &amp; Privacy</div>
+        <div class="screen-note">Both pages display client-provided legal text in full — InApps builds the pages, not the legal content.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function setView(view){
+    var isProto = view === 'prototype';
+    document.getElementById('prototypeView').hidden = !isProto;
+    document.getElementById('galleryView').hidden = isProto;
+    document.getElementById('galleryNav').hidden = isProto;
+    document.querySelectorAll('.view-btn').forEach(function(b){
+      b.classList.toggle('active', b.dataset.view === view);
+    });
+  }
+
+  // Group the 21 gallery cards by flow stage (parsed from each "M02 · Entry" style
+  // screen-id label) so the gallery reads as a story instead of an unordered strip,
+  // and build sticky jump-chips so any stage is one click away.
+  (function groupGallery(){
+    var gallery = document.getElementById('galleryView');
+    var nav = document.getElementById('galleryNav');
+    var cards = Array.prototype.slice.call(gallery.querySelectorAll('.screen-card'));
+    var STAGE_ORDER = ['Entry', 'Core', 'Detail', 'Action', 'System', 'Support', 'Legal'];
+    var groups = {};
+    cards.forEach(function(card){
+      var idEl = card.querySelector('.screen-id');
+      var label = idEl ? idEl.textContent : '';
+      var parts = label.split('·');
+      var stage = (parts.length > 1 ? parts[1] : label).trim() || 'Other';
+      (groups[stage] = groups[stage] || []).push(card);
+    });
+    var stages = STAGE_ORDER.filter(function(s){ return groups[s]; })
+      .concat(Object.keys(groups).filter(function(s){ return STAGE_ORDER.indexOf(s) === -1; }));
+
+    gallery.innerHTML = '';
+    stages.forEach(function(stage){
+      var slug = 'cat-' + stage.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      var header = document.createElement('div');
+      header.className = 'gallery-section-header';
+      header.id = slug;
+      var count = groups[stage].length;
+      header.innerHTML = '<h2>' + stage + '</h2><span class="gallery-section-count">' +
+        count + ' screen' + (count > 1 ? 's' : '') + '</span>';
+      gallery.appendChild(header);
+      groups[stage].forEach(function(card){ gallery.appendChild(card); });
+
+      var chip = document.createElement('a');
+      chip.href = '#' + slug;
+      chip.innerHTML = stage + '<span>' + count + '</span>';
+      nav.appendChild(chip);
+    });
+  })();
+
+  function showScreen(name){
+    var screens = document.querySelectorAll('.proto-screen');
+    var exists = Array.prototype.some.call(screens, function(s){ return s.dataset.screen === name; });
+    if (!exists) { console.warn('showScreen: no screen named "' + name + '" — ignoring'); return; }
+    screens.forEach(function(s){
+      s.hidden = s.dataset.screen !== name;
+    });
+  }
+
+  function openModal(name){
+    var m = document.getElementById('modal-' + name);
+    if (m) m.hidden = false;
+  }
+  function closeModal(name){
+    var m = document.getElementById('modal-' + name);
+    if (m) m.hidden = true;
+  }
+
+  var CAL_MAX_NIGHTS = 7;
+  var CAL_DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var calRangeStart = null;
+
+  function calSelectableCells(){
+    return Array.prototype.slice.call(document.querySelectorAll('#booking-cal-grid .cal-cell.selectable'));
+  }
+  function calDay(el){ return parseInt(el.textContent, 10); }
+
+  function selectDate(el){
+    var cells = calSelectableCells();
+    var day = calDay(el);
+
+    // first tap of a pair, or tapping back at/behind the current start: begin a fresh single-day selection
+    if (calRangeStart === null || day <= calRangeStart) {
+      calRangeStart = day;
+      cells.forEach(function(c){ c.classList.remove('selected'); });
+      el.classList.add('selected');
+      calUpdateSelection(day, day);
+      hideCalNote();
+      return;
+    }
+
+    var spanned = cells.filter(function(c){ return calDay(c) >= calRangeStart && calDay(c) <= day; });
+    if (spanned.length !== (day - calRangeStart + 1)) {
+      // the tapped range crosses a booked/held/blocked date — not a continuous open range
+      showCalNote('invalid-range', 'That range crosses a booked, held, or blocked date — pick a range that stays inside open dates.');
+      calRangeStart = null;
+      return;
+    }
+
+    var end = day;
+    var capped = (end - calRangeStart + 1) > CAL_MAX_NIGHTS;
+    if (capped) { end = calRangeStart + CAL_MAX_NIGHTS - 1; }
+
+    cells.forEach(function(c){
+      var d = calDay(c);
+      c.classList.toggle('selected', d >= calRangeStart && d <= end);
+    });
+    calUpdateSelection(calRangeStart, end);
+    if (capped) {
+      showCalNote('capped', 'Trips are capped at ' + CAL_MAX_NIGHTS + ' days — selection trimmed to ' + calRangeStart + '–' + end + ' Mar.');
+    } else {
+      hideCalNote();
+    }
+    calRangeStart = null; // range complete; next tap starts a new selection
+  }
+
+  // Booking-type pricing per design/02-resolved-open-questions-scope.md #4 — Weekend Block (Fri→Sun) is
+  // confirmed by the WBS; Long Weekend (Thu→Sun) is an unconfirmed assumption pending Matt's sign-off.
+  // Christmas Window is system-assigned and never reaches this picker, so it isn't priced here.
+  function calBookingType(start, end){
+    var nights = end - start + 1;
+    var startDow = (start - 1) % 7; // 0=Sun … 5=Fri, 6=Sat
+    if (nights === 3 && startDow === 5) return { label: 'Weekend Block', points: 5 };
+    if (nights === 4 && startDow === 4) return { label: 'Long Weekend', points: 7 };
+    if (nights === 1) return { label: 'Single Day', points: 1 };
+    return { label: nights + '-Day Trip', points: nights };
+  }
+
+  function calUpdateSelection(start, end){
+    var type = calBookingType(start, end);
+    document.getElementById('cal-selected-label').textContent = start === end ? (start + ' Mar') : (start + '–' + end + ' Mar');
+    document.getElementById('cal-points-label').textContent = type.points;
+  }
+
+  function goToReview(){
+    var selected = document.querySelectorAll('#booking-cal-grid .cal-cell.selected');
+    if (!selected.length) return;
+    var days = Array.prototype.map.call(selected, calDay).sort(function(a,b){ return a - b; });
+    var start = days[0], end = days[days.length - 1];
+    var type = calBookingType(start, end);
+    var startLabel = CAL_DOW[(start - 1) % 7] + ' ' + start + ' Mar';
+    var endLabel = CAL_DOW[(end - 1) % 7] + ' ' + end + ' Mar';
+
+    document.getElementById('review-title').textContent = 'Halcyon — ' + type.label;
+    document.getElementById('review-dates').textContent = start === end ? startLabel : (startLabel + ' → ' + endLabel);
+
+    var avail = 5;
+    var used = type.points;
+    var balance = avail - used;
+    document.getElementById('review-points-avail').textContent = avail;
+    document.getElementById('review-points-used').textContent = used;
+    var balEl = document.getElementById('review-points-balance');
+    balEl.textContent = balance;
+    balEl.classList.toggle('negative', balance < 0);
+
+    showScreen('review');
+  }
+
+  var CAL_NOTES = {
+    blocked: 'Out of service for scheduled maintenance — not bookable until it\'s back in the water.',
+    booked: 'Already booked by another partner on Halcyon.',
+    held: 'Held for a towing request, pending Matt\'s approval.'
+  };
+  function explainDate(type){
+    showCalNote(type, CAL_NOTES[type]);
+  }
+  function showCalNote(type, msg){
+    var note = document.getElementById('cal-note');
+    note.className = 'cal-note ' + type;
+    note.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span>' + msg + '</span>';
+    note.hidden = false;
+  }
+  function hideCalNote(){
+    document.getElementById('cal-note').hidden = true;
+  }
+</script>
+
+</body></html>

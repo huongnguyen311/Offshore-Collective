@@ -1,0 +1,141 @@
+{
+  "$note": "Companion file to tokens/colors.json — Token Studio should import both as part of the same set collection (global.color lives in colors.json; global.spacing/border-radius/shadow/duration/easing/opacity live here). Typography tokens (fontSize/fontWeight/lineHeight/letterSpacing/typography.*) are owned by SKILL 06 (alice-typography-system) and intentionally NOT redefined here, per the skill's single-source-of-truth rule.",
+
+  "global": {
+    "spacing": {
+      "0":  { "value": "0px",  "type": "spacing" },
+      "1":  { "value": "4px",  "type": "spacing" },
+      "2":  { "value": "8px",  "type": "spacing" },
+      "3":  { "value": "12px", "type": "spacing" },
+      "4":  { "value": "16px", "type": "spacing" },
+      "5":  { "value": "20px", "type": "spacing" },
+      "6":  { "value": "24px", "type": "spacing" },
+      "8":  { "value": "32px", "type": "spacing" },
+      "10": { "value": "40px", "type": "spacing" },
+      "12": { "value": "48px", "type": "spacing" },
+      "16": { "value": "64px", "type": "spacing" },
+      "20": { "value": "80px", "type": "spacing", "$description": "Quiet Harbour direction calls for generous vertical rhythm — extended past the standard 4pt scale for Home/hero breathing room" },
+      "24": { "value": "96px", "type": "spacing", "$description": "Largest step — reserved for the space above/below the Home points-balance hero moment" }
+    },
+
+    "border-radius": {
+      "xs":   { "value": "6px",    "type": "borderRadius" },
+      "sm":   { "value": "10px",   "type": "borderRadius" },
+      "md":   { "value": "14px",   "type": "borderRadius", "$description": "Default container radius — echoes the brand mark's rounded-square geometry" },
+      "lg":   { "value": "20px",   "type": "borderRadius" },
+      "xl":   { "value": "28px",   "type": "borderRadius", "$description": "Large surfaces — bottom sheets, modal cards" },
+      "full": { "value": "9999px", "type": "borderRadius", "$description": "Pills/avatars/badges only — never a default container radius" },
+      "$note": "Deliberately soft and generous, never sharp (0-2px) corners — sharp corners would contradict the Quiet Harbour direction and the mark's own rounded-square icon."
+    },
+
+    "border-width": {
+      "hairline": { "value": "1px",   "type": "borderWidth", "$description": "Default line weight — kept delicate per the 'unhurried, quiet' personality" },
+      "base":     { "value": "1.5px", "type": "borderWidth" },
+      "thick":    { "value": "2px",   "type": "borderWidth", "$description": "Reserved for focus rings and the booked/held calendar-date border" }
+    },
+
+    "shadow": {
+      "none":   { "value": "none", "type": "boxShadow" },
+      "subtle": {
+        "value": { "x": 0, "y": 1, "blur": 3, "spread": 0, "color": "{global.color.navy.900}", "type": "dropShadow" },
+        "type": "boxShadow",
+        "$description": "Opacity applied via global.opacity.subtle (6%) at the component level — the ONLY shadow in the system. Depth comes from spacing and the navy/gold palette, not shadow-card stacks, per the art direction's anti-template guardrail."
+      }
+    },
+
+    "opacity": {
+      "disabled": { "value": "0.4",  "type": "opacity" },
+      "overlay":  { "value": "0.5",  "type": "opacity", "$description": "Modal/sheet backdrops" },
+      "subtle":   { "value": "0.06", "type": "opacity", "$description": "Used with shadow.subtle and hover/press background tints" },
+      "pressed-tint": { "value": "0.12", "type": "opacity" }
+    },
+
+    "size": {
+      "icon": {
+        "sm": { "value": "16px", "type": "sizing" },
+        "md": { "value": "20px", "type": "sizing" },
+        "lg": { "value": "24px", "type": "sizing" },
+        "xl": { "value": "32px", "type": "sizing" },
+        "$note": "Added per 20-design-review.md — previously only documented in prose in 16-icon-asset-spec.md, never an actual token. Icon color tokens live in colors.json (global.color / light.color.icon / dark.color.icon), not here."
+      }
+    },
+
+    "duration": {
+      "fast":    { "value": "120ms", "type": "other", "$description": "Micro-feedback — tab press, checkbox toggle" },
+      "normal":  { "value": "220ms", "type": "other", "$description": "Standard transitions — screen pushes, sheet open" },
+      "slow":    { "value": "360ms", "type": "other", "$description": "Larger-area transitions — calendar month change" },
+      "confirm": { "value": "560ms", "type": "other", "$description": "SIGNATURE — the gold-chevron booking-confirmation motion only (M08→M09). Deliberately slower than routine UI per art direction: this moment should feel considered, not snappy. Never reuse this duration for ordinary navigation." }
+    },
+
+    "easing": {
+      "standard": { "value": "cubic-bezier(0.33, 1, 0.68, 1)", "type": "other", "$description": "Gentle ease-out for routine transitions — smooth deceleration, no overshoot/bounce" },
+      "enter":    { "value": "cubic-bezier(0.22, 1, 0.36, 1)", "type": "other" },
+      "exit":     { "value": "cubic-bezier(0.4, 0, 1, 1)",     "type": "other" },
+      "confirm":  { "value": "cubic-bezier(0.16, 1, 0.3, 1)",  "type": "other", "$description": "SIGNATURE — slow, settling deceleration paired with duration.confirm for the gold-chevron motif. Pairs only with duration.confirm." },
+      "$note": "No spring/bounce curves anywhere in this system — explicitly forbidden by the art direction's motion-character guardrail (fluid, restrained; Direction A's mechanical snap and any spring physics are rejected)."
+    }
+  },
+
+  "component": {
+    "button": {
+      "primary-bg":         { "value": "{color.action.primary}",        "type": "color" },
+      "primary-bg-hover":   { "value": "{color.action.primary-hover}",  "type": "color" },
+      "primary-bg-pressed": { "value": "{color.action.primary-pressed}","type": "color" },
+      "primary-text":       { "value": "{color.action.primary-text}",   "type": "color" },
+      "radius":             { "value": "{global.border-radius.md}",     "type": "borderRadius" },
+      "padding-x":          { "value": "{global.spacing.6}",            "type": "spacing" },
+      "padding-y":          { "value": "{global.spacing.4}",            "type": "spacing", "$description": "Generous vertical padding — Quiet Harbour spacious density, larger than a typical 8-12px button" },
+      "shadow":             { "value": "{global.shadow.none}",          "type": "boxShadow", "$description": "Buttons never carry a drop shadow — flat, confident, no fake elevation" }
+    },
+    "button-accent": {
+      "bg":            { "value": "{color.action.accent}",             "type": "color", "$description": "Rare — only the single highest-priority CTA on a screen (e.g. Confirm on M08) may use the gold accent button; every other action uses component.button.primary" },
+      "text":          { "value": "{color.action.accent-text-on-fill}","type": "color", "$description": "Always navy on gold fills — never white (fails WCAG AA, see 07-color-system.md)" }
+    },
+    "booking-calendar-date": {
+      "available-bg":     { "value": "{color.calendar.available-bg}",     "type": "color" },
+      "available-border":  { "value": "{color.calendar.available-border}", "type": "color" },
+      "booked-bg":         { "value": "{color.calendar.booked-bg}",        "type": "color" },
+      "booked-border":     { "value": "{color.calendar.booked-border}",    "type": "color" },
+      "held-bg":           { "value": "{color.calendar.held-bg}",          "type": "color" },
+      "held-border":       { "value": "{color.calendar.held-border}",      "type": "color" },
+      "blocked-bg":        { "value": "{color.calendar.blocked-bg}",       "type": "color" },
+      "christmas-window-bg":     { "value": "{color.calendar.christmas-window-bg}",     "type": "color" },
+      "christmas-window-border": { "value": "{color.calendar.christmas-window-border}", "type": "color" },
+      "radius":            { "value": "{global.border-radius.xs}",         "type": "borderRadius", "$description": "Rounded-square glyph per date, echoing the brand icon's interlocking squares — see Signature Moments in 06-art-direction.md. Matches 11-component-specs.md and 18-figma-specs.md exactly (6px) — corrected per 20-design-review.md finding." },
+      "border-width":      { "value": "{global.border-width.base}",        "type": "borderWidth" }
+    },
+    "status-badge": {
+      "pending-approval-bg":       { "value": "{color.app-status.pending-approval-bg}",       "type": "color" },
+      "pending-approval-text":     { "value": "{color.app-status.pending-approval-text}",     "type": "color" },
+      "qualification-pending-bg":  { "value": "{color.app-status.qualification-pending-bg}",  "type": "color" },
+      "qualification-pending-text":{ "value": "{color.app-status.qualification-pending-text}","type": "color" },
+      "booking-blocked-bg":        { "value": "{color.app-status.booking-blocked-bg}",        "type": "color" },
+      "booking-blocked-text":      { "value": "{color.app-status.booking-blocked-text}",      "type": "color" },
+      "radius":                    { "value": "{global.border-radius.full}", "type": "borderRadius", "$description": "Pill badge — the one deliberate 'full' radius use case" },
+      "padding-x":                 { "value": "{global.spacing.3}", "type": "spacing" },
+      "padding-y":                 { "value": "{global.spacing.1}", "type": "spacing" }
+    },
+    "confirmation-motion": {
+      "accent-color": { "value": "{color.app-status.confirmation-accent}", "type": "color" },
+      "duration":     { "value": "{global.duration.confirm}",              "type": "other" },
+      "easing":       { "value": "{global.easing.confirm}",                "type": "other" },
+      "$description": "Wires the signature gold-chevron confirmation moment (M08→M09) — see Signature Moments row 4 in 06-art-direction.md. Feeds SKILL 10 (Motion Design) directly."
+    },
+    "points-balance-display": {
+      "text-color":  { "value": "{color.text.brand}", "type": "color" },
+      "$description": "Numeral typeface/size is owned by SKILL 06 (Typography) — this component token only fixes the color reference; typography should use the wordmark-derived monospace treatment per 06-art-direction.md Handoff table."
+    },
+    "card": {
+      "bg":     { "value": "{color.bg.subtle}",           "type": "color" },
+      "radius": { "value": "{global.border-radius.lg}",   "type": "borderRadius" },
+      "padding":{ "value": "{global.spacing.5}",          "type": "spacing" },
+      "shadow": { "value": "{global.shadow.none}",        "type": "boxShadow", "$description": "No card shadow by default — Quiet Harbour depth comes from spacing/tonal contrast (bg.subtle vs bg.default), not elevation. Use shadow.subtle only for a card that must visually float above other content (e.g. a bottom sheet)." }
+    },
+    "tab-bar": {
+      "active-indicator-color": { "value": "{color.action.accent}", "type": "color", "$description": "Subtle brass underline/dot, never a full-fill active tab icon — keeps gold rare per art direction guardrail" },
+      "bg":                     { "value": "{color.bg.default}",   "type": "color" },
+      "icon-inactive":          { "value": "{color.text.secondary}","type": "color" },
+      "icon-active":            { "value": "{color.text.brand}",   "type": "color" }
+    }
+  }
+}
