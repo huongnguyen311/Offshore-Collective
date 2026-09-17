@@ -268,6 +268,16 @@
     background:var(--info-100); color:var(--info-700);
     font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.02em;
   }
+  /* C.31 Boat Ready Status, push fallback: the ready state is written onto the Dashboard boat card
+     at the same trigger point as the push (TMP Launch Confirmed), so a partner whose notifications
+     are switched off at OS level still sees it on their next open. Icon + text, never colour alone. */
+  .boat-id-body{ flex:1; min-width:0; }
+  .boat-id-ready{
+    display:inline-flex; align-items:center; gap:5px; margin-top:6px; padding:4px 10px; border-radius:999px;
+    background:var(--success-100); color:var(--success-700);
+    font-family:var(--font-soft); font-size:12px; font-weight:700; letter-spacing:0.01em;
+  }
+  .boat-id-ready svg{ width:12px; height:12px; flex:none; }
 
   /* ---- upcoming bookings — one modern, independently-tappable card per trip, not table rows in
      a shared box, since the Booking Rule Engine allows up to 2 concurrent bookings (C.4). Date
@@ -372,6 +382,10 @@
   /* beyond the 60-day advance window (A.19/B.13): visible so partners can see what's ahead, but
      muted and not selectable, tapping explains why rather than doing nothing. */
   .cal-cell.outside-window{ background:var(--neutral-50); color:var(--neutral-300); cursor:pointer; }
+  /* Standby only ever opens on today (A.19), which only reads correctly if the days before it
+     stop looking bookable. Past dates are muted and inert, the same treatment as the far end
+     of the 60-day window, so the green TODAY cell sits on a visible boundary. */
+  .cal-cell.past{ background:var(--neutral-50); color:var(--neutral-300); }
   .cal-cell.empty{ background:transparent; }
 
   /* ---- per-screen state key, mirrors the cell tokens above so partners don't have to
@@ -386,6 +400,39 @@
   .cal-legend-chip.unclaimed{ background:var(--navy-50); border:1.5px dashed var(--navy-300); }
   .cal-legend-chip.holiday{ background:var(--info-100); border:1.5px dashed var(--info-700); }
   .cal-legend-chip.outside-window{ background:var(--neutral-50); border:1px dashed var(--neutral-300); }
+  /* A.19/C.27: standby only ever appears on the current date, once 7am passes with nobody holding
+     a confirmed booking. Marking that cell "today" keeps the same-day rule visible on the calendar
+     itself, so the green never reads as a general "cheap dates" state spread across the month. */
+  .cal-cell.today{ box-shadow:inset 0 0 0 2px var(--success-700); }
+  .cal-cell.today::before{
+    content:'TODAY'; position:absolute; top:2px; left:0; right:0;
+    font-family:var(--font-soft); font-size:6.5px; font-weight:800; letter-spacing:0.08em;
+    color:var(--success-700); text-align:center;
+  }
+
+  /* A.17 Support Contact: the SOW puts the static name/phone/email in the app footer, configurable
+     from the Admin Portal (B.29). The dedicated Support screen satisfies "can see it", but not
+     "in the app footer", so the same three values also sit at the foot of Profile, where the
+     partner ends up when they are looking for help. Read-only here by definition. */
+  .app-footer{
+    margin-top:22px; padding:16px 2px 4px; text-align:center;
+    background-image:linear-gradient(to right, transparent, var(--navy-100) 25%, var(--navy-100) 75%, transparent);
+    background-position:top; background-size:100% 1px; background-repeat:no-repeat;
+  }
+  .app-footer-label{ display:block; font-family:var(--font-soft); font-weight:700; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--neutral-500); margin-bottom:6px; }
+  .app-footer-name{ font-size:15px; font-weight:600; color:var(--navy-800); }
+  .app-footer-line{ display:block; font-family:var(--font-mono); font-size:12px; color:var(--neutral-600); margin-top:3px; }
+
+  /* ---- Standby claim (A.19) ---- */
+  .standby-hero{
+    display:flex; align-items:center; gap:14px; padding:18px; margin-bottom:18px;
+    background:var(--success-100); border:1.5px solid var(--success-700); border-radius:18px;
+  }
+  .standby-hero-icon{ width:40px; height:40px; border-radius:14px; background:var(--success-700); color:#fff; display:flex; align-items:center; justify-content:center; flex:none; }
+  .standby-hero-icon svg{ width:20px; height:20px; }
+  .standby-hero-label{ display:block; font-family:var(--font-soft); font-weight:700; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--success-700); margin-bottom:2px; }
+  .standby-hero-value{ font-family:var(--font-mono); font-weight:600; font-size:22px; color:var(--navy-900); font-variant-numeric:tabular-nums; }
+  .standby-hero-value small{ font-family:var(--font-soft); font-weight:600; font-size:11px; color:var(--neutral-600); text-transform:uppercase; margin-left:4px; }
 
   .cal-note{ margin-top:10px; padding:10px 12px; border-radius:12px; font-size:16px; line-height:1.5; display:flex; align-items:flex-start; gap:8px; }
   .cal-note svg{ width:15px; height:15px; flex:none; margin-top:1px; }
@@ -483,6 +530,17 @@
   .rule-compare-title{ font-family:var(--font-soft); font-weight:700; font-size:15px; color:var(--navy-800); margin-bottom:2px; }
   .rule-compare-desc{ font-size:16px; color:var(--neutral-600); }
 
+  /* C.5 Unclaimed Weekend / Long Weekend Access reprices by the day you claim on, so the rules
+     screen has to show a small rate table, not a single "priced per day" line, which was wrong. */
+  .rule-price-table{ background:#fff; border:1px solid var(--navy-100); border-radius:14px; padding:2px 14px; margin-bottom:10px; box-shadow:0 5px 14px -10px rgba(20,42,61,0.12); }
+  .rule-price-head{ font-family:var(--font-soft); font-weight:700; font-size:12px; letter-spacing:0.02em; color:var(--navy-800); padding:12px 0 8px; }
+  .rule-price-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:9px 0; border-top:1px solid var(--navy-50); }
+  .rule-price-when{ font-size:15px; color:var(--neutral-700); line-height:1.4; }
+  .rule-price-when small{ display:block; font-size:13px; color:var(--neutral-500); }
+  .rule-price-pts{ font-family:var(--font-mono); font-weight:600; font-size:15px; color:var(--navy-800); font-variant-numeric:tabular-nums; flex:none; }
+  .rule-cost-card.free{ background:var(--success-100); border-color:var(--success-700); }
+  .rule-cost-card.free .rule-cost-value{ color:var(--success-700); }
+
   .rule-checklist{ display:flex; flex-direction:column; gap:8px; }
   .rule-check-item{ display:flex; align-items:flex-start; gap:10px; background:#fff; border:1px solid var(--navy-100); border-radius:12px; padding:11px 13px; box-shadow:0 5px 14px -10px rgba(20,42,61,0.12); }
   .rule-check-icon{ width:20px; height:20px; border-radius:50%; background:var(--success-100); color:var(--success-700); display:flex; align-items:center; justify-content:center; flex:none; margin-top:1px; }
@@ -575,29 +633,22 @@
   .gate-icon{ width:60px; height:60px; margin:8px auto 22px; border-radius:18px; background:var(--info-100); display:flex; align-items:center; justify-content:center; }
   .gate-icon svg{ width:28px; height:28px; color:var(--info-700); }
 
-  /* ---- Payments & Invoices ---- */
-  .invoice-row{ display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid var(--navy-100); }
-  .invoice-icon{ width:36px; height:36px; border-radius:12px; background:var(--navy-100); display:flex; align-items:center; justify-content:center; flex:none; box-shadow:-5px 5px 0 -3px var(--navy-50), 0 0 0 1px rgba(20,42,61,0.05); }
-  .invoice-icon svg{ width:17px; height:17px; color:var(--navy-700); }
-  .invoice-info{ flex:1; min-width:0; }
-  .invoice-title{ font-size:15px; font-weight:600; color:var(--navy-800); margin-bottom:2px; }
-  .invoice-date{ font-family:var(--font-mono); font-size:11px; color:var(--neutral-500); }
-  .invoice-amount{ text-align:right; flex:none; }
-  .invoice-value{ font-family:var(--font-mono); font-weight:600; font-size:15px; color:var(--navy-800); font-variant-numeric:tabular-nums; margin-bottom:4px; }
 
   /* ---- Christmas Window ---- */
   .xmas-intro{ font-size:16px; color:var(--neutral-600); line-height:1.6; margin:0 0 14px; }
-  .xmas-stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:18px; }
-  .xmas-stat-card{ display:flex; align-items:center; justify-content:space-between; gap:8px; background:#fff; border:1px solid var(--navy-100); border-radius:11px; padding:8px 12px; }
-  .xmas-stat-card.highlight{ background:var(--info-100); border-color:var(--info-700); }
-  .xmas-stat-label{ font-size:11px; color:var(--neutral-600); }
-  .xmas-stat-value{ font-family:var(--font-mono); font-weight:600; font-size:14px; color:var(--navy-800); font-variant-numeric:tabular-nums; }
-  .xmas-stat-value small{ font-family:var(--font-soft); font-weight:600; font-size:9px; color:var(--neutral-500); text-transform:uppercase; }
+  .xmas-cost-card{ display:flex; align-items:center; gap:12px; background:var(--info-100); border:1px solid var(--info-700); border-radius:14px; padding:13px 14px; margin-bottom:18px; box-shadow:0 6px 16px -10px rgba(20,42,61,0.12); }
+  .xmas-cost-icon{ flex:none; width:38px; height:38px; border-radius:10px; background:#fff; display:flex; align-items:center; justify-content:center; color:var(--info-700); box-shadow:0 2px 6px -2px rgba(20,42,61,0.18); }
+  .xmas-cost-icon svg{ width:19px; height:19px; }
+  .xmas-cost-body{ flex:1; min-width:0; }
+  .xmas-cost-label{ display:block; font-size:11px; color:var(--neutral-600); margin-bottom:2px; }
+  .xmas-cost-value{ font-family:var(--font-mono); font-weight:600; font-size:19px; color:var(--navy-800); font-variant-numeric:tabular-nums; }
+  .xmas-cost-value small{ font-family:var(--font-soft); font-weight:600; font-size:10px; color:var(--neutral-500); text-transform:uppercase; margin-left:2px; }
+  .xmas-cost-note{ margin:3px 0 0; font-size:11.5px; color:var(--neutral-600); line-height:1.4; }
   .xmas-year-card{ background:#fff; border:1px solid var(--navy-100); border-radius:14px; padding:11px; margin-bottom:10px; box-shadow:0 6px 16px -10px rgba(20,42,61,0.12); }
   .xmas-year-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
   .xmas-year-label{ font-family:var(--font-mono); font-weight:600; font-size:13px; color:var(--navy-800); flex:none; }
   .xmas-window-row{ display:flex; gap:6px; }
-  .xmas-window{ flex:1; border-radius:10px; padding:8px; text-align:center; background:var(--navy-50); border:1px solid var(--navy-100); }
+  .xmas-window{ flex:1; border-radius:10px; padding:8px; text-align:center; background:var(--navy-50); border:1px solid var(--navy-100); box-shadow:0 4px 10px -8px rgba(20,42,61,0.16); }
   .xmas-window:not(.assigned){ opacity:0.65; }
   .xmas-window.assigned{ background:var(--info-100); border-color:var(--info-700); }
   .xmas-window-name{ display:block; font-family:var(--font-soft); font-weight:700; font-size:9.5px; color:var(--neutral-600); text-transform:uppercase; letter-spacing:0.02em; margin-bottom:3px; }
@@ -728,8 +779,10 @@
             </div></div>
             <div class="boat-id">
               <div class="boat-id-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
-              <div class="boat-id-name">Halcyon</div>
-              <span class="boat-id-model">Rayglass 3000</span>
+              <div class="boat-id-body">
+                <div class="boat-id-name">Halcyon<span class="boat-id-model">Rayglass 3000</span></div>
+                <span class="boat-id-ready"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12l4 4 10-10"/></svg>Ready for your trip</span>
+              </div>
             </div>
             <div class="section-title">Upcoming Bookings</div>
             <div class="booking-card" onclick="openBookingDetail(1)">
@@ -767,8 +820,9 @@
           <div class="content">
             <div class="boat-id">
               <div class="boat-id-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
-              <div class="boat-id-name">Halcyon</div>
-              <span class="boat-id-model">Rayglass 3000</span>
+              <div class="boat-id-body">
+                <div class="boat-id-name">Halcyon<span class="boat-id-model">Rayglass 3000</span></div>
+              </div>
             </div>
             <div class="cal-month-nav">
               <button class="cal-month-btn" id="cal-prev-btn" onclick="changeCalMonth(-1)" disabled aria-label="Previous month">‹</button>
@@ -779,8 +833,8 @@
               <span class="cal-legend-item"><span class="cal-legend-chip available"></span>Available</span>
               <span class="cal-legend-item"><span class="cal-legend-chip booked"></span>Booked</span>
               <span class="cal-legend-item"><span class="cal-legend-chip blocked"></span>Blocked</span>
-              <span class="cal-legend-item"><span class="cal-legend-chip standby"></span>Standby-available</span>
-              <span class="cal-legend-item"><span class="cal-legend-chip unclaimed"></span>Unclaimed, per day</span>
+              <span class="cal-legend-item"><span class="cal-legend-chip standby"></span>Standby: today, free</span>
+              <span class="cal-legend-item"><span class="cal-legend-chip unclaimed"></span>Unclaimed, reduced rate</span>
               <span class="cal-legend-item"><span class="cal-legend-chip holiday"></span>Named Holiday</span>
               <span class="cal-legend-item"><span class="cal-legend-chip outside-window"></span>Outside 60-day window</span>
             </div>
@@ -788,10 +842,10 @@
             <div class="cal-grid" id="booking-cal-grid">
               <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
               <div id="booking-cal-days" style="display:contents">
-              <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell blocked" onclick="explainDate('blocked')">4<span class="cal-glyph blocked"></span></div><div class="cal-cell blocked" onclick="explainDate('blocked')">5<span class="cal-glyph blocked"></span></div>
+              <div class="cal-cell past">1</div><div class="cal-cell past">2</div><div class="cal-cell past">3</div><div class="cal-cell blocked" onclick="explainDate('blocked')">4<span class="cal-glyph blocked"></span></div><div class="cal-cell blocked" onclick="explainDate('blocked')">5<span class="cal-glyph blocked"></span></div>
               <div class="cal-cell booked" onclick="explainDate('booked')">6<span class="cal-glyph booked"></span></div><div class="cal-cell booked" onclick="explainDate('booked')">7<span class="cal-glyph booked"></span></div>
-              <div class="cal-cell booked" onclick="explainDate('booked')">8<span class="cal-glyph booked"></span></div><div class="cal-cell available">9</div><div class="cal-cell available">10</div>
-              <div class="cal-cell available">11</div><div class="cal-cell standby" onclick="explainDate('standby')">12<span class="cal-glyph standby"></span></div><div class="cal-cell standby" onclick="explainDate('standby')">13<span class="cal-glyph standby"></span></div>
+              <div class="cal-cell booked" onclick="explainDate('booked')">8<span class="cal-glyph booked"></span></div><div class="cal-cell past">9</div><div class="cal-cell past">10</div>
+              <div class="cal-cell past">11</div><div class="cal-cell standby today" onclick="openStandbyClaim()">12<span class="cal-glyph standby"></span></div><div class="cal-cell available selectable" onclick="selectDate(this)">13</div>
               <div class="cal-cell available selectable" onclick="selectDate(this)">14</div><div class="cal-cell available selectable" onclick="selectDate(this)">15</div><div class="cal-cell available selectable" onclick="selectDate(this)">16</div><div class="cal-cell available selectable" onclick="selectDate(this)">17</div>
               <div class="cal-cell available selectable holiday" onclick="selectDate(this)">18<span class="cal-glyph holiday"></span></div><div class="cal-cell available selectable" onclick="selectDate(this)">19</div><div class="cal-cell available selectable holiday" onclick="selectDate(this)">20<span class="cal-glyph holiday"></span></div>
               <div class="cal-cell available selectable holiday" onclick="selectDate(this)">21<span class="cal-glyph holiday"></span></div><div class="cal-cell available selectable holiday" onclick="selectDate(this)">22<span class="cal-glyph holiday"></span></div><div class="cal-cell available selectable holiday" onclick="selectDate(this)">23<span class="cal-glyph holiday"></span></div><div class="cal-cell available selectable" onclick="selectDate(this)">24</div>
@@ -814,6 +868,47 @@
           <div style="padding:0 18px 30px;display:flex;flex-direction:column;gap:8px;">
             <button id="review-booking-btn" class="btn btn-primary" onclick="goToReview()" disabled>Review Booking</button>
             <button class="btn btn-ghost" onclick="clearCalSelection()">Clear Selection</button>
+          </div>
+        </div>
+
+        <!-- PROTO: STANDBY CLAIM -->
+        <div class="proto-screen" data-screen="standby" hidden>
+          <div class="navbar"><span class="navbar-icon"></span><button class="back-btn" onclick="showScreen('calendar')">‹</button>Claim Today</div>
+          <div class="content">
+            <div class="card" style="margin-bottom:16px;">
+              <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg>Halcyon: Standby Claim</div>
+              <div class="section-sub">Thu 12 Mar, today</div>
+              <div class="divider"></div>
+              <div class="row"><span class="row-label">Points available</span><span class="row-value big">5</span></div>
+              <div class="row"><span class="row-label">This claim uses</span><span class="row-value big">0</span></div>
+              <div class="row"><span class="row-label">Balance after</span><span class="row-value big">5</span></div>
+            </div>
+            <div class="standby-hero">
+              <div class="standby-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div>
+              <div>
+                <span class="standby-hero-label">Standby, today only</span>
+                <div class="standby-hero-value">0 <small>points</small></div>
+              </div>
+            </div>
+            <span class="field-label">Estimated departure time</span>
+            <div class="field-row">
+              <select class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">
+                <option>6</option><option>7</option><option>8</option><option>9</option><option selected>10</option><option>11</option>
+                <option>12</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              </select>
+              <select class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">
+                <option selected>:00</option><option>:30</option>
+              </select>
+              <select class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">
+                <option selected>AM</option><option>PM</option>
+              </select>
+            </div>
+            <p style="font-size:16px;color:var(--neutral-500);line-height:1.5;margin:0 0 16px;">We text and email Tamaki Marine Park the moment you claim, so give them as much notice as you can.</p>
+            <p style="font-size:16px;color:var(--neutral-600);line-height:1.6;margin:0;">Nobody booked today by 7am, so it is open to all six partners, free. First to claim gets it, and there is no limit on how many standby days you take in a year.</p>
+          </div>
+          <div style="padding:0 18px 30px;display:flex;flex-direction:column;gap:8px;">
+            <button class="btn btn-accent" onclick="claimStandby()">Claim Today, Free</button>
+            <button class="btn btn-ghost" onclick="showScreen('calendar')">Back to Calendar</button>
           </div>
         </div>
 
@@ -889,16 +984,18 @@
               <div class="rule-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
               <div>
                 <div class="rule-highlight-value">58<span>pts / year</span></div>
-                <div class="rule-highlight-note">Resets on Halcyon's delivery anniversary, shared by all 6 owners</div>
+                <div class="rule-highlight-note">Resets on Halcyon’s delivery anniversary, shared by all 6 owners</div>
               </div>
             </div>
 
             <div class="rule-section-label">Booking Types &amp; Cost</div>
             <div class="rule-cost-grid">
               <div class="rule-cost-card"><span class="rule-cost-label">Regular day</span><span class="rule-cost-value">1 <small>pt</small></span></div>
-              <div class="rule-cost-card"><span class="rule-cost-label">Weekend block</span><span class="rule-cost-value">5 <small>pts</small></span></div>
-              <div class="rule-cost-card"><span class="rule-cost-label">Long weekend</span><span class="rule-cost-value">7 <small>pts</small></span></div>
-              <div class="rule-cost-card highlight"><span class="rule-cost-label">Christmas Window</span><span class="rule-cost-value">14 <small>pts</small></span></div>
+              <div class="rule-cost-card"><span class="rule-cost-label">Weekend block <small style="color:var(--neutral-500)">Fri to Sun</small></span><span class="rule-cost-value">5 <small>pts</small></span></div>
+              <div class="rule-cost-card"><span class="rule-cost-label">Long weekend <small style="color:var(--neutral-500)">Fri to Mon</small></span><span class="rule-cost-value">7 <small>pts</small></span></div>
+              <div class="rule-cost-card highlight"><span class="rule-cost-label">Christmas Window <small style="color:var(--neutral-500)">7 days</small></span><span class="rule-cost-value">14 <small>pts</small></span></div>
+              <div class="rule-cost-card free"><span class="rule-cost-label">Standby <small style="color:var(--neutral-500)">today only</small></span><span class="rule-cost-value">0 <small>pts</small></span></div>
+              <div class="rule-cost-card"><span class="rule-cost-label">Unclaimed weekend</span><span class="rule-cost-value">2–5 <small>pts</small></span></div>
             </div>
 
             <div class="rule-section-label">Timing Limits</div>
@@ -908,15 +1005,41 @@
               <div class="rule-stat"><div class="rule-stat-value">7</div><div class="rule-stat-label">days / trip</div></div>
             </div>
             <div class="rule-checklist" style="margin-top:10px;">
-              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">You can book up to 60 days ahead. First to book gets the date, no queue or turns.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Dates open at <b>7am</b>, 60 days ahead. First to book gets them, there is no queue and no rotation.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Friday is never booked on its own. It travels with the weekend, or as part of a longer trip.</span></div>
               <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Wait 7 days after a full 7-day trip before booking again.</span></div>
-              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">You can take up to 2 long weekends every 12 months.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Up to 2 long weekends every 12 months. Claiming one that went unclaimed never counts toward those 2.</span></div>
             </div>
+
+            <div class="rule-section-label">Standby: Today, Free</div>
+            <div class="rule-checklist">
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">If nobody has claimed today by <b>7am</b>, it opens to all six of you at <b>no point cost</b>.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">First to claim gets it, and there is no yearly limit on how many standby days you take.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Only today ever opens this way, never a day already inside someone else’s confirmed booking.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">We text Tamaki Marine Park the moment you claim, so tell us when you plan to head out.</span></div>
+            </div>
+
+            <div class="rule-section-label">If a Weekend Goes Unclaimed</div>
+            <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:0px 2px 10px;">If nobody books a weekend by <b>midnight Friday</b>, it reopens to everyone. You take it from the day you claim through to the end of the block, so the rate drops as the weekend goes on.</p>
+            <div class="rule-price-table">
+              <div class="rule-price-head">Weekend block</div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri, Sat and Sun</small></span><span class="rule-price-pts">5 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat and Sun</small></span><span class="rule-price-pts">4 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun only</small></span><span class="rule-price-pts">2 pts</span></div>
+            </div>
+            <div class="rule-price-table">
+              <div class="rule-price-head">Long weekend</div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri to Mon</small></span><span class="rule-price-pts">7 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat to Mon</small></span><span class="rule-price-pts">6 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun and Mon</small></span><span class="rule-price-pts">4 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Monday<small>Mon only</small></span><span class="rule-price-pts">2 pts</span></div>
+            </div>
+            <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:0px 2px 0px;">Saturday never comes without its Sunday, and a reopened weekend is never split between two partners.</p>
 
             <div class="rule-section-label">Fairness</div>
             <div class="rule-checklist">
-              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">On named public holidays, partners who haven't had that holiday yet get first pick.</span></div>
-              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">If nobody books a weekend by Friday midnight, it opens to everyone, priced per day instead of the weekend rate.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">On named public holidays, partners who haven’t had that holiday yet get first pick, every time it comes round in your 3-year term.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">If a long weekend is still free <b>14 days</b> out, it opens to everyone, including anyone already at their 2-long-weekend limit.</span></div>
             </div>
 
             <div class="rule-section-label">Cancellation</div>
@@ -932,8 +1055,10 @@
                 <div class="rule-compare-desc">Points forfeited</div>
               </div>
             </div>
+            <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:10px 2px 0px;">That is for a trip you booked in advance. A weekend you picked up after it went unclaimed forfeits its points whenever you cancel, and a standby claim has no points to lose, we simply tell Tamaki Marine Park to stand down.</p>
 
             <div class="rule-section-label">Christmas Window</div>
+            <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:0px 2px 10px;">One week, drawn once when Halcyon is delivered and held for you for the whole term. Window 1 is <b>22 to 28 Dec</b>, Window 2 is <b>30 Dec to 5 Jan</b>. The <b>14 points</b> come off automatically on the delivery anniversary of the year your window falls in, leaving you 44 for the rest of that year. 29 Dec and 6 Jan are cleaning days and are never bookable.</p>
             <div class="rule-compare">
               <div class="rule-compare-card good">
                 <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></div>
@@ -946,7 +1071,7 @@
                 <div class="rule-compare-desc">Points forfeited</div>
               </div>
             </div>
-            <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:10px 2px 0;">Longer than the usual 48-hour rule, so your other 5 partners have more time to book the dates you free up.</p>
+            <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:10px 2px 0px;">Longer than the usual 48-hour rule, so your other 5 partners have more time to book the dates you free up. All five are told the moment you release.</p>
           </div>
           <div class="tabbar">
             <button class="tab" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></button>
@@ -969,8 +1094,12 @@
               <div><div class="notif-title">Halcyon is ready for your trip</div><div class="notif-time">Yesterday</div></div>
             </div>
             <div class="notif-row">
-              <div class="notif-icon tint-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
-              <div><div class="notif-title">Payment due: Q1 management fee</div><div class="notif-time">3 days ago</div></div>
+              <div class="notif-icon tint-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4"/></svg></div>
+              <div><div class="notif-title">Reminder: complete your Post-Use Checklist for <span style="font-family:var(--font-mono)">Sat 14 Mar</span></div><div class="notif-time">3 days ago</div></div>
+            </div>
+            <div class="notif-row">
+              <div class="notif-icon tint-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 8h18M6 8a3 3 0 016 0 3 3 0 016 0"/><path d="M5 8h14v3a2 2 0 01-2 2H7a2 2 0 01-2-2V8z"/></svg></div>
+              <div><div class="notif-title">A Christmas Window just opened: <span style="font-family:var(--font-mono)">22–28 Dec</span> on Halcyon</div><div class="notif-time">4 days ago</div></div>
             </div>
             <div class="notif-row">
               <div class="notif-icon tint-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/></svg></div>
@@ -989,13 +1118,19 @@
             <div class="card" style="margin-bottom:20px;">
               <div class="row"><span class="row-label">Qualification</span><span class="badge confirmed">Approved</span></div>
               <div class="row"><span class="row-label">Secondary operator</span><span class="row-value" style="font-family:var(--font-body);font-weight:400;color:var(--neutral-500);">Not set</span></div>
+              <p style="font-size:14px;color:var(--neutral-500);line-height:1.45;margin:10px 0 0;">Adding or changing a second operator goes through Matt directly, it is not editable here.</p>
             </div>
-            <div class="menu-row" onclick="showScreen('payments')" style="cursor:pointer;">Payments &amp; Invoices <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
             <div class="menu-row" onclick="showScreen('christmas')" style="cursor:pointer;">Christmas Window <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
             <div class="menu-row" onclick="showScreen('support')" style="cursor:pointer;">Support <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
             <div class="menu-row" onclick="showScreen('legal')" style="cursor:pointer;">Terms &amp; Privacy <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
             <div class="menu-row" onclick="openModal('logout')" style="cursor:pointer;">Sign out <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
             <div class="menu-row danger" onclick="openModal('delete')" style="cursor:pointer;">Delete Account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            <div class="app-footer">
+              <span class="app-footer-label">Support</span>
+              <span class="app-footer-name">Matt Flanagan</span>
+              <span class="app-footer-line">021 555 0142</span>
+              <span class="app-footer-line">matt@offshorecollective.co.nz</span>
+            </div>
           </div>
           <div class="tabbar">
             <button class="tab" onclick="showScreen('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></button>
@@ -1156,36 +1291,18 @@
           <div style="padding:0 18px 30px;"><button class="btn btn-primary" type="button" onclick="HOME_BOOKINGS[activeBookingId].preDepartureDone = false; renderBookingDetail(); showScreen('home');">Submit &amp; Start Turnaround</button></div>
         </div>
 
-        <!-- PROTO: PAYMENTS & INVOICES -->
-        <div class="proto-screen" data-screen="payments" hidden>
-          <div class="navbar"><span class="navbar-icon"></span><button class="back-btn" onclick="showScreen('profile')">‹</button>Payments &amp; Invoices</div>
-          <div class="content">
-            <div class="invoice-row">
-              <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
-              <div class="invoice-info"><div class="invoice-title"><span style="font-family:var(--font-mono)">Q1 2026</span> Management Fee</div><div class="invoice-date">Invoiced 3 Jan 2026</div></div>
-              <div class="invoice-amount"><div class="invoice-value">$1,850.00</div><span class="badge confirmed">Paid</span></div>
-            </div>
-            <div class="invoice-row">
-              <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22c5-4 8-8 8-12a8 8 0 10-16 0c0 4 3 8 8 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
-              <div class="invoice-info"><div class="invoice-title">Fuel Reimbursement</div><div class="invoice-date">Invoiced 14 Feb 2026</div></div>
-              <div class="invoice-amount"><div class="invoice-value">$42.00</div><span class="badge confirmed">Paid</span></div>
-            </div>
-            <div class="invoice-row">
-              <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
-              <div class="invoice-info"><div class="invoice-title"><span style="font-family:var(--font-mono)">Q2 2026</span> Management Fee</div><div class="invoice-date">Invoiced 2 Apr 2026</div></div>
-              <div class="invoice-amount"><div class="invoice-value">$1,850.00</div><span class="badge pending">Due</span></div>
-            </div>
-          </div>
-        </div>
-
         <!-- PROTO: CHRISTMAS WINDOW -->
         <div class="proto-screen" data-screen="christmas" hidden>
           <div class="navbar"><span class="navbar-icon"></span><button class="back-btn" onclick="showScreen('profile')">‹</button>Christmas Window</div>
           <div class="content">
-            <p class="xmas-intro">Drawn once by the admin when the boat is delivered, one window in one year of your 3-year term. It's a single allocation, not a yearly repeat.</p>
-            <div class="xmas-stat-grid">
-              <div class="xmas-stat-card highlight"><span class="xmas-stat-label">Cost</span><span class="xmas-stat-value">14 <small>pts</small></span></div>
-              <div class="xmas-stat-card"><span class="xmas-stat-label">Allocation</span><span class="xmas-stat-value" style="font-family:var(--font-soft);">Once per term</span></div>
+            <p class="xmas-intro">Drawn once by the admin when Halcyon is delivered, one window in one year of your 3-year term. It is a single allocation, not a yearly repeat. 29 Dec and 6 Jan are cleaning days and are never bookable.</p>
+            <div class="xmas-cost-card">
+              <div class="xmas-cost-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 8h18M6 8a3 3 0 016 0 3 3 0 016 0"/><path d="M5 8h14v3a2 2 0 01-2 2H7a2 2 0 01-2-2V8z"/></svg></div>
+              <div class="xmas-cost-body">
+                <span class="xmas-cost-label">Cost</span>
+                <div class="xmas-cost-value">14 <small>pts</small></div>
+                <p class="xmas-cost-note">Comes off automatically on the delivery anniversary of the year your window falls in, leaving you 44 points for the rest of that year. No separate booking step.</p>
+              </div>
             </div>
             <div class="xmas-year-card na">
               <div class="xmas-year-header">
@@ -1281,11 +1398,24 @@
           </div>
         </div>
 
+        <!-- MODAL: CANCEL A STANDBY CLAIM (C.30) -->
+        <div class="modal-overlay" id="modal-cancel-standby" hidden>
+          <div class="modal-box">
+            <div class="modal-icon" style="background:var(--navy-100);color:var(--navy-700);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div>
+            <div class="modal-title">Give up today's standby?</div>
+            <div class="modal-body">A standby claim costs <span style="font-family:var(--font-mono)">0 points</span>, so there is nothing to refund or forfeit. We will tell Tamaki Marine Park straight away to stand down, or to bring Halcyon back in if she is already in the water.</div>
+            <div class="modal-actions">
+              <button class="btn" style="background:var(--error-700);color:#fff;" onclick="showScreen('home'); closeModal('cancel-standby');">Give Up Standby</button>
+              <button class="btn btn-ghost" onclick="closeModal('cancel-standby')">Keep It</button>
+            </div>
+          </div>
+        </div>
+
         <div class="modal-overlay" id="modal-release-xmas" hidden>
           <div class="modal-box">
             <div class="modal-icon" style="background:var(--navy-100);color:var(--navy-700);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
             <div class="modal-title">Release your week, 30 Dec–5 Jan?</div>
-            <div class="modal-body"><span style="font-family:var(--font-mono)">30 Dec–5 Jan</span> is more than <span style="font-family:var(--font-mono)">14 days</span> away, so your <span style="font-family:var(--font-mono)">14 points</span> will be refunded in full. Inside 14 days, releasing forfeits the points instead. The dates then open to your other 5 partners, first-confirmed.</div>
+            <div class="modal-body"><span style="font-family:var(--font-mono)">30 Dec–5 Jan</span> is more than <span style="font-family:var(--font-mono)">14 days</span> away, so your <span style="font-family:var(--font-mono)">14 points</span> will be refunded in full. Inside 14 days, releasing forfeits the points instead. Either way, all 5 of your partners are told at the same moment, and the dates open to them first-confirmed.</div>
             <div class="modal-actions">
               <button class="btn" style="background:var(--error-700);color:#fff;" onclick="showScreen('christmas'); closeModal('release-xmas');">Release This Week</button>
               <button class="btn btn-ghost" onclick="closeModal('release-xmas')">Keep My Week</button>
@@ -1354,8 +1484,10 @@
           </div></div>
           <div class="boat-id">
             <div class="boat-id-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
-            <div class="boat-id-name">Halcyon</div>
-            <span class="boat-id-model">Rayglass 3000</span>
+            <div class="boat-id-body">
+              <div class="boat-id-name">Halcyon<span class="boat-id-model">Rayglass 3000</span></div>
+              <span class="boat-id-ready"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12l4 4 10-10"/></svg>Ready for your trip</span>
+            </div>
           </div>
           <div class="section-title">Upcoming Bookings</div>
           <div class="booking-card">
@@ -1447,25 +1579,27 @@
         <div class="content">
           <div class="boat-id">
             <div class="boat-id-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
-            <div class="boat-id-name">Halcyon</div>
-            <span class="boat-id-model">Rayglass 3000</span>
+            <div class="boat-id-body">
+              <div class="boat-id-name">Halcyon<span class="boat-id-model">Rayglass 3000</span></div>
+            </div>
           </div>
           <div class="section-sub" style="margin:-8px 0 14px;">March</div>
           <div class="cal-legend">
             <span class="cal-legend-item"><span class="cal-legend-chip available"></span>Available</span>
             <span class="cal-legend-item"><span class="cal-legend-chip booked"></span>Booked</span>
             <span class="cal-legend-item"><span class="cal-legend-chip blocked"></span>Blocked</span>
-            <span class="cal-legend-item"><span class="cal-legend-chip standby"></span>Standby-available</span>
-            <span class="cal-legend-item"><span class="cal-legend-chip unclaimed"></span>Unclaimed, per day</span>
+            <span class="cal-legend-item"><span class="cal-legend-chip standby"></span>Standby: today, free</span>
+            <span class="cal-legend-item"><span class="cal-legend-chip unclaimed"></span>Unclaimed, reduced rate</span>
             <span class="cal-legend-item"><span class="cal-legend-chip holiday"></span>Named Holiday</span>
+            <span class="cal-legend-item"><span class="cal-legend-chip outside-window"></span>Outside 60-day window</span>
           </div>
           <div class="cal-holiday-note"><span>Wed 18: Waitangi Day</span><span>Fri 20–Mon 23: King's Birthday Weekend</span></div>
           <div class="cal-grid">
             <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
-            <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell blocked">4<span class="cal-glyph blocked"></span></div><div class="cal-cell blocked">5<span class="cal-glyph blocked"></span></div>
+            <div class="cal-cell past">1</div><div class="cal-cell past">2</div><div class="cal-cell past">3</div><div class="cal-cell blocked">4<span class="cal-glyph blocked"></span></div><div class="cal-cell blocked">5<span class="cal-glyph blocked"></span></div>
             <div class="cal-cell booked">6<span class="cal-glyph booked"></span></div><div class="cal-cell booked">7<span class="cal-glyph booked"></span></div>
-            <div class="cal-cell booked">8<span class="cal-glyph booked"></span></div><div class="cal-cell available">9</div><div class="cal-cell available">10</div>
-            <div class="cal-cell available">11</div><div class="cal-cell standby">12<span class="cal-glyph standby"></span></div><div class="cal-cell standby">13<span class="cal-glyph standby"></span></div>
+            <div class="cal-cell booked">8<span class="cal-glyph booked"></span></div><div class="cal-cell past">9</div><div class="cal-cell past">10</div>
+            <div class="cal-cell past">11</div><div class="cal-cell standby today">12<span class="cal-glyph standby"></span></div><div class="cal-cell available">13</div>
             <div class="cal-cell available selected">14</div><div class="cal-cell available selected">15</div><div class="cal-cell available">16</div><div class="cal-cell available">17</div>
             <div class="cal-cell available holiday">18<span class="cal-glyph holiday"></span></div><div class="cal-cell available">19</div><div class="cal-cell available holiday">20<span class="cal-glyph holiday"></span></div>
             <div class="cal-cell available holiday">21<span class="cal-glyph holiday"></span></div><div class="cal-cell available holiday">22<span class="cal-glyph holiday"></span></div><div class="cal-cell available holiday">23<span class="cal-glyph holiday"></span></div><div class="cal-cell available">24</div>
@@ -1491,7 +1625,7 @@
       <div class="screen-caption">
         <div class="screen-id">M04 · Core</div>
         <div class="screen-name">Booking Calendar</div>
-        <div class="screen-note">Signature Moment #3: rounded-square date glyphs echo the brand mark; boat identity reuses Home's header component. The key names each state (available, booked, blocked, standby-available, unclaimed); Christmas Window's tint shows only when that window falls in the visible month. Per A.6/A.7, tapping any day in an intact Weekend or Long Weekend block selects/prices the whole block (C.4); once unclaimed past Friday midnight (C.5), days become individually selectable again. Named Holidays use a distinct dashed info-tint marker (C.7), display-only. Standby-available (12–13, A.6/C.27, added 2026-09-14) replaces a leftover "Held" state from the removed Rayglass 2400 Towing Approval flow; its exact claim mechanics still need confirming against A.6/C.27. Tab bar is dropped for a back arrow, matching Review & Confirm and Booking Detail.</div>
+        <div class="screen-note">Signature Moment #3: rounded-square date glyphs echo the brand mark; boat identity reuses Home's header component. The key names every state (available, booked, blocked, standby, unclaimed, named holiday, outside the 60-day window). Standby carries a TODAY marker because A.19 only ever opens the current date, after 7am, and only when nothing confirmed covers it. Unclaimed dates reprice from C.5's table by the day you claim on, not per day.</div>
       </div>
     </div>
 
@@ -1653,14 +1787,40 @@
           <div class="sheet-handle"></div>
           <span class="badge blocked" style="margin-bottom:14px;">Blocked</span>
           <div style="font-family:var(--font-body);font-weight:600;font-size:16px;color:var(--navy-800);margin-bottom:8px;">Long weekend limit reached</div>
-          <p style="font-size:16px;color:var(--neutral-700);line-height:1.6;margin:0 0 20px;">You've already used your <b style="font-family:var(--font-mono);color:var(--navy-800)">2 long weekends</b> in the last 12 months.</p>
+          <p style="font-size:16px;color:var(--neutral-700);line-height:1.6;margin:0 0 20px;">You've already booked your <b style="font-family:var(--font-mono);color:var(--navy-800)">2 long weekends</b> for the last 12 months. If this one is still free <b style="font-family:var(--font-mono);color:var(--navy-800)">14 days</b> out, or it goes unclaimed, you can still claim it then, it won't count toward your 2.</p>
           <button class="btn btn-ghost">Choose Different Dates</button>
         </div>
       </div></div>
       <div class="screen-caption">
         <div class="screen-id">M22 · System</div>
         <div class="screen-name">Booking Blocked: Long-Weekend Cap</div>
-        <div class="screen-note">States the cap (2) and window (rolling 12 months) precisely.</div>
+        <div class="screen-note">States the cap (2) and window (rolling 12 months), and names the two C.7 routes that stay open to a partner at their cap, the 14-day release and an unclaimed claim. Blocking without those reads as a harder rule than the SOW sets.</div>
+      </div>
+    </div>
+
+    <!-- ============ M22 BOOKING BLOCKED — FRIDAY ALONE ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content" style="background:var(--navy-50);opacity:0.5;">
+          <div class="section-title" style="margin-bottom:14px;">Halcyon · March</div>
+          <div class="cal-grid">
+            <div class="cal-dow">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow">S</div>
+            <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell available">4</div><div class="cal-cell available">5</div><div class="cal-cell selected">6</div><div class="cal-cell available">7</div>
+          </div>
+        </div>
+        <div class="sheet" style="top:520px;">
+          <div class="sheet-handle"></div>
+          <span class="badge blocked" style="margin-bottom:14px;">Blocked</span>
+          <div style="font-family:var(--font-body);font-weight:600;font-size:16px;color:var(--navy-800);margin-bottom:8px;">Friday isn't booked on its own</div>
+          <p style="font-size:16px;color:var(--neutral-700);line-height:1.6;margin:0 0 20px;">Add Saturday and Sunday for a <b style="font-family:var(--font-mono);color:var(--navy-800)">weekend block</b>, carry on to Monday for a <b style="font-family:var(--font-mono);color:var(--navy-800)">long weekend</b>, or pick a different day.</p>
+          <button class="btn btn-ghost">Choose Different Dates</button>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M22 · System</div>
+        <div class="screen-name">Booking Blocked: Friday Alone</div>
+        <div class="screen-note">SOW C.4 hard-blocks a standalone Friday under both the advance window and unclaimed access. No state covered this before, so a lone Friday would have priced as a 1-point single day. The copy offers the two ways forward rather than only refusing.</div>
       </div>
     </div>
 
@@ -1687,6 +1847,74 @@
         <div class="screen-id">M22 · System</div>
         <div class="screen-name">Booking Blocked: Named-Holiday Fairness</div>
         <div class="screen-note">New copy for this rule (none existed in `14-ux-writing.md`); follows the same named-rule pattern as the other variants.</div>
+      </div>
+    </div>
+
+    <!-- ============ M24 - System CANCEL: UNCLAIMED-ACCESS BOOKING ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="navbar-icon"></span><span class="back">‹</span>Booking</div>
+        <div class="content" style="opacity:0.45;">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+              <div><div class="section-title">Unclaimed Weekend</div><div class="section-sub">Sat 28 → Sun 29 Mar</div></div>
+              <span class="badge confirmed">Confirmed</span>
+            </div>
+            <div class="divider"></div>
+            <div class="row"><span class="row-label">Points used</span><span class="row-value">4</span></div>
+          </div>
+        </div>
+        <div class="modal-overlay">
+          <div class="modal-box">
+            <div class="modal-icon" style="background:var(--navy-100);color:var(--navy-700);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></div>
+            <div class="modal-title">Cancel this weekend?</div>
+            <div class="modal-body">You picked this up after it went unclaimed, so the <span style="font-family:var(--font-mono)">4 points</span> are forfeited whenever you cancel. The 48-hour refund applies to trips booked in advance, not to one claimed this close to the date. The dates go straight back to your other 5 partners.</div>
+            <div class="modal-actions">
+              <button class="btn" style="background:var(--error-700);color:#fff;">Cancel, Forfeit 4 pts</button>
+              <button class="btn btn-ghost">Keep Booking</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M24 · System</div>
+        <div class="screen-name">Cancel: Unclaimed-Access Booking</div>
+        <div class="screen-note">SOW C.30, previously undesigned. An unclaimed-access booking has no meaningful advance-notice window to protect, so it forfeits its points whenever it is cancelled. The dialog says so plainly and explains why the 48-hour rule the partner already knows does not apply here, rather than silently taking the points.</div>
+      </div>
+    </div>
+
+    <!-- ============ M24 - System CANCEL: STANDBY CLAIM ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="navbar-icon"></span><span class="back">‹</span>Booking</div>
+        <div class="content" style="opacity:0.45;">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+              <div><div class="section-title">Standby Claim</div><div class="section-sub">Thu 12 Mar, today</div></div>
+              <span class="badge confirmed">Claimed</span>
+            </div>
+            <div class="divider"></div>
+            <div class="row"><span class="row-label">Points used</span><span class="row-value">0</span></div>
+          </div>
+        </div>
+        <div class="modal-overlay">
+          <div class="modal-box">
+            <div class="modal-icon" style="background:var(--navy-100);color:var(--navy-700);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div>
+            <div class="modal-title">Give up today's standby?</div>
+            <div class="modal-body">A standby claim costs <span style="font-family:var(--font-mono)">0 points</span>, so there is nothing to refund or forfeit. We will tell Tamaki Marine Park straight away to stand down, or to bring Halcyon back in if she is already in the water.</div>
+            <div class="modal-actions">
+              <button class="btn" style="background:var(--error-700);color:#fff;">Give Up Standby</button>
+              <button class="btn btn-ghost">Keep It</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M24 · System</div>
+        <div class="screen-name">Cancel: Standby Claim</div>
+        <div class="screen-note">SOW C.30. The only cancellation with no points on either side, so the dialog leads with the operational consequence instead: TMP has to stand down or retrieve. No post-use checklist is expected on a cancelled standby claim, which is why this does not route into the checklist flow.</div>
       </div>
     </div>
 
@@ -1750,16 +1978,18 @@
             <div class="rule-highlight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
             <div>
               <div class="rule-highlight-value">58<span>pts / year</span></div>
-              <div class="rule-highlight-note">Resets on Halcyon's delivery anniversary, shared by all 6 owners</div>
+              <div class="rule-highlight-note">Resets on Halcyon’s delivery anniversary, shared by all 6 owners</div>
             </div>
           </div>
 
           <div class="rule-section-label">Booking Types &amp; Cost</div>
           <div class="rule-cost-grid">
             <div class="rule-cost-card"><span class="rule-cost-label">Regular day</span><span class="rule-cost-value">1 <small>pt</small></span></div>
-            <div class="rule-cost-card"><span class="rule-cost-label">Weekend block</span><span class="rule-cost-value">5 <small>pts</small></span></div>
-            <div class="rule-cost-card"><span class="rule-cost-label">Long weekend</span><span class="rule-cost-value">7 <small>pts</small></span></div>
-            <div class="rule-cost-card highlight"><span class="rule-cost-label">Christmas Window</span><span class="rule-cost-value">14 <small>pts</small></span></div>
+            <div class="rule-cost-card"><span class="rule-cost-label">Weekend block <small style="color:var(--neutral-500)">Fri to Sun</small></span><span class="rule-cost-value">5 <small>pts</small></span></div>
+            <div class="rule-cost-card"><span class="rule-cost-label">Long weekend <small style="color:var(--neutral-500)">Fri to Mon</small></span><span class="rule-cost-value">7 <small>pts</small></span></div>
+            <div class="rule-cost-card highlight"><span class="rule-cost-label">Christmas Window <small style="color:var(--neutral-500)">7 days</small></span><span class="rule-cost-value">14 <small>pts</small></span></div>
+            <div class="rule-cost-card free"><span class="rule-cost-label">Standby <small style="color:var(--neutral-500)">today only</small></span><span class="rule-cost-value">0 <small>pts</small></span></div>
+            <div class="rule-cost-card"><span class="rule-cost-label">Unclaimed weekend</span><span class="rule-cost-value">2–5 <small>pts</small></span></div>
           </div>
 
           <div class="rule-section-label">Timing Limits</div>
@@ -1769,15 +1999,41 @@
             <div class="rule-stat"><div class="rule-stat-value">7</div><div class="rule-stat-label">days / trip</div></div>
           </div>
           <div class="rule-checklist" style="margin-top:10px;">
-            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">You can book up to 60 days ahead. First to book gets the date, no queue or turns.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Dates open at <b>7am</b>, 60 days ahead. First to book gets them, there is no queue and no rotation.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Friday is never booked on its own. It travels with the weekend, or as part of a longer trip.</span></div>
             <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Wait 7 days after a full 7-day trip before booking again.</span></div>
-            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">You can take up to 2 long weekends every 12 months.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Up to 2 long weekends every 12 months. Claiming one that went unclaimed never counts toward those 2.</span></div>
           </div>
+
+          <div class="rule-section-label">Standby: Today, Free</div>
+          <div class="rule-checklist">
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">If nobody has claimed today by <b>7am</b>, it opens to all six of you at <b>no point cost</b>.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">First to claim gets it, and there is no yearly limit on how many standby days you take.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Only today ever opens this way, never a day already inside someone else’s confirmed booking.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">We text Tamaki Marine Park the moment you claim, so tell us when you plan to head out.</span></div>
+          </div>
+
+          <div class="rule-section-label">If a Weekend Goes Unclaimed</div>
+          <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:0px 2px 10px;">If nobody books a weekend by <b>midnight Friday</b>, it reopens to everyone. You take it from the day you claim through to the end of the block, so the rate drops as the weekend goes on.</p>
+          <div class="rule-price-table">
+            <div class="rule-price-head">Weekend block</div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri, Sat and Sun</small></span><span class="rule-price-pts">5 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat and Sun</small></span><span class="rule-price-pts">4 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun only</small></span><span class="rule-price-pts">2 pts</span></div>
+          </div>
+          <div class="rule-price-table">
+            <div class="rule-price-head">Long weekend</div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri to Mon</small></span><span class="rule-price-pts">7 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat to Mon</small></span><span class="rule-price-pts">6 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun and Mon</small></span><span class="rule-price-pts">4 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Monday<small>Mon only</small></span><span class="rule-price-pts">2 pts</span></div>
+          </div>
+          <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:0px 2px 0px;">Saturday never comes without its Sunday, and a reopened weekend is never split between two partners.</p>
 
           <div class="rule-section-label">Fairness</div>
           <div class="rule-checklist">
-            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">On named public holidays, partners who haven't had that holiday yet get first pick.</span></div>
-            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">If nobody books a weekend by Friday midnight, it opens to everyone, priced per day instead of the weekend rate.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">On named public holidays, partners who haven’t had that holiday yet get first pick, every time it comes round in your 3-year term.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">If a long weekend is still free <b>14 days</b> out, it opens to everyone, including anyone already at their 2-long-weekend limit.</span></div>
           </div>
 
           <div class="rule-section-label">Cancellation</div>
@@ -1793,8 +2049,10 @@
               <div class="rule-compare-desc">Points forfeited</div>
             </div>
           </div>
+          <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:10px 2px 0px;">That is for a trip you booked in advance. A weekend you picked up after it went unclaimed forfeits its points whenever you cancel, and a standby claim has no points to lose, we simply tell Tamaki Marine Park to stand down.</p>
 
           <div class="rule-section-label">Christmas Window</div>
+          <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:0px 2px 10px;">One week, drawn once when Halcyon is delivered and held for you for the whole term. Window 1 is <b>22 to 28 Dec</b>, Window 2 is <b>30 Dec to 5 Jan</b>. The <b>14 points</b> come off automatically on the delivery anniversary of the year your window falls in, leaving you 44 for the rest of that year. 29 Dec and 6 Jan are cleaning days and are never bookable.</p>
           <div class="rule-compare">
             <div class="rule-compare-card good">
               <div class="rule-compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></div>
@@ -1807,7 +2065,7 @@
               <div class="rule-compare-desc">Points forfeited</div>
             </div>
           </div>
-          <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:10px 2px 0;">Longer than the usual 48-hour rule, so your other 5 partners have more time to book the dates you free up.</p>
+          <p style="font-size:16px;color:var(--neutral-600);line-height:1.55;margin:10px 2px 0px;">Longer than the usual 48-hour rule, so your other 5 partners have more time to book the dates you free up. All five are told the moment you release.</p>
         </div>
         <div class="tabbar">
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></div>
@@ -1819,7 +2077,7 @@
       <div class="screen-caption">
         <div class="screen-id">M05 · Core</div>
         <div class="screen-name">Boat Rules</div>
-        <div class="screen-note">Grouped by topic per the WBS. Towing/Rayglass 2400 section removed per PRD v1.5, fleet is 3000-only.</div>
+        <div class="screen-note">A.5 asks for a plain-language summary of every booking rule, grouped by topic, so all of them are here: the six things a partner can book and what each costs, the timing limits, standby, the unclaimed rate tables from C.5, fairness, and both cancellation regimes. Fleet is Rayglass 3000 only.</div>
       </div>
     </div>
 
@@ -1838,8 +2096,12 @@
             <div><div class="notif-title">Halcyon is ready for your trip</div><div class="notif-time">Yesterday</div></div>
           </div>
           <div class="notif-row">
-            <div class="notif-icon tint-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
-            <div><div class="notif-title">Payment due: Q1 management fee</div><div class="notif-time">3 days ago</div></div>
+            <div class="notif-icon tint-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4"/></svg></div>
+            <div><div class="notif-title">Reminder: complete your Post-Use Checklist for <span style="font-family:var(--font-mono)">Sat 14 Mar</span></div><div class="notif-time">3 days ago</div></div>
+          </div>
+          <div class="notif-row">
+            <div class="notif-icon tint-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 8h18M6 8a3 3 0 016 0 3 3 0 016 0"/><path d="M5 8h14v3a2 2 0 01-2 2H7a2 2 0 01-2-2V8z"/></svg></div>
+            <div><div class="notif-title">A Christmas Window just opened: <span style="font-family:var(--font-mono)">22–28 Dec</span> on Halcyon</div><div class="notif-time">4 days ago</div></div>
           </div>
           <div class="notif-row">
             <div class="notif-icon tint-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/></svg></div>
@@ -1850,7 +2112,7 @@
       <div class="screen-caption">
         <div class="screen-id">M06 · Core</div>
         <div class="screen-name">Notification Center</div>
-        <div class="screen-note">Every WBS notification type is listed, even if push was missed. Icons follow the rounded navy line style.</div>
+        <div class="screen-note">Covers each type named in SOW A.14: booking confirmed, boat ready, access opened, and the three release triggers (C.9). No payment-due entry exists, the platform raises no partner-facing invoice (A.14 AC). The checklist reminder comes from C.32.</div>
       </div>
     </div>
 
@@ -1866,13 +2128,19 @@
           <div class="card" style="margin-bottom:20px;">
             <div class="row"><span class="row-label">Qualification</span><span class="badge confirmed">Approved</span></div>
             <div class="row"><span class="row-label">Secondary operator</span><span class="row-value" style="font-family:var(--font-body);font-weight:400;color:var(--neutral-500);">Not set</span></div>
+            <p style="font-size:14px;color:var(--neutral-500);line-height:1.45;margin:10px 0 0;">Adding or changing a second operator goes through Matt directly, it is not editable here.</p>
           </div>
-          <div class="menu-row">Payments &amp; Invoices <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
           <div class="menu-row">Christmas Window <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
           <div class="menu-row">Support <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
           <div class="menu-row">Terms &amp; Privacy <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
           <div class="menu-row">Sign out <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
           <div class="menu-row danger">Delete Account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+          <div class="app-footer">
+            <span class="app-footer-label">Support</span>
+            <span class="app-footer-name">Matt Flanagan</span>
+            <span class="app-footer-line">021 555 0142</span>
+            <span class="app-footer-line">matt@offshorecollective.co.nz</span>
+          </div>
         </div>
         <div class="tabbar">
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></div>
@@ -1884,7 +2152,7 @@
       <div class="screen-caption">
         <div class="screen-id">M07 · Core</div>
         <div class="screen-name">Profile</div>
-        <div class="screen-note">Secondary-menu hub for Payments, Christmas Window, and legal pages, keeping the tab bar at 5 items per the IA.</div>
+        <div class="screen-note">Secondary-menu hub for Christmas Window, Support, and the legal pages, keeping the tab bar at 4 items per the IA. The platform holds no financial data (C.26), so this menu has no money screen. Secondary operator is view-only (A.16), with the route to change it stated rather than implied. The support name, phone, and email also sit in the app footer, which is where A.17 puts them.</div>
       </div>
     </div>
 
@@ -2043,33 +2311,52 @@
       </div>
     </div>
 
-    <!-- ============ M11 PAYMENTS & INVOICES ============ -->
+    <!-- ============ M23 STANDBY CLAIM ============ -->
     <div class="screen-card">
       <div class="phone"><div class="screen">
         <div class="statusbar"><span>9:41</span><span>●●●</span></div>
-        <div class="navbar"><span class="navbar-icon"></span><span class="back">‹</span>Payments &amp; Invoices</div>
+        <div class="navbar"><span class="navbar-icon"></span><span class="back">‹</span>Claim Today</div>
         <div class="content">
-          <div class="invoice-row">
-            <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
-            <div class="invoice-info"><div class="invoice-title"><span style="font-family:var(--font-mono)">Q1 2026</span> Management Fee</div><div class="invoice-date">Invoiced 3 Jan 2026</div></div>
-            <div class="invoice-amount"><div class="invoice-value">$1,850.00</div><span class="badge confirmed">Paid</span></div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg>Halcyon: Standby Claim</div>
+            <div class="section-sub">Thu 12 Mar, today</div>
+            <div class="divider"></div>
+            <div class="row"><span class="row-label">Points available</span><span class="row-value big">5</span></div>
+            <div class="row"><span class="row-label">This claim uses</span><span class="row-value big">0</span></div>
+            <div class="row"><span class="row-label">Balance after</span><span class="row-value big">5</span></div>
           </div>
-          <div class="invoice-row">
-            <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22c5-4 8-8 8-12a8 8 0 10-16 0c0 4 3 8 8 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
-            <div class="invoice-info"><div class="invoice-title">Fuel Reimbursement</div><div class="invoice-date">Invoiced 14 Feb 2026</div></div>
-            <div class="invoice-amount"><div class="invoice-value">$42.00</div><span class="badge confirmed">Paid</span></div>
+          <div class="standby-hero">
+            <div class="standby-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div>
+            <div>
+              <span class="standby-hero-label">Standby, today only</span>
+              <div class="standby-hero-value">0 <small>points</small></div>
+            </div>
           </div>
-          <div class="invoice-row">
-            <div class="invoice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
-            <div class="invoice-info"><div class="invoice-title"><span style="font-family:var(--font-mono)">Q2 2026</span> Management Fee</div><div class="invoice-date">Invoiced 2 Apr 2026</div></div>
-            <div class="invoice-amount"><div class="invoice-value">$1,850.00</div><span class="badge pending">Due</span></div>
+          <span class="field-label">Estimated departure time</span>
+          <div class="field-row">
+            <select class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">
+              <option>6</option><option>7</option><option>8</option><option>9</option><option selected>10</option><option>11</option>
+              <option>12</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+            <select class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">
+              <option selected>:00</option><option>:30</option>
+            </select>
+            <select class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">
+              <option selected>AM</option><option>PM</option>
+            </select>
           </div>
+          <p style="font-size:16px;color:var(--neutral-500);line-height:1.5;margin:0 0 16px;">We text and email Tamaki Marine Park the moment you claim, so give them as much notice as you can.</p>
+          <p style="font-size:16px;color:var(--neutral-600);line-height:1.6;margin:0;">Nobody booked today by 7am, so it is open to all six partners, free. First to claim gets it, and there is no limit on how many standby days you take in a year.</p>
+        </div>
+        <div style="padding:0 18px 30px;display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-accent">Claim Today, Free</button>
+          <button class="btn btn-ghost">Back to Calendar</button>
         </div>
       </div></div>
       <div class="screen-caption">
-        <div class="screen-id">M11 · Detail</div>
-        <div class="screen-name">Payments &amp; Invoices</div>
-        <div class="screen-note">Read-only: all fees are invoiced and paid outside the app via Xero/bank transfer. No in-app payment action exists.</div>
+        <div class="screen-id">M23 · Action</div>
+        <div class="screen-name">Standby Claim</div>
+        <div class="screen-note">SOW A.19 / C.27, previously unbuilt. Reached only from the calendar's today cell, and only once 7am passes with nobody holding a confirmed booking. Zero points, so the balance rows read 5 / 0 / 5 rather than being hidden. Captures the same estimated departure time as a normal confirmation (A.8), because C.28 puts it in the real-time SMS and email to Tamaki Marine Park.</div>
       </div>
     </div>
 
@@ -2079,10 +2366,14 @@
         <div class="statusbar"><span>9:41</span><span>●●●</span></div>
         <div class="navbar"><span class="navbar-icon"></span><span class="back">‹</span>Christmas Window</div>
         <div class="content">
-          <p class="xmas-intro">Drawn once by the admin when the boat is delivered, one window in one year of your 3-year term. It's a single allocation, not a yearly repeat.</p>
-          <div class="xmas-stat-grid">
-            <div class="xmas-stat-card highlight"><span class="xmas-stat-label">Cost</span><span class="xmas-stat-value">14 <small>pts</small></span></div>
-            <div class="xmas-stat-card"><span class="xmas-stat-label">Allocation</span><span class="xmas-stat-value" style="font-family:var(--font-soft);">Once per term</span></div>
+          <p class="xmas-intro">Drawn once by the admin when Halcyon is delivered, one window in one year of your 3-year term. It is a single allocation, not a yearly repeat. 29 Dec and 6 Jan are cleaning days and are never bookable.</p>
+          <div class="xmas-cost-card">
+            <div class="xmas-cost-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 8h18M6 8a3 3 0 016 0 3 3 0 016 0"/><path d="M5 8h14v3a2 2 0 01-2 2H7a2 2 0 01-2-2V8z"/></svg></div>
+            <div class="xmas-cost-body">
+              <span class="xmas-cost-label">Cost</span>
+              <div class="xmas-cost-value">14 <small>pts</small></div>
+              <p class="xmas-cost-note">Comes off automatically on the delivery anniversary of the year your window falls in, leaving you 44 points for the rest of that year. No separate booking step.</p>
+            </div>
           </div>
           <div class="xmas-year-card na">
             <div class="xmas-year-header">
@@ -2296,13 +2587,13 @@
   var calMonthIndex = 0;
   var CAL_MONTHS = [
     {
-      label: 'March 2026', abbr: 'Mar',
+      label: 'March 2026', abbr: 'Mar', offset: 0,
       note: '<div class="cal-holiday-note"><span>Wed 18: Waitangi Day</span><span>Fri 20–Mon 23: King\'s Birthday Weekend</span></div>',
       cells: `
-        <div class="cal-cell available">1</div><div class="cal-cell available">2</div><div class="cal-cell available">3</div><div class="cal-cell blocked" onclick="explainDate('blocked')">4<span class="cal-glyph blocked"></span></div><div class="cal-cell blocked" onclick="explainDate('blocked')">5<span class="cal-glyph blocked"></span></div>
+        <div class="cal-cell past">1</div><div class="cal-cell past">2</div><div class="cal-cell past">3</div><div class="cal-cell blocked" onclick="explainDate('blocked')">4<span class="cal-glyph blocked"></span></div><div class="cal-cell blocked" onclick="explainDate('blocked')">5<span class="cal-glyph blocked"></span></div>
         <div class="cal-cell booked" onclick="explainDate('booked')">6<span class="cal-glyph booked"></span></div><div class="cal-cell booked" onclick="explainDate('booked')">7<span class="cal-glyph booked"></span></div>
-        <div class="cal-cell booked" onclick="explainDate('booked')">8<span class="cal-glyph booked"></span></div><div class="cal-cell available">9</div><div class="cal-cell available">10</div>
-        <div class="cal-cell available">11</div><div class="cal-cell standby" onclick="explainDate('standby')">12<span class="cal-glyph standby"></span></div><div class="cal-cell standby" onclick="explainDate('standby')">13<span class="cal-glyph standby"></span></div>
+        <div class="cal-cell booked" onclick="explainDate('booked')">8<span class="cal-glyph booked"></span></div><div class="cal-cell past">9</div><div class="cal-cell past">10</div>
+        <div class="cal-cell past">11</div><div class="cal-cell standby today" onclick="openStandbyClaim()">12<span class="cal-glyph standby"></span></div><div class="cal-cell available selectable" onclick="selectDate(this)">13</div>
         <div class="cal-cell available selectable" onclick="selectDate(this)">14</div><div class="cal-cell available selectable" onclick="selectDate(this)">15</div><div class="cal-cell available selectable" onclick="selectDate(this)">16</div><div class="cal-cell available selectable" onclick="selectDate(this)">17</div>
         <div class="cal-cell available selectable holiday" onclick="selectDate(this)">18<span class="cal-glyph holiday"></span></div><div class="cal-cell available selectable" onclick="selectDate(this)">19</div><div class="cal-cell available selectable holiday" onclick="selectDate(this)">20<span class="cal-glyph holiday"></span></div>
         <div class="cal-cell available selectable holiday" onclick="selectDate(this)">21<span class="cal-glyph holiday"></span></div><div class="cal-cell available selectable holiday" onclick="selectDate(this)">22<span class="cal-glyph holiday"></span></div><div class="cal-cell available selectable holiday" onclick="selectDate(this)">23<span class="cal-glyph holiday"></span></div><div class="cal-cell available selectable" onclick="selectDate(this)">24</div>
@@ -2311,7 +2602,7 @@
       `
     },
     {
-      label: 'April 2026', abbr: 'Apr',
+      label: 'April 2026', abbr: 'Apr', offset: 3,
       note: '<div class="cal-window-note"><span>Nothing to flag this month, no named holidays, and every date is within your 60-day window.</span></div>',
       cells: `
         <div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell available selectable" onclick="selectDate(this)">1</div><div class="cal-cell available selectable" onclick="selectDate(this)">2</div><div class="cal-cell booked" onclick="explainDate('booked')">3<span class="cal-glyph booked"></span></div><div class="cal-cell booked" onclick="explainDate('booked')">4<span class="cal-glyph booked"></span></div>
@@ -2322,7 +2613,7 @@
       `
     },
     {
-      label: 'May 2026', abbr: 'May',
+      label: 'May 2026', abbr: 'May', offset: 5,
       note: '<div class="cal-window-note"><span>Bookable through Tue 12 May.</span><span>Opens up daily as the window moves forward.</span></div>',
       cells: `
         <div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell empty"></div><div class="cal-cell available selectable" onclick="selectDate(this)">1</div><div class="cal-cell available selectable" onclick="selectDate(this)">2</div>
@@ -2361,14 +2652,21 @@
     return null;
   }
 
+  // Day-of-week for a date in the month on screen. Each month carries its real first-weekday
+  // offset, so Friday is genuinely Friday in April and May too, not just in March where the 1st
+  // happens to fall on a Sunday. Every Fri/Sat/Sun rule below depends on this being right.
+  function calDow(day){
+    return (CAL_MONTHS[calMonthIndex].offset + day - 1) % 7; // 0=Sun … 5=Fri, 6=Sat
+  }
+
   // A.6/A.7: Weekend Block (Fri→Sun) and Long Weekend (Fri→Mon) are indivisible while still under
   // standard advance booking, per C.4, there's no single-day booking to offer inside an intact block.
   // Tapping Fri/Sat/Sun resolves to the 3-night Weekend Block; tapping the Monday resolves to the
   // 4-day Long Weekend. Once any day of that span has gone unclaimed (marked .unclaimed, per C.5),
-  // the block is no longer intact and this returns null so the tap falls through to single-day/range
-  // selection at the per-day rate instead.
+  // the block is no longer intact and this returns null so the tap falls through to the separate
+  // unclaimed-access path below, which reprices from C.5's table.
   function calBlockForDay(day){
-    var dow = (day - 1) % 7; // 0=Sun … 5=Fri, 6=Sat
+    var dow = calDow(day);
     var friDay;
     if (dow === 5) friDay = day;          // Fri itself
     else if (dow === 6) friDay = day - 1; // Sat → that week's Fri
@@ -2400,9 +2698,49 @@
     return CAL_NAMED_HOLIDAYS[start + '-' + end] || null;
   }
 
+  // ---- C.5 Unclaimed Weekend / Long Weekend Access -------------------------------------------
+  // Once a block passes midnight Friday unclaimed it stops being one indivisible unit, but it never
+  // becomes a pick-any-day free-for-all either: it shrinks from the front only. A partner claims it
+  // from whichever day they claim it through to the end of the block, at the confirmed rate for that
+  // day. That is exactly what the two tables in C.5 say, read as "which day am I claiming on".
+  //   Weekend block (Fri→Sun):  Fri 5 pts · Sat 4 pts (carries Sun) · Sun 2 pts
+  //   Long weekend (Fri→Mon):   Fri 7 pts · Sat 6 pts · Sun 4 pts (carries Mon) · Mon 2 pts
+  // Saturday is never sold without its Sunday, and the block never splits across two partners, both
+  // of which fall out of the claim-to-the-end rule rather than needing a separate guard.
+  var UNCLAIMED_RATES = {
+    weekend: { 5: 5, 6: 4, 0: 2 },
+    long:    { 5: 7, 6: 6, 0: 4, 1: 2 }
+  };
+
+  // The contiguous run of .unclaimed cells containing this day, or null. A 4-day run starting on a
+  // Friday is a long weekend; anything else is treated as a weekend block.
+  function calUnclaimedRun(day){
+    var c = calCellByDay(day);
+    if (!c || !c.classList.contains('unclaimed')) return null;
+    var start = day, end = day, n;
+    while ((n = calCellByDay(start - 1)) && n.classList.contains('unclaimed')) start--;
+    while ((n = calCellByDay(end + 1)) && n.classList.contains('unclaimed')) end++;
+    return { start: start, end: end, long: (end - start + 1) === 4 && calDow(start) === 5 };
+  }
+
   function selectDate(el){
     var cells = calSelectableCells();
     var day = calDay(el);
+
+    // unclaimed access: claim from the tapped day through to the end of the block, repriced per C.5
+    var run = calUnclaimedRun(day);
+    if (run) {
+      calRangeStart = null;
+      cells.forEach(function(c){ c.classList.remove('selected'); });
+      for (var u = day; u <= run.end; u++) {
+        var uc = calCellByDay(u);
+        if (uc) uc.classList.add('selected');
+      }
+      calUpdateSelection(day, run.end);
+      var left = run.end - day + 1;
+      showCalNote('block', 'This ' + (run.long ? 'long weekend' : 'weekend') + ' went unclaimed, so it reopened to everyone at a lower rate. You take it from the day you claim through to the end of the block, so ' + (left === 1 ? 'one day' : left + ' days') + ' here. The rate drops again with each day that passes.');
+      return;
+    }
 
     // indivisible block: any tap inside an intact Weekend/Long Weekend block selects the whole
     // block, discarding any range already in progress, rather than letting a single day inside it
@@ -2431,7 +2769,7 @@
       cells.forEach(function(c){ c.classList.remove('selected'); });
       el.classList.add('selected');
       calUpdateSelection(day, day);
-      hideCalNote();
+      if (!calSelectionBlocked) hideCalNote();
       return;
     }
 
@@ -2454,7 +2792,7 @@
     calUpdateSelection(calRangeStart, end);
     if (capped) {
       showCalNote('capped', 'Trips are capped at ' + CAL_MAX_NIGHTS + ' days, selection trimmed to ' + calRangeStart + '–' + end + ' ' + CAL_MONTHS[calMonthIndex].abbr + '.');
-    } else {
+    } else if (!calSelectionBlocked) {
       hideCalNote();
     }
     calRangeStart = null; // range complete; next tap starts a new selection
@@ -2474,8 +2812,26 @@
   }
   function calBookingType(start, end){
     var nights = end - start + 1;
-    var startDow = (start - 1) % 7; // 0=Sun … 5=Fri, 6=Sat
+    var startDow = calDow(start);
     var type;
+
+    // C.5: a range inside a reopened block is priced from the unclaimed table by the day it is
+    // claimed on, never per day at the standard rate.
+    var run = calUnclaimedRun(start);
+    if (run) {
+      var pts = UNCLAIMED_RATES[run.long ? 'long' : 'weekend'][startDow];
+      return {
+        label: (run.long ? 'Unclaimed Long Weekend' : 'Unclaimed Weekend'),
+        points: (pts === undefined ? nights : pts)
+      };
+    }
+
+    // C.4: Friday is never bookable as a standalone day, under the advance window or unclaimed
+    // access. A Friday only travels as part of a weekend block, a long weekend, or a longer range.
+    if (nights === 1 && startDow === 5) {
+      return { label: 'Friday alone', points: null, blocked: true };
+    }
+
     if (!calRangeHasUnclaimed(start, end) && nights === 3 && startDow === 5) type = { label: 'Weekend Block', points: 5 };
     else if (!calRangeHasUnclaimed(start, end) && nights === 4 && startDow === 5) type = { label: 'Long Weekend', points: 7 };
     else if (nights === 1) type = { label: 'Single Day', points: 1 };
@@ -2487,12 +2843,17 @@
     return holidayName ? { label: holidayName, points: type.points } : type;
   }
 
+  var calSelectionBlocked = false;
   function calUpdateSelection(start, end){
     var type = calBookingType(start, end);
     var monAbbr = CAL_MONTHS[calMonthIndex].abbr;
+    calSelectionBlocked = !!type.blocked;
     document.getElementById('cal-type-label').textContent = type.label;
     document.getElementById('cal-selected-label').textContent = start === end ? (start + ' ' + monAbbr) : (start + '–' + end + ' ' + monAbbr);
-    document.getElementById('cal-points-label').textContent = type.points;
+    document.getElementById('cal-points-label').textContent = (type.points === null ? '–' : type.points);
+    if (type.blocked) {
+      showCalNote('invalid-range', 'Friday is never booked on its own. Add Saturday and Sunday for a weekend block, carry on to Monday for a long weekend, or pick a different day.');
+    }
     calSyncReviewButton();
   }
 
@@ -2501,11 +2862,12 @@
     // no more silent no-op taps against a booking with nothing chosen yet.
     var hasSelection = document.querySelectorAll('#booking-cal-grid .cal-cell.selected').length > 0;
     var btn = document.getElementById('review-booking-btn');
-    if (btn) btn.disabled = !hasSelection;
+    if (btn) btn.disabled = !hasSelection || calSelectionBlocked;
   }
 
   function clearCalSelection(){
     calRangeStart = null;
+    calSelectionBlocked = false;
     calSelectableCells().forEach(function(c){ c.classList.remove('selected'); });
     document.getElementById('cal-type-label').textContent = 'Tap a date';
     document.getElementById('cal-selected-label').textContent = '';
@@ -2558,7 +2920,11 @@
   // Pre-Departure/Post-Use state independently, so checking in on one never touches the other.
   var HOME_BOOKINGS = {
     1: { type: 'Single Day', date: 'Sat 14 Mar', pointsUsed: 1, pointsAvail: 5, preDepartureDone: false },
-    2: { type: 'Weekend Block', date: 'Fri 20 Mar → Sun 22 Mar', pointsUsed: 5, pointsAvail: 5, preDepartureDone: false }
+    2: { type: 'Weekend Block', date: 'Fri 20 Mar → Sun 22 Mar', pointsUsed: 5, pointsAvail: 5, preDepartureDone: false },
+    // A.19 Standby Claim: the same booking record as any other, but claimed same-day at zero
+    // points, which is why C.30 gives it its own cancellation path (nothing to forfeit, but TMP
+    // still has to be told to stand down or retrieve).
+    3: { type: 'Standby Claim', date: 'Thu 12 Mar, today', pointsUsed: 0, pointsAvail: 5, preDepartureDone: false, kind: 'standby' }
   };
   var activeBookingId = 1;
   function renderBookingDetail(){
@@ -2580,7 +2946,14 @@
 
     var state = b.preDepartureDone
       ? { badge: 'Checked Out', badgeClass: 'badge pending', msg: 'Out on the water. Complete your Post-Use Checklist once you\'re back.', ctaLabel: 'Complete Post-Use Checklist', ctaScreen: 'postcheck', canCancel: false }
-      : { badge: 'Confirmed', badgeClass: 'badge confirmed', msg: 'Booked. See you on the water.', ctaLabel: 'Return to Home', ctaScreen: 'home', canCancel: true };
+      : b.kind === 'standby'
+        ? { badge: 'Claimed', badgeClass: 'badge confirmed', msg: 'Claimed. Tamaki Marine Park has been told, they will have Halcyon in the water for you.', ctaLabel: 'Return to Home', ctaScreen: 'home', canCancel: true }
+        : { badge: 'Confirmed', badgeClass: 'badge confirmed', msg: 'Booked. See you on the water.', ctaLabel: 'Return to Home', ctaScreen: 'home', canCancel: true };
+
+    // C.30: a standby claim does not follow the 48-hour refund rule (there is nothing to
+    // refund), so it must not open the standard cancel dialog.
+    var cancelBtn = cancelWrap && cancelWrap.querySelector('button');
+    if (cancelBtn) cancelBtn.onclick = function(){ openModal(b.kind === 'standby' ? 'cancel-standby' : 'cancel'); };
 
     if (msg) msg.textContent = state.msg;
     if (cta) { cta.textContent = state.ctaLabel; cta.onclick = function(){ showScreen(state.ctaScreen); }; }
@@ -2588,6 +2961,11 @@
     if (badge) { badge.textContent = state.badge; badge.className = state.badgeClass; }
     if (homeBadge) { homeBadge.textContent = state.badge; homeBadge.className = state.badgeClass; }
   }
+  // A.19: the claim itself. No points change hands, so there is no points-preview step between
+  // the calendar and the confirmation, unlike the A.8 booking path.
+  function claimStandby(){ openBookingDetail(3); }
+  function openStandbyClaim(){ showScreen('standby'); }
+
   function openBookingDetail(id){
     if (id) activeBookingId = id;
     renderBookingDetail();
@@ -2597,7 +2975,7 @@
   var CAL_NOTES = {
     blocked: 'Out of service for scheduled maintenance. Not bookable until it\'s back in the water.',
     booked: 'Already booked by another partner on Halcyon.',
-    standby: 'Standby-available: open to a free, same-day standby claim.',
+    standby: 'Standby-available: nobody claimed today by 7am, so it is open to any partner, free. Tap it again to claim.',
     window: 'These dates are more than 60 days away. You can book them once they\'re within the 60-day window.'
   };
   function explainDate(type){
