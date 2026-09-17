@@ -50,10 +50,10 @@ This maps cleanly onto the art direction's hero-at-top composition: the Data Her
 
 | Pattern | Where used | 320pt risk |
 |---|---|---|
-| **Single Column** | Home (M03), Profile (M07), Boat Rules (M05), all form/checklist screens (M15/M16/M18/M19), all detail screens (M09, M11-M14) | Safe |
-| **Tab Bar** | Global navigation (5 items) | [WARN] see 320pt checklist below — 5 labelled items is tight at 320pt |
+| **Single Column** | Home (M03), Profile (M07), Boat Rules (M05), all form/checklist screens (M15/M16/M28), M07 in edit mode, all detail screens (M09, M13) | Safe |
+| **Tab Bar** | Global navigation (4 items: Home, Book, Rules, Profile) | Safe — the 320pt risk below was written against a 5-item bar; Notifications moved to the Home top bar, which resolves it |
 | **Calendar Grid** *(app-specific pattern, not in the skill's generic list)* | Booking Calendar (M04) | [WARN] 7-column grid is the tightest layout in the app at 320pt — see note below |
-| **Bottom Sheet** | Booking Blocked (M22) rule-violation message, Cancel Booking (M17) confirmation | Safe |
+| **Bottom Sheet** | Booking Blocked (M22) rule-violation messages, the three cancellation confirmations (M17 advance booking, M29 unclaimed-access, M29 standby), Christmas Window release | Safe |
 | **Sticky Header + Scroll** | Boat Rules (M05, grouped-by-topic long content), Notification Center (M06) | Safe |
 
 **No Card Grid, Split View, Master-Detail, Side Drawer, or FAB** — this app's IA (5-tab bar, no multi-pane needs, no single dominant recurring action outside the tab bar) doesn't call for any of them; introducing one would add unscoped complexity per the art direction's restraint principle.

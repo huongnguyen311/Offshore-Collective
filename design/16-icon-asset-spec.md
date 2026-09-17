@@ -18,6 +18,7 @@ Rationale: Phosphor's Regular weight uses consistently rounded joins and stroke 
 **Sizing scale (token-based):**
 | Token | Size | Usage |
 |---|---|---|
+| `size.icon.xs` | 12px | Glyph inside an uppercase group label, where 16px would outweigh the 11.5px text beside it |
 | `size.icon.sm` | 16px | Inline icons within body text, StatusBadge leading icon |
 | `size.icon.md` | 20px | Default UI icons — list rows, form field icons |
 | `size.icon.lg` | 24px | Tab bar icons, screen-header icons |
@@ -50,25 +51,27 @@ color.icon.inverse    = color.text.inverse
 | icon-photo-attached | Checklist — photo thumbnail overlay (retake affordance) | `arrows-clockwise` | size.icon.sm |
 | icon-notification-booking | Notification Center — booking confirmed type | `calendar-check` | size.icon.md |
 | icon-notification-boat-ready | Notification Center — boat ready type | `anchor` | size.icon.md |
-| icon-notification-payment | Notification Center — payment due type | `receipt` | size.icon.md |
+| icon-notification-checklist | Notification Center — checklist reminder type (SOW C.32) | `clipboard-text` | size.icon.md |
 | icon-notification-access | Notification Center — access opened type | `lock-open` | size.icon.md |
 | icon-notification-release | Notification Center — release notification type | `bell-ringing` | size.icon.md |
 | icon-status-blocked | StatusBadge — booking-blocked leading icon | `warning` | size.icon.sm |
 | icon-empty-boat | Home empty state (M21) — line-art chevron-pointing motif | Custom (see Section 3) | size.icon.xl |
 | icon-offline | Offline banners | `wifi-slash` | size.icon.sm |
 | icon-retry | Error states — retry action | `arrow-clockwise` | size.icon.md |
-| icon-towing | Towing destination entry (M10) | `map-pin` | size.icon.md |
-| icon-secondary-operator | Profile — add secondary operator | `user-plus` | size.icon.md |
-| icon-invoice | Payments & Invoices | `file-text` | size.icon.md |
+| icon-standby | Standby Claim (M28) — zero-cost hero and calendar standby affordance | `lightning` | size.icon.md |
+| icon-edit-profile | Profile (M07) — Edit control at the top right of the identity card, paired with the visible word "Edit" | `pencil-simple` | size.icon.sm |
+| icon-locked-field | Profile (M07) — padlock on the "Secondary operator" group heading, marking an admin-held field | `lock-simple` | size.icon.xs |
+| icon-today | Booking Calendar — today marker on the standby cell | Custom label, not a glyph (see note below) | — |
 | icon-back | Navigation bar back action | `arrow-left` | size.icon.lg |
 
 **Calendar date-state glyphs are NOT Phosphor icons** — per `11-component-specs.md`, `CalendarDateCell`'s StateGlyph is a bespoke rounded-square accent shape (echoing the brand icon directly), not a library glyph. It's specified as a component asset, not an icon-library entry — listed here for completeness only:
 
 | Semantic name | Where used | Shape | Notes |
 |---|---|---|---|
-| glyph-calendar-booked | CalendarDateCell, booked state | Small filled rounded-square, `border-radius.xs`, `color.calendar.booked-border` | Custom, not from Phosphor |
-| glyph-calendar-held | CalendarDateCell, held state | Same shape, `color.calendar.held-border` | Custom |
-| glyph-calendar-christmas | CalendarDateCell, christmas-window state | Same shape, `color.calendar.christmas-window-border` (the one everyday gold glyph) | Custom |
+| glyph-calendar-booked | CalendarDateCell, booked state | Small rounded-square, `border-radius.xs`, **white** with a navy ring, since the cell fill behind it is now solid navy | Custom, not from Phosphor |
+| glyph-calendar-blocked | CalendarDateCell, blocked state | Same shape, `color.calendar.blocked-text` at mid grey, sitting on the 45° hatch | Custom |
+| _(removed)_ | standby and unclaimed states | `glyph-calendar-standby` and `glyph-calendar-unclaimed` were **dropped on 2026-09-17**. The glyph now marks only dates a partner cannot select (booked, blocked). Standby and unclaimed are both dates the partner can take, and each already carries a stronger cue that also appears in the legend, a TODAY label and a dashed border respectively | — |
+| _(no glyph)_ | CalendarDateCell, named-holiday-long-weekend state | **No glyph by design.** The C.7 holiday block is cued by a 3px rule across the top edge of every cell in the span, which reads as one banner over the block and needs no corner mark. The former `glyph-calendar-christmas` is removed with the christmas-window cell state: the window is a one-time admin draw shown on M13, and the glyph was the last everyday gold asset, which the PRD v1.5 foundation dropped | — |
 
 ---
 
@@ -85,7 +88,7 @@ color.icon.inverse    = color.text.inverse
    - Treatment: a subtle navy gradient overlay (`color.bg.inverse` at low opacity) if text needs to sit on top, never a busy/high-contrast crop
    - This entire category is a **future enhancement note**, not a current deliverable — do not build a photography pipeline for launch.
 
-**Empty-state illustrations beyond M21:** per `13-state-gallery.md`, Notification Center (M06) and Payments & Invoices (M11) also have empty states, but neither was specified with a bespoke illustration in that document — they use a simple icon (`icon-tab-alerts` / `icon-invoice` at `size.icon.xl`, in `color.icon.default`) rather than custom line art, reserving the custom-illustration treatment for the Home screen only (the highest-traffic empty state, and the one tied to the brand's signature chevron motif).
+**Empty-state illustrations beyond M21:** per `13-state-gallery.md`, Notification Center (M06) also has an empty state, but it was not specified with a bespoke illustration in that document — it uses a simple icon (`icon-tab-alerts` at `size.icon.xl`, in `color.icon.default`) rather than custom line art, reserving the custom-illustration treatment for the Home screen only (the highest-traffic empty state, and the one tied to the brand's signature chevron motif).
 
 ---
 
@@ -105,7 +108,7 @@ color.icon.inverse    = color.text.inverse
 | logo-lockup-navy | SVG | vector | Login (M02), Splash (M01) | Existing client asset (`lockup-navy.png`) — re-exported as SVG for crisp scaling; PNG source retained as fallback |
 | logo-icon-navy | SVG | vector | App icon source, in-app small brand mark if needed | Existing client asset (`icon-navy.png`) — re-exported as SVG |
 | icon-* (all Section 2 entries) | SVG | vector | Throughout | Phosphor Regular, recolored via `color.icon.*` tokens at render time — never baked-in color |
-| glyph-calendar-* (3 entries) | SVG | vector | CalendarDateCell | Custom, built from `border-radius.xs` shape token, not Phosphor |
+| glyph-calendar-* (2 entries: booked, blocked) | SVG | vector | CalendarDateCell | Custom, built from `border-radius.xs` shape token, not Phosphor |
 | illustration-empty-boat-chevron | SVG | vector | M21 Home empty state | Custom line-art, gold stroke |
 | hero-boat-photography-placeholder | N/A | N/A | None currently | **Not exported for this release** — see Section 3 future-enhancement note; no placeholder asset needed since no screen currently requires it |
 

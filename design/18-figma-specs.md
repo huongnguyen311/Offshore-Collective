@@ -8,9 +8,9 @@
 # Component 1 — CalendarDateCell
 
 ## 1. Component Specs
-- **Component name:** `CalendarDateCell/sm-md/available-booked-held-blocked-xmas`
+- **Component name:** `CalendarDateCell/sm-md/available-holiday-unclaimed-standby-blocked-booked`
 - **Figma location (target, if generated later):** Design System > Components > Booking Calendar > CalendarDateCell
-- **Variant properties:** State (available/booked/held/blocked/christmas-window) × Selected (true/false) × Disabled (true/false) × Size (sm/md)
+- **Variant properties:** State (available/named-holiday-long-weekend/unclaimed/standby/not-bookable/blocked/booked) × Selected (true/false) × Disabled (true/false) × Size (sm/md). There is no `held` state and no `christmas-window` state: `held` was a leftover from the removed Rayglass 2400 towing-approval flow, and the Christmas Window is a one-time admin draw presented on M13, never a selectable cell on this grid.
 
 ## 2. Auto Layout Table
 
@@ -28,7 +28,7 @@
 CalendarDateCell/
 ├── Root (frame, rounded-square, fill = state background)
 │   ├── DayNumber (text, typography.dataInline, centered)
-│   ├── StateGlyph (rectangle, 5×5pt, rounded, absolute bottom-right, hidden for available/blocked)
+│   ├── StateGlyph (rectangle, 5×5pt, rounded, absolute bottom-right, visible ONLY for booked/blocked)
 │   └── SelectionRing (rectangle, stroke only, absolute, inset 0, hidden by default)
 ```
 
@@ -41,17 +41,19 @@ CalendarDateCell/
 | State | Visual Change | Behavioral Change |
 |---|---|---|
 | default (available) | `color.calendar.available-bg`, no border, no StateGlyph | Tappable |
-| booked | `color.calendar.booked-bg`, `border-width.base` stroke `color.calendar.booked-border`, StateGlyph visible | Tappable → navigates to M09 |
-| held | `color.calendar.held-bg`, stroke `color.calendar.held-border`, StateGlyph visible | Tappable → navigates to M09 |
-| blocked | `color.calendar.blocked-bg`, muted `DayNumber` color, no StateGlyph | **Not tappable**, `aria-disabled="true"` [equivalent: Android `clickable=false`, iOS `isUserInteractionEnabled=false`] |
-| christmas-window | `color.calendar.christmas-window-bg` (gold), stroke `color.calendar.christmas-window-border`, StateGlyph visible | Tappable → navigates to M13 |
+| booked | `color.calendar.booked-bg` (solid navy fill), stroke `color.calendar.booked-border`, DayNumber inverts to white, StateGlyph visible | Tappable → navigates to M09 |
+| standby | `color.calendar.standby-bg`, 1.5pt stroke `color.calendar.standby-border`, **no StateGlyph**, plus a `TODAY` label above the DayNumber | Tappable → navigates to M28 |
+| unclaimed | `color.calendar.available-bg` (identical fill to available, by design), **dashed** stroke `color.calendar.unclaimed-border`, **no StateGlyph** | Tappable → selects to the end of the block, repriced per C.5 |
+| not-bookable | `color.calendar.not-bookable-bg`, muted `DayNumber` color, **no stroke**, no StateGlyph | Past: not tappable. Beyond the 60-day window: tappable only to surface the explanation |
+| blocked | `color.calendar.blocked-bg` + 45° hatch fill, `DayNumber` in `color.calendar.blocked-text`, StateGlyph visible (the shared "cannot select" mark it carries with booked) | **Not tappable**, `aria-disabled="true"` [equivalent: Android `clickable=false`, iOS `isUserInteractionEnabled=false`] |
+| named-holiday-long-weekend | `color.calendar.holiday-block-bg`, 1pt stroke `color.calendar.holiday-block-border` on all four sides with the **top edge at 3pt**, no StateGlyph | Tappable → selects the whole Fri-to-Mon span at once and prices it as one Long Weekend, labelled with the holiday name (C.7) |
 | selected | `SelectionRing` visible, `border-width.thick` stroke `color.border.focus` | Part of active range selection |
 | pressed | Background overlay at `opacity.pressed-tint` | Immediate tap feedback |
 | focus-visible | `SelectionRing`-equivalent ring in `color.border.focus`, 2pt offset | Keyboard/switch-control focus only |
 | disabled (pre-qualification) | Entire cell at `opacity.disabled` | No interaction at all, regardless of underlying state |
 
 ## 6. Interaction Notes
-- Tap on `available`/`booked`/`held`/`christmas-window` → see per-state target above.
+- Tap on `available`/`booked`/`standby`/`unclaimed`/`named-holiday-long-weekend` → see per-state target above. A tap inside a named-holiday long weekend selects all four cells in the span, never the single cell tapped, so the prototype must wire the whole variant set for that span together.
 - Animation on entering `selected`: reference `15-motion-design.md` Section on CalendarDateCell (not separately spec'd there beyond the component doc's own state table) — `duration.fast` (120ms), `easing.standard`, animating `border-color` only. Reduced motion: instant, no transition.
 - Pressed-state feedback: reference Platform Flags below.
 
@@ -61,16 +63,21 @@ CalendarDateCell/
 |---|---|---|
 | Root | fill (available) | `color.calendar.available-bg` |
 | Root | fill (booked) | `color.calendar.booked-bg` |
-| Root | fill (held) | `color.calendar.held-bg` |
+| Root | fill (standby) | `color.calendar.standby-bg` |
+| Root | fill (not-bookable) | `color.calendar.not-bookable-bg` |
 | Root | fill (blocked) | `color.calendar.blocked-bg` |
-| Root | fill (christmas-window) | `color.calendar.christmas-window-bg` |
+| Root | fill (named-holiday-long-weekend) | `color.calendar.holiday-block-bg` |
 | Root | border-radius | `border-radius.xs` (6pt) |
-| Root | stroke (booked/held/xmas) | respective `*-border` token, `border-width.base` |
+| Root | stroke (booked/standby) | respective `*-border` token, `border-width.base` |
+| Root | stroke (named-holiday-long-weekend) | `color.calendar.holiday-block-border` at `border-width.base`, with the top edge at `component.booking-calendar-date.holiday-block-top-width` (3pt). In Figma this is an individual-stroke override on the top side, not a uniform stroke |
+| Root | stroke (unclaimed) | `color.calendar.unclaimed-border`, `border-width.base`, **dashed** |
 | DayNumber | typography | `typography.dataInline` (scaled to ~13pt at `sm`, per `09-typography-system.md`'s render-time note) |
 | DayNumber | color (booked) | `color.calendar.booked-text` |
-| DayNumber | color (held) | `color.calendar.held-text` |
+| DayNumber | color (booked) | `color.calendar.booked-text` (white on the solid navy fill) |
+| DayNumber | color (standby) | `color.calendar.standby-text` |
+| DayNumber | color (not-bookable) | `color.calendar.not-bookable-text` |
 | DayNumber | color (blocked) | `color.calendar.blocked-text` |
-| StateGlyph | fill | matches the cell's own `*-border` token |
+| StateGlyph | fill | booked: white with a `color.calendar.booked-border` ring. blocked: `color.calendar.blocked-text`. No other state shows it |
 | SelectionRing | stroke | `color.border.focus`, `border-width.thick` |
 | Root (pressed) | overlay opacity | `opacity.pressed-tint` |
 | Root (disabled) | opacity | `opacity.disabled` |
@@ -85,9 +92,9 @@ CalendarDateCell/
 # Component 2 — StatusBadge
 
 ## 1. Component Specs
-- **Component name:** `StatusBadge/pending-approval-qualification-pending-booking-blocked-confirmed`
+- **Component name:** `StatusBadge/checked-out-qualification-pending-booking-blocked-confirmed`
 - **Figma location (target):** Design System > Components > Status > StatusBadge
-- **Variant properties:** Status (pending-approval/qualification-pending/booking-blocked/confirmed) × hasLeadingIcon (true/false — true only valid with booking-blocked)
+- **Variant properties:** Status (checked-out/qualification-pending/booking-blocked/confirmed) × hasLeadingIcon (true/false — true only valid with booking-blocked)
 
 ## 2. Auto Layout Table
 
@@ -124,19 +131,19 @@ StatusBadge/
 
 ## 6. Interaction Notes
 - Non-interactive — no tap target, no navigation on tap.
-- The only "interaction" is a data-driven status change while the badge is on-screen (e.g. towing approval resolving) — see State 2 above and `11-component-specs.md` Section 6 for the full animation spec.
+- The only "interaction" is a data-driven status change while the badge is on-screen (e.g. a booking flipping from Confirmed to Checked Out on checklist submission) — see State 2 above and `11-component-specs.md` Section 6 for the full animation spec.
 
 ## 7. Token References Table
 
 | Element | Property | Token |
 |---|---|---|
-| Root | fill (pending-approval) | `color.app-status.pending-approval-bg` |
+| Root | fill (checked-out) | `color.app-status.checked-out-bg` |
 | Root | fill (qualification-pending) | `color.app-status.qualification-pending-bg` |
 | Root | fill (booking-blocked) | `color.app-status.booking-blocked-bg` |
 | Root | fill (confirmed) | `color.status.success-bg` |
 | Root | border-radius | `border-radius.full` |
 | Label | typography | `typography.labelMedium` |
-| Label | color (pending-approval) | `color.app-status.pending-approval-text` |
+| Label | color (checked-out) | `color.app-status.checked-out-text` |
 | Label | color (qualification-pending) | `color.app-status.qualification-pending-text` |
 | Label | color (booking-blocked) | `color.app-status.booking-blocked-text` |
 | Label | color (confirmed) | `color.status.success-text` |

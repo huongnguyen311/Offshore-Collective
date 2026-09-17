@@ -33,7 +33,7 @@
 
 - [WARN] T3 — The hand-authored HTML artifact (`17-screen-design.md`) uses some pixel values not literally compiled from `tokens/foundations.json` (e.g. `.content{padding:20px 18px}` doesn't map to a single spacing step). Nothing observed is off the *scale* (all values are recognizable multiples/near-multiples of the 4pt grid), but a developer should be told explicitly: **the token JSON files and spec docs are the source of truth, not the artifact's literal CSS** — the artifact is illustrative, not a build target. Recommend adding this one-line disclaimer directly to `17-screen-design.md`.
 
-- [WARN] N3 — Free-text fields (`notFullReason`, `damageDescription`, towing `destination`) have a *recommended* soft character cap (e.g. 500 / 500 / 200 characters per `12-form-specs.md`) but no client-confirmed final number. A developer can proceed using the recommended defaults without blocking, but this should be tracked as an open confirmation, not treated as finalized.
+- [WARN] N3 — Free-text fields (`notFullReason`, `damageDescription`) have a *recommended* soft character cap (e.g. 500 / 500 characters per `12-form-specs.md`) but no client-confirmed final number. A developer can proceed using the recommended defaults without blocking, but this should be tracked as an open confirmation, not treated as finalized.
 
 - [WARN] H1 — `20-design-review.md`'s MINOR finding (PointsBalanceDisplay's 360ms vs. the art direction's ~400ms target) is fixed at the token level but the cross-reference note recommended in that review hasn't yet been added to `15-motion-design.md` Section 3. Small doc-polish item, not a functional gap.
 

@@ -38,7 +38,7 @@ Body:         'Fraunces', 'SF Pro Text', system-ui, serif
 | Body Small | Serif | 13px | Regular | 1.5 | +0.02em | Secondary/helper text |
 | **Data Inline** | Mono | 15px | Medium | 1.2 | Tabular +0.01em | Calendar date numerals (M04), points-cost breakdown on Booking Review (M08), litres readings on checklists |
 | Label Large | Mono | 14px | Semibold | 1.2 | Widest, UPPERCASE | Primary buttons, active tab-bar label |
-| Label Medium | Mono | 12px | Semibold | 1.2 | Widest, UPPERCASE | Secondary buttons, status badges (Pending Approval / Booking Blocked / etc.) |
+| Label Medium | Mono | 12px | Semibold | 1.2 | Widest, UPPERCASE | Secondary buttons, status badges (Confirmed / Claimed / Checked Out / Booking Blocked / etc.) |
 | Label Small | Mono | 10px | Bold | 1.2 | Widest, UPPERCASE | Micro-badges only |
 | Caption | Serif | 12px | Regular | 1.5 | +0.02em | Timestamps, metadata, fine print |
 

@@ -22,8 +22,8 @@
 
 ## Scope
 - Key screens/flows (full detail in `01-information-architecture.md`):
-  - **Mobile (26 screens):** Login, Home/Dashboard, Booking Calendar → Review & Confirm, Boat Rules, Notification Center, Profile, Pre-Departure/Post-Use Checklists, Christmas Window Display, Payments & Invoices (read-only), Towing Destination (2400 only), Cancel Booking, Qualification Pending gate
-  - **Admin Portal (28 screens):** Needs Your Action Feed, Tomorrow's Automations, Fleet Calendar (+ Priority Queue), Boats Registry, Pipeline Kanban Board, Partner Directory, Manual Confirmation Center, Financials Overview, Content Management, Business Milestones Panel, Reports/Export
+  - **Mobile:** Login, Home/Dashboard, Booking Calendar → Review & Confirm, Standby Claim, Boat Rules, Notification Center, Profile, Pre-Departure/Post-Use Checklists, Christmas Window Display, Cancel Booking (three variants per C.30), Qualification Pending gate
+  - **Admin Portal:** Needs Your Action Feed, Tomorrow's Automations, Fleet Calendar (+ Priority Queue), Boats Registry, Pipeline Kanban Board, Partner Directory, Manual Confirmation Center, Content Management, Business Milestones Panel, Reports/Export
   - **Contractor Mini-Portal (6 screens):** Login, Job Queue/Fleet Calendar (restricted), Job Detail, Mark Job Complete (MDC), Confirm Launch (TMP)
 - Platform: iOS + Android (mobile, portrait-only, cross-platform native feel per platform conventions) + Web (Admin Portal, desktop-first) + Web (Contractor Mini-Portal, restricted)
 - Priority: Full product — not an MVP trim. The WBS is a fixed, fully-quoted scope (15–17 week timeline, milestone payment structure) with two sections (Business Milestones, Reports/Export) resolved by independent analysis rather than left as gaps

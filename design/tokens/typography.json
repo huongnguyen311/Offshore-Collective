@@ -112,7 +112,7 @@
     "labelMedium": {
       "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.semibold}", "fontSize": "{global.fontSize.12}", "lineHeight": "{global.lineHeight.snug}", "letterSpacing": "{global.letterSpacing.widest}", "textCase": "uppercase" },
       "type": "typography",
-      "$description": "Secondary buttons, status badges (Pending Approval, Booking Blocked, etc.)"
+      "$description": "Secondary buttons, status badges (Confirmed, Claimed, Checked Out, Booking Blocked, etc.)"
     },
     "labelSmall": {
       "value": { "fontFamily": "{global.fontFamily.display}", "fontWeight": "{global.fontWeight.bold}", "fontSize": "{global.fontSize.10}", "lineHeight": "{global.lineHeight.snug}", "letterSpacing": "{global.letterSpacing.widest}", "textCase": "uppercase" },

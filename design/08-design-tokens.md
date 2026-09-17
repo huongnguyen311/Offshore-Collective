@@ -25,7 +25,7 @@ Every non-color foundation value below was chosen to serve **Direction B — Qui
 ## Component tokens worth flagging
 
 - **`component.button-accent`** exists specifically so the gold accent color can be used on *at most one* CTA per screen (per the art direction's "gold stays rare" guardrail) without every button defaulting to it — `component.button.primary-bg` (navy) remains the default for everything else.
-- **`component.booking-calendar-date`** wires the four calendar states (available/booked/held/blocked) plus the Christmas Window highlight directly to the semantic color groups defined in `colors.json`'s `calendar.*` — this is the token layer for Signature Moment #3 (rounded-square date glyphs).
+- **`component.booking-calendar-date`** wires the six calendar states (available / named-holiday-long-weekend / unclaimed / standby-available / blocked / booked) plus the shared `not-bookable` treatment directly to the semantic color groups defined in `colors.json`'s `calendar.*`. The old `held` state and the Christmas Window highlight are both gone: `held` came from the removed Rayglass 2400 towing-approval flow, and the Christmas Window is a one-time admin draw presented on M13 rather than a cell state on this grid — this is the token layer for Signature Moment #3 (rounded-square date glyphs).
 - **`component.confirmation-motion`** is a dedicated token group (not folded into a generic "motion" component) so SKILL 10 (Motion Design) has one unambiguous place to pull the signature moment's color/duration/easing from.
 - **`component.card`** defaults to `shadow.none` — a card only gets `shadow.subtle` if it must visually float (e.g. a bottom sheet), which should be the exception, not the rule, on every screen.
 

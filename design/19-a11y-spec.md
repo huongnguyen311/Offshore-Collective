@@ -17,16 +17,16 @@
 
 **Focus order (VoiceOver/TalkBack swipe order):**
 ```
-1. Eyebrow Label + Data Hero, announced together as one unit ("Points balance, 37")
-2. Next-booking supporting line ("Halcyon, 6 to 8 March, 5 days away")
-3. Quick-link: Book
-4. Quick-link: Checklist
-5. Quick-link: Invoices
-6. Upcoming booking card (boat name, dates, StatusBadge)
-7. Tab bar: Home (current) → Book → Rules → Alerts → Profile
+1. Support, button (top bar)
+2. Notifications, button (top bar; unread state announced, never signalled by the dot alone)
+3. Eyebrow Label + Data Hero, announced together as one unit ("Points balance, 5 of 58 points left this year")
+4. Boat identity + ready status, announced as one unit ("Halcyon, Rayglass 3000, ready for your trip Sat 14 Mar")
+5. Upcoming booking card 1 (date, booking type, StatusBadge)
+6. Upcoming booking card 2
+7. Tab bar: Home (current) → Book → Rules → Profile
 ```
 
-**Keyboard/Switch Control map:** external keyboard Tab moves through items 1–7 in the same order; Enter/Space activates a focused quick-link or tab; Switch Control scanning follows the identical order (no custom scan groups needed — the screen is a single linear flow).
+**Keyboard/Switch Control map:** external keyboard Tab moves through items 1–7 in the same order; Enter/Space activates a focused button, booking card or tab; Switch Control scanning follows the identical order (no custom scan groups needed — the screen is a single linear flow).
 
 **Landmarks + heading outline:**
 ```
@@ -36,13 +36,18 @@ Heading level 1: "Home" (screen title, announced but not visually duplicated —
 
 **Screen-reader flow:**
 ```
-On load: "Home, heading level 1. Points balance, 37. Next: Halcyon, 6 to 8 March, 5 days away.
-          Book, button. Checklist, button. Invoices, button.
-          Upcoming, Halcyon, heading level 2. Fri 6 Mar to Sun 8 Mar, Confirmed."
+On load: "Home, heading level 1. Support, button. Notifications, 1 unread, button.
+          Points balance, 5 of 58 points left this year, resets 12 June.
+          Halcyon, Rayglass 3000, ready for your trip Sat 14 Mar.
+          Upcoming, heading level 2. Sat 14 Mar, single day, Confirmed. Fri 20 to Sun 22 Mar, weekend block, Confirmed."
 On tab change (to Book): focus moves to the M04 heading, per Section 6.
 ```
 
 **Contrast:** Data Hero (`color.text.brand` on `color.bg.default`) and body text all pass AA per `07-color-system.md`; no new combinations introduced on this screen.
+
+**Boat-ready status (SOW C.31):** this status exists precisely because a push notification may never reach the partner, so it must carry a text label ("Ready for your trip") alongside its tick icon and success tint, and be part of the boat card's single announced unit. It must never be conveyed by the green fill alone. When the boat is not ready the label is absent entirely rather than rendered in a muted state, so there is no ambiguous third reading.
+
+The label names the trip it belongs to ("Ready for your trip Sat 14 Mar", date in `font.mono`). A partner can hold 2 concurrent bookings and TMP confirms launch per booking, so an undated label is ambiguous as soon as there is a second upcoming trip. The date sits inside the same announced unit rather than in a separate element, so the screen reader still reads boat and status as one phrase. Set only by TMP's Confirm Launch (C05), never by MDC's Mark Job Complete (C04, internal hand-off); cleared when the partner checks out or when the post-use checklist starts the turnaround.
 
 ---
 
@@ -51,11 +56,13 @@ On tab change (to Book): focus moves to the M04 heading, per Section 6.
 **Focus order:**
 ```
 1. Screen heading ("Booking Calendar")
-2. Month/boat label ("Halcyon, March")
-3. Calendar grid — swipe order is row-by-row, left to right, each cell announced with its full state label
-4. Selected-dates summary row (when a selection is active)
-5. Points-required row (when a selection is active)
-6. "Review Booking" button (when a selection is active; hidden/unreachable otherwise)
+2. Month label ("March 2026")
+3. Month stepper (previous month, month label, next month; a disabled end is announced as disabled, not omitted)
+4. Calendar grid — swipe order is row-by-row, left to right, each cell announced with its full state label
+5. Rule note (live region; fires when a tap triggers an explanation, a repricing, or a block)
+6. Selected-dates summary row (when a selection is active)
+7. Points-required row (when a selection is active)
+8. "Review Booking" button (disabled, and announced as disabled, until a selection is both present and permitted)
 ```
 
 **Keyboard/Switch Control map:** Arrow keys move focus between adjacent calendar cells (per `11-component-specs.md` Section 5 — this is the one screen where arrow-key navigation is specified at the component level, not just linear Tab order); Enter/Space selects a cell; Escape cancels an in-progress range selection. Switch Control: group the calendar grid as a single scan group with row/column scanning enabled (Switch Control's built-in grid-scanning mode), rather than forcing a full linear scan through 30+ individual cells.
@@ -63,17 +70,21 @@ On tab change (to Book): focus moves to the M04 heading, per Section 6.
 **Landmarks + heading outline:**
 ```
 Heading level 1: "Booking Calendar"
-  Heading level 2: "Halcyon, March" (implicit via the section label — mark as heading level 2 if the component renders it as a visually distinct section label, per `10-responsive-layout.md`)
+  Heading level 2: "March 2026" (implicit via the section label — mark as heading level 2 if the component renders it as a visually distinct section label, per `10-responsive-layout.md`). The boat is not named here: the fleet is one boat, the partner co-owns exactly one, and M03 already carries that identity, so repeating it costs a swipe stop on every visit to the calendar.
 ```
 
 **Screen-reader flow:**
 ```
-On load: "Booking Calendar, heading level 1. Halcyon, March.
-          March 1, available, button. March 2, available, button. ... 
+On load: "Booking Calendar, heading level 1. March 2026.
+          March 1, not bookable. ...
           March 4, out of service, not bookable. ...
-          March 6, your booking, button. ..."
-On selecting a range: "Selected, March 14 to March 15. Points required, 1."
-On tapping a blocked cell attempt: no announcement change (blocked cells are non-interactive, so no activation event fires) — the cell's state is already known from its label on focus.
+          March 6, booked, not available. ...
+          March 12, today, standby available, free, button. ...
+          March 27, unclaimed weekend, lower rate, button. ..."
+On selecting a range: "Selected, March 15 to March 16. Points required, 2."
+On claiming from an unclaimed block: "Unclaimed weekend, March 28 to March 29. Points required, 4." followed by the live-region note explaining the claim-to-the-end-of-block rule.
+On selecting a lone Friday: "Friday alone. Points required, unavailable." followed by the live-region note, and Review Booking is announced as dimmed.
+On tapping a non-selectable cell: the live-region note fires with the explanation; the cell itself stays non-interactive, so no activation event is announced.
 ```
 
 **Motion/2.3.3 check:** the selection-ring transition (`11-component-specs.md`, `duration.fast`/`easing.standard`) is a border-color change only, not a parallax/motion-triggered effect — it does not fall under 2.3.3's "motion actuation" concern at all, but the reduced-motion fallback (instant border-color change, per `15-motion-design.md` Section 4) is still honored for users with `prefers-reduced-motion`/`isReduceMotionEnabled` set, satisfying the stricter bar even though 2.3.3 itself doesn't strictly require it here.
@@ -122,7 +133,7 @@ Swiping through: each section heading followed immediately by its full body para
 4. Tab bar
 ```
 
-**Keyboard/Switch Control map:** linear Tab/scan through rows; Enter/Space on a row opens the relevant notification detail/context (M14 or its target, per the IA).
+**Keyboard/Switch Control map:** linear Tab/scan through rows; Enter/Space on a row opens that notification's destination directly (M09, M15, M16 or M04, per the IA). There is no intermediate detail screen, so every row must carry its full message as visible text: nothing is held back for a second screen to reveal.
 
 **Landmarks + heading outline:**
 ```
@@ -142,29 +153,83 @@ On reaching the end of the loaded list (infinite scroll): "Loading more notifica
 
 ### M07 — Profile
 
-**Focus order:**
+**Focus order — view mode:**
 ```
 1. Screen heading ("Profile")
-2. Avatar + name + boat (announced as one unit, not three separate stops)
-3. Qualification status row
-4. Secondary operator row
-5. Menu: Payments & Invoices
-6. Menu: Christmas Window
-7. Menu: Support
-8. Menu: Terms & Privacy
-9. Tab bar
+2. Name + boat (announced as one unit, not two separate stops). There is no avatar: initials in a coloured square carried no information a screen reader could use and no information the name below it did not already give
+3. Edit (button, `aria-label="Edit your details"`, opens edit mode in place; does not navigate)
+4. Qualification status row
+5. Phone row
+6. Email row
+7. Group heading: "Secondary operator" (padlock announced as part of the heading, see below)
+8. Secondary operator value: "None added", or Name / Contact / Powerboat Training NZ status when one is set
+9. Secondary-operator supporting text ("Someone else can operate Halcyon on your behalf. Contact us to add one.")
+10. Menu: Christmas Window
+11. Menu: Support
+12. Menu: Terms & Privacy
+13. Menu: Sign out
+14. Menu: Delete Account
+15. Support contact footer (name, phone, email, announced as one unit)
+16. Tab bar
 ```
+
+The Edit button precedes the three values it governs, so a screen-reader user meets the control before the values rather than discovering afterwards that the block was editable. It sits inside the same card as the name, and since the compaction on 2026-09-17 removed the visible "Your details" heading, the button carries `aria-label="Edit your details"` so its accessible name still says what it edits.
+
+**Focus order — edit mode:**
+```
+1. Screen heading ("Profile")
+2. Name (text input) ← focus lands here when Edit is activated, caret at end of value
+3. Boat ("Halcyon, Rayglass 3000")
+4. Qualification status row (unchanged, still static)
+5. Phone (tel input)
+6. Email (email input)
+7. Cancel (button)
+8. Save (button)
+9. Group heading: "Secondary operator" (unchanged, still padlocked)
+10. Secondary operator value (unchanged, still static)
+11. Secondary-operator supporting text
+12-16. Menu rows, footer, tab bar as above
+```
+
+Items 4, 9 and 10 are the point: they are byte-for-byte what they were in view mode. A partner who wonders why their qualification or their secondary operator did not become typeable gets the answer from the screen itself.
+
+**Mode changes:**
+- Activating Edit moves focus to the name input (item 2). Announce the change, either with `aria-expanded` on the Edit button or a polite live-region message ("Editing your details").
+- Save, Cancel, and dismissing the discard dialog all return focus to the Edit button.
+- A failed Save moves focus to the first invalid field and announces its error.
+- The discard confirmation is a modal dialog: focus trapped inside it, Escape maps to "Keep Editing", focus returns to Cancel's origin on close.
 
 **Landmarks + heading outline:**
 ```
 Heading level 1: "Profile"
+  Heading level 2: "Secondary operator"
 ```
+
+The editable group no longer carries a visible heading: it is the card that opens with the partner's own name, and the Edit button's `aria-label` names it instead. The padlocked group keeps its heading, moved inside its card, because that heading is what marks the boundary between what the partner can change and what they cannot.
+
+**Note:** in view mode, items 4, 5, 6, 8, 9 and 15 are static content, not controls. They appear in the swipe order (so the information is reachable) but must not be exposed with a `button` role, and Tab must skip them on an external keyboard. Three points deserve care here. The secondary-operator helper text (9) is the one place a partner is most likely to reach for a control that does not exist, so it must never be given one: A.16 puts that change with Matt, off-platform. The "Secondary operator" heading (7) is now the only heading separating what the partner can edit from what they cannot, so it must be exposed as a heading (level 2), not as plain text, even though it sits inside its card rather than above it, or the distinction is lost to a screen reader. Its padlock is decorative to the eye but load-bearing to the ear: it must reach a screen reader as part of the heading's accessible name ("Secondary operator, not editable"), never as a bare `img` with no label and never as a separate stop. And the phone and email rows (5, 6) must stay static in view mode even though they are editable via item 3: making the row itself a control as well would give the same action two different names.
+
+The phone number and email in the footer are the only static items that may become controls: if they are made tappable, each becomes its own labelled link.
 
 **Screen-reader flow:**
 ```
 On load: "Profile, heading level 1. David Kearney, Halcyon, Rayglass 3000.
-          Qualification, Approved. Secondary operator, Not set.
-          Payments and Invoices, button. Christmas Window, button. Support, button. Terms and Privacy, button."
+          Edit your details, button, collapsed.
+          Qualification, Approved.
+          Phone, 021 555 0198. Email, david dot kearney at xtra dot co dot nz.
+          Secondary operator, not editable, heading level 2. None added.
+          Someone else can operate Halcyon on your behalf. Contact us to add one.
+          Christmas Window, button. Support, button. Terms and Privacy, button. Sign out, button. Delete Account, button.
+          Support. Offshore Collective, Owner Support. 021 555 0142. support at offshorecollective dot co dot nz."
+
+On activating Edit: "Editing your details. Name, edit text, David Kearney."
+                    (focus is in the name field; the rest of the screen is unchanged and
+                     re-reads exactly as above apart from Phone and Email now being edit fields)
+
+On a failed Save:   "Phone, edit text, invalid entry, Enter a valid phone number."
+
+On Save:            "Edit your details, button, collapsed."
+                    (focus is back on Edit, and the rows below read the new values)
 ```
 
 ---
@@ -216,7 +281,7 @@ Full field-level accessibility detail already lives in `12-form-specs.md` Sectio
 6. "Any damage?" toggle group
 7. (conditional) Damage description
 8. (conditional) Damage photo
-9. (conditional, 2400 only) Towing disclaimer checkbox
+9. Estimated return time, announced as a single labelled group of three controls (hour, minutes, AM/PM)
 10. "Submit Checklist" button
 ```
 
@@ -252,8 +317,8 @@ Heading level 1: "Almost there"
 
 **Screen-reader flow:**
 ```
-On load: "Almost there, heading level 1. Matt is confirming your Powerboat Training NZ certification.
-          Booking opens automatically the moment he does — no action needed from you.
+On load: "Almost there, heading level 1. We're confirming your Powerboat Training NZ certification.
+          Booking opens as soon as that is done. Nothing needed from you.
           Read the Boat Rules, button."
 ```
 
@@ -261,20 +326,58 @@ On load: "Almost there, heading level 1. Matt is confirming your Powerboat Train
 
 ---
 
+### M28 — Standby Claim
+
+Reached only from the calendar's today cell, and only when SOW A.19's conditions hold (past 7am, nothing confirmed covering today).
+
+**Focus order:**
+```
+1. Screen heading ("Claim Today") + back button
+2. Claim summary card, announced as one unit ("Halcyon, standby claim, Thursday 12 March, today")
+3. Points rows (available, this claim uses, balance after)
+4. Zero-cost hero, announced as one unit ("Standby, today only. 0 points")
+5. Estimated departure time, announced as a single labelled group of three controls (hour, minutes, AM/PM)
+6. "Claim Today, Free" button
+7. "Back to Calendar" button
+```
+
+**Keyboard/Switch Control map:** linear Tab/scan. The three time controls are individually focusable but share one group label, so the purpose of each is clear without repeating "estimated departure time" three times.
+
+**Landmarks + heading outline:**
+```
+Heading level 1: "Claim Today"
+```
+
+**Screen-reader flow:**
+```
+On load: "Claim Today, heading level 1. Halcyon, standby claim. Thursday 12 March, today.
+          Points available, 5. This claim uses, 0. Balance after, 5.
+          Standby, today only. 0 points.
+          Estimated departure time, 10, colon 00, A M.
+          Claim Today, Free, button."
+On claim: focus moves to the confirmation screen's heading, which announces "Claimed" as text, not as a colour change.
+```
+
+**Zero as a value, not an absence:** "0 points" must be announced, never skipped as an empty or null field. It is the whole point of the screen, and a partner who hears nothing cannot tell a free claim from a failed one.
+
+**Contrast:** the zero-cost hero uses the success family on a tinted fill; per `07-color-system.md` that pairing passes AA at this text size. The tint never carries the meaning on its own, the words "0 points" do.
+
+---
+
 ## 6. Focus Management & Skip Links
 
-- **Skip links:** not applicable to native mobile navigation (no page-load skip pattern) — instead, the equivalent requirement is: **tab-bar switches move focus to the new screen's heading**, not leave focus stranded on the tapped tab icon. Applies to every tab switch (M03↔M04↔M05↔M06↔M07).
-- **Sheets/modals (M22 Booking Blocked, M17 Cancel confirmation):** focus traps inside the sheet while open; on dismiss, focus returns to the element that triggered it (e.g. the calendar cell selection that caused the block, or the Cancel Booking button on M09).
+- **Skip links:** not applicable to native mobile navigation (no page-load skip pattern) — instead, the equivalent requirement is: **tab-bar switches move focus to the new screen's heading**, not leave focus stranded on the tapped tab icon. Applies to every tab switch (M03↔M04↔M05↔M07; the tab bar is 4 items, Notifications is reached from the Home top bar, not a tab).
+- **Sheets/modals (M22 Booking Blocked, M29 Cancel confirmations, Christmas Window release):** focus traps inside the sheet while open; on dismiss, focus returns to the element that triggered it (e.g. the calendar cell selection that caused the block, or the Cancel Booking button on M09). The three cancellation dialogs differ in consequence, not in structure, so each one's body text must state the points outcome explicitly rather than relying on the partner remembering which booking type they are cancelling.
 - **Route change (push navigation, e.g. M04→M08):** focus moves to the new screen's heading on arrival — never left on the now-invisible previous screen's last-focused element.
-- **Infinite-scroll content (M06, M11):** as new items load, focus is never moved automatically to them (that would be disorienting) — only the "Loading more..." live-region announcement fires, per M06's Screen-reader flow above.
+- **Infinite-scroll content (M06):** as new items load, focus is never moved automatically to them (that would be disorienting) — only the "Loading more..." live-region announcement fires, per M06's Screen-reader flow above.
 
 ## 7. Motion & Sensory
 - All animations in `15-motion-design.md` have reduced-motion fallbacks (Section 4 of that doc) — confirmed compliant with 2.3.3 across every listed animation, including the signature gold-chevron and points-tick moments (see per-screen motion checks above for the two most safety-relevant instances).
-- Color is never the sole signal anywhere in this app: every StatusBadge pairs color with a text label (`Pending Approval`, `Blocked`, `Confirmed`); every CalendarDateCell state pairs color with the rounded-square StateGlyph (or its absence) AND a screen-reader label naming the state explicitly — never color alone.
+- Color is never the sole signal anywhere in this app: every StatusBadge pairs color with a text label (`Confirmed`, `Claimed`, `Checked Out`, `Blocked`); every CalendarDateCell state pairs color with a second, non-colour signal AND a screen-reader label naming the state explicitly — never color alone. That second signal is specific per state: a solid thin border (available), a dashed border (unclaimed), a 3px rule across the top edge (named-holiday long weekend), no border at all (not bookable), a 45° hatch (blocked), a 2px border plus a TODAY label (standby), and an inverted white numeral on a solid fill (booked). This matters because the light states cannot all be separated by luminance alone without turning the month into a heat map, and it is why the holiday block is carried by its top rule rather than by its tint: measured, that tint sits at 1.24:1 against available, 1.01:1 against not-bookable and 1.10:1 against standby, and no light fill reaches 3:1 against the others. The holiday name is never left to the tint either: it is announced in the cell label and repeated in a visible key below the grid, where each row carries the same swatch its dates wear. The standby cell carries a visible `TODAY` marker as its whole cue, because SOW A.19 only ever opens the current date and the state is meaningless without that anchor. The corner glyph is deliberately **not** part of this set: since 2026-09-17 it is reserved for the two states a partner cannot select (booked, blocked), so it reads as one consistent "not yours" mark instead of a fourth decoration competing with the cues above.
 - Nothing in this app auto-plays or is time-limited (no carousels, no auto-advancing content) — no additional user-control requirement applies.
 
 ## 8. Forms Accessibility
-Fully specified per-field in `12-form-specs.md` Section 6 for all 5 forms (Pre-Departure Checklist, Post-Use Checklist, Towing Destination Entry, Edit Profile, Secondary Operator) — this document doesn't duplicate that detail; see that file directly. Screen-level flow for the checklist form is covered in Section 5 (M15) above.
+Fully specified per-field in `12-form-specs.md` Section 6 for all 4 forms (Pre-Departure Checklist, Post-Use Checklist, Standby Claim, and Edit Profile, which has no screen of its own and edits in place on M07) — this document doesn't duplicate that detail; see that file directly. Screen-level flow for the checklist form is covered in Section 5 (M15) above.
 
 ## 9. Contrast Summary
 

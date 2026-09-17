@@ -23,7 +23,7 @@
 - Trip booking, maintenance tracking, and co-owner communication live in one app.
 
 ### Strengths
-- Seasonal point-weighting directly solves the "everyone wants August" fairness problem — more sophisticated than Offshore Collective's flat per-booking-type cost (1/5/7/21 pts regardless of calendar date).
+- Seasonal point-weighting directly solves the "everyone wants August" fairness problem — more sophisticated than Offshore Collective's flat per-booking-type cost (1/5/7/14 pts regardless of calendar date).
 - Guaranteed weeks remove the anxiety of "what if I never get summer" — a trust-building mechanic absent from Offshore Collective's first-confirmed-only model.
 
 ### Weaknesses / Gaps
@@ -141,7 +141,7 @@
 ### Differentiator Patterns (choose to use or skip)
 | Pattern | Used by | Competitive advantage |
 |---|---|---|
-| Seasonal/demand-weighted point cost (not flat rate) | The Owners App, timeshare exchanges | Offshore Collective currently uses a flat cost per booking type (1/5/7/21 pts) regardless of calendar demand — already locked into the WBS, not a change to propose, but worth flagging as a *future* differentiator if the client revisits pricing logic post-launch |
+| Seasonal/demand-weighted point cost (not flat rate) | The Owners App, timeshare exchanges | Offshore Collective currently uses a flat cost per booking type (1/5/7/11 pts) regardless of calendar demand — already locked into the WBS, not a change to propose, but worth flagging as a *future* differentiator if the client revisits pricing logic post-launch |
 | Guaranteed-use weeks on top of the points pool | The Owners App | Offshore Collective has no guaranteed-week concept — again, not in current scope, but a retention-relevant idea worth noting for a future release |
 | Combined availability+booking view (see status and book in one screen) | SeaNet | Directly actionable now: consider whether M04 (Calendar) and M08 (Booking Review) can be tightened into fewer steps — flag to alice-user-flow |
 
@@ -156,7 +156,7 @@
 ## Gap Analysis
 
 ### Gap 1 — Flat-rate points cost misses demand fairness
-**What's missing:** None of Offshore Collective's competitors with visible points systems (The Owners App, timeshare exchanges) use a flat rate — they weight by season/demand. Offshore Collective's flat 1/5/7/21-point cost (already fixed in the WBS) is simpler to build but doesn't solve the "everyone wants the same weekend" problem the way competitors do.
+**What's missing:** None of Offshore Collective's competitors with visible points systems (The Owners App, timeshare exchanges) use a flat rate — they weight by season/demand. Offshore Collective's flat 1/5/7/14-point cost (already fixed in the WBS) is simpler to build but doesn't solve the "everyone wants the same weekend" problem the way competitors do.
 **Evidence:** The Owners App's explicit 3/2/1-point seasonal tiers; general timeshare-exchange practice of desirability-based point values.
 **Opportunity:** Not a scope change now — this is fixed in the client's WBS — but worth a one-line note to Matt as a v2 consideration, since Offshore Collective's own Boat Rules content already explains long-weekend caps and holiday fairness rules as a *partial* answer to the same fairness problem via caps rather than pricing.
 

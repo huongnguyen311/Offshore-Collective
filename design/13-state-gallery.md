@@ -16,9 +16,10 @@
 | M07 Profile | ✔ | — | — | ✔ | ✔ | ✔ | — | — |
 | M08 Booking Review & Confirm | — | — | — | ✔ | ✔ (→ M22) | ✔ | ✔ | — |
 | M09 Booking Detail | ✔ | — | — | ✔ | ✔ | ✔ | — | — |
-| M11 Payments & Invoices | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | — | — |
+| M13 Christmas Window | ✔ | — | — | ✔ | ✔ | ✔ | ✔ | — |
+| M28 Standby Claim | ✔ | — | — | ✔ | ✔ | ✔ | ✔ | — |
 
-`no-permission` on M04 routes to the already-specified M20 Qualification Pending Gate — no new screen invented. `error` on M08 routes to the already-specified M22 Booking Blocked — likewise no new screen. M22 is now rendered in `screens-preview.html` as 6 variants, one per rule in FLOW-BOOK-01 Case 2 (points, 60-day window, 2-booking/7-day cap, back-to-back, long-weekend cap, named-holiday fairness), so every rule this project enforces has an on-screen explanation to point to.
+`no-permission` on M04 routes to the already-specified M20 Qualification Pending Gate — no new screen invented. `error` on M08 routes to the already-specified M22 Booking Blocked — likewise no new screen. M22 is now rendered in `screens-preview.html` as 7 variants, one per rule the engine enforces (points, 60-day window, 2-booking/7-day cap, back-to-back, long-weekend cap, named-holiday fairness, and Friday-alone per SOW C.4), so every rule this project enforces has an on-screen explanation to point to.
 
 ---
 
@@ -112,13 +113,28 @@
 ### M07 — Profile
 
 **Loading**
-- Pattern: skeleton — placeholder blocks for name/contact/qualification status/secondary operator section.
+- Pattern: skeleton, with placeholder blocks for the identity card (name, boat, then the qualification, phone and email rows) and the "Secondary operator" card. The Edit control is not drawn until the real values are in, so nothing invites a tap into a card that has no content yet.
+
+**Secondary operator, not set** *(the default for most partners)*
+- "None added", followed by one line saying what the field is for and how to add one: "Someone else can operate Halcyon on your behalf. Contact us to add one."
+- This is not an error or a warning state, and must not be styled as one. Most partners will never add a secondary operator.
+
+**Secondary operator, set**
+- Three rows, per A.16: Name, Contact, Powerboat Training NZ status. The status is a StatusBadge, not plain text, because it is the one value a partner comes here to check.
+- Closing line: "Contact us to change any of these."
+- Both states keep the padlock on the group heading. It is the heading, not the body copy, that carries the read-only signal.
+
+**Editing** *(a screen state, not a field state)*
+- Reached from the Edit control at the top right of the identity card. The three values become inputs in place and a Cancel/Save pair appears beneath them; nothing else on the screen moves or changes.
+- The qualification row and the "Secondary operator" card render identically to view mode. This is the state's main job: it shows the partner exactly where their control ends.
+- Error variant: any field can carry an inline error beneath it, with the field keeping its error border even while focused.
+- Exit states: Save (returns to view with the new values), Cancel with nothing changed (returns straight to view), Cancel with changes (confirmation dialog first, see `12-form-specs.md` Form 4).
 
 **Error**
 - Type: server (profile fails to load). Message: "Couldn't load your profile." Recovery: Retry.
 
 **Offline**
-- Show cached profile data read-only; Edit Profile (M18) is disabled while offline with a note: "You can't edit your profile while offline."
+- Show cached profile data read-only; the Edit control is disabled while offline with a note: "You can't edit your profile while offline." If the partner is already in edit mode when the connection drops, stay in edit mode and keep what they typed, disabling Save only; dropping them back to view mode would discard work they can still see on screen. The qualification row and the secondary operator card need no offline treatment, they are read-only on every connection state.
 
 ---
 
@@ -149,23 +165,58 @@
 
 ---
 
-### M11 — Payments & Invoices
+### M13 — Christmas Window
+
+The screen has one structural state the others do not: exactly one of the three year cards is the partner’s, and the other two are permanently empty. That is the full state, not a partial load, so nothing on this screen ever renders as "not yet assigned" once the draw has happened.
 
 **Loading**
-- Pattern: skeleton list of placeholder invoice rows.
+- Pattern: skeleton on the three year cards. The cost readout (14 pts) renders immediately, it is a fixed rule, not fetched data.
 
-**Empty**
-- First-time partner with no invoices yet: icon + "No invoices yet — they'll appear here once Matt sends your first one."
-- CTA: none required (same exception as Notification Center — invoicing is entirely Matt-initiated; there's no partner action to prompt here). State the exception rather than inventing a fake CTA.
+**Full, before the draw**
+- All three years render in the not-applicable treatment with a single line: the draw happens once the boat is delivered and all six partners are Stage 3 Confirmed. No release action exists on the screen in this state.
 
-**Partial**
-- Pagination: infinite scroll for invoice history, same pattern as Notification Center.
+**Full, after the draw**
+- One year card carries the assigned window, the raised elevation, the "Your week" check on Window 1 or Window 2, and the release footer. The other two years are flat, tinted, and carry no window and no action. The release button appears on the assigned year only, never on all three.
+
+**Success (release confirmed)**
+- The assigned year card drops back to the not-applicable treatment, the release footer disappears, and the points either return to the balance or do not, per the branch taken. A partner has no second week to release, so there is no path back into this state.
 
 **Error**
-- Type: server. Message: "Couldn't load your invoices." Recovery: Retry.
+- Type: server (release fails after confirm). Message: "We couldn’t release your week. Nothing has changed, please try again." Recovery: Retry. Stating that nothing changed matters more here than on any other error in the app, because the partner has just been told their points are at stake.
 
 **Offline**
-- Show cached invoice list (read-only, which this screen always is anyway) with a banner: "Offline — showing last-known invoices."
+- Year cards render from cache. The release button is disabled with: "You need to be online to release your week." The release notifies five other partners at the moment it lands (C.9), so it cannot be queued for later.
+
+**Confirmation dialog, two states**
+- Refund (more than 14 days out): navy icon, navy confirm button, copy in [`14-ux-writing.md`](14-ux-writing.md).
+- Forfeit (inside 14 days): error-tinted icon, red confirm button carrying the cost. Which one renders is decided by the date, not by the partner, so the two are never both reachable.
+
+---
+
+### M28 — Standby Claim
+
+This screen is unusual in that it can go stale between opening and submitting: standby is first-confirmed (SOW A.19), so another partner can take the day while this one is deciding. That race is the screen's real state problem, not loading.
+
+**Loading**
+- Pattern: skeleton on the summary card and the points rows. The zero-cost hero renders immediately, since 0 is not data that has to be fetched.
+
+**Empty**
+- Not applicable. The screen is unreachable unless a standby day exists; there is no version of it with nothing to show.
+
+**Taken while open (app-specific state, not in the standard set)**
+- Trigger: another partner confirms the claim first, or 11:59pm passes and the day lapses.
+- Treatment: replace the claim button with a non-dismissible inline notice, "Someone else claimed today first. Standby is first come, first served." Single action: Back to Calendar.
+- The partner must never be able to tap Claim and receive a failure afterwards; the button goes before the tap does.
+
+**Error**
+- Type: server, on submitting the claim. Message: "Couldn't claim today. Nothing has been taken from your points." Recovery: Retry.
+- The second sentence is load-bearing. With a zero-point claim there is nothing to reverse, and saying so prevents the partner from checking their balance in alarm.
+
+**Offline**
+- Block the claim outright rather than queueing it: "You need to be online to claim standby." A queued same-day claim could land after the day has gone, and SOW C.28 fires a real-time SMS to Tamaki Marine Park on confirmation, so a deferred claim would page a contractor about a day that no longer exists.
+
+**Success**
+- Routes to the booking detail in its Claimed state, with the confirmation that Tamaki Marine Park has been notified. See `screens-preview.html`, M28.
 
 ---
 
@@ -189,7 +240,7 @@ All durations/easings reference `tokens/foundations.json` — no new raw values 
 |---|---|
 | M03 Home | A brand-new partner (persona Priya) lands on M03 immediately after first sign-in with qualification still Pending — the points balance still renders (58 points, full allocation) even though booking is locked at M04; this is intentional, so she can see what she's working with while waiting on Matt. |
 | M06 Notification Center | First-run empty state copy (above) is written for a partner who has genuinely never received a notification — distinct from a returning user's ordinary "no new notifications right now" case, which would show the existing (now-read) list rather than the empty state at all. |
-| M11 Payments & Invoices | First-run empty state (above) applies to any partner before their first Xero invoice is sent — not tied to onboarding specifically, since invoicing timing is Matt's, not the app's. |
+| M28 Standby Claim | No first-run difference. A partner can claim standby from their first day qualified, and there is no cap or history that changes the screen over time (SOW A.19). |
 
 ---
 

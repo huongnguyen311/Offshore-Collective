@@ -52,6 +52,7 @@
 
     "size": {
       "icon": {
+        "xs": { "value": "12px", "type": "sizing", "$description": "Only for a glyph set inside an uppercase group label, where 16px would outweigh the 11.5px text it sits beside. Currently the padlock on M07's Secondary operator heading." },
         "sm": { "value": "16px", "type": "sizing" },
         "md": { "value": "20px", "type": "sizing" },
         "lg": { "value": "24px", "type": "sizing" },
@@ -96,17 +97,20 @@
       "available-border":  { "value": "{color.calendar.available-border}", "type": "color" },
       "booked-bg":         { "value": "{color.calendar.booked-bg}",        "type": "color" },
       "booked-border":     { "value": "{color.calendar.booked-border}",    "type": "color" },
-      "held-bg":           { "value": "{color.calendar.held-bg}",          "type": "color" },
-      "held-border":       { "value": "{color.calendar.held-border}",      "type": "color" },
+      "standby-bg":        { "value": "{color.calendar.standby-bg}",       "type": "color" },
+      "standby-border":    { "value": "{color.calendar.standby-border}",   "type": "color" },
+      "unclaimed-border":  { "value": "{color.calendar.unclaimed-border}", "type": "color" },
+      "not-bookable-bg":   { "value": "{color.calendar.not-bookable-bg}",  "type": "color" },
       "blocked-bg":        { "value": "{color.calendar.blocked-bg}",       "type": "color" },
-      "christmas-window-bg":     { "value": "{color.calendar.christmas-window-bg}",     "type": "color" },
-      "christmas-window-border": { "value": "{color.calendar.christmas-window-border}", "type": "color" },
+      "holiday-block-bg":       { "value": "{color.calendar.holiday-block-bg}",     "type": "color" },
+      "holiday-block-border":   { "value": "{color.calendar.holiday-block-border}", "type": "color" },
+      "holiday-block-top-width":{ "value": "3", "type": "borderWidth", "$description": "Top edge only, against border-width.base on the other three sides. This asymmetry is the primary non-colour cue for a C.7 named holiday long weekend, since no light fill can reach 3:1 against the other light cell states." },
       "radius":            { "value": "{global.border-radius.xs}",         "type": "borderRadius", "$description": "Rounded-square glyph per date, echoing the brand icon's interlocking squares — see Signature Moments in 06-art-direction.md. Matches 11-component-specs.md and 18-figma-specs.md exactly (6px) — corrected per 20-design-review.md finding." },
       "border-width":      { "value": "{global.border-width.base}",        "type": "borderWidth" }
     },
     "status-badge": {
-      "pending-approval-bg":       { "value": "{color.app-status.pending-approval-bg}",       "type": "color" },
-      "pending-approval-text":     { "value": "{color.app-status.pending-approval-text}",     "type": "color" },
+      "checked-out-bg":       { "value": "{color.app-status.checked-out-bg}",       "type": "color" },
+      "checked-out-text":     { "value": "{color.app-status.checked-out-text}",     "type": "color" },
       "qualification-pending-bg":  { "value": "{color.app-status.qualification-pending-bg}",  "type": "color" },
       "qualification-pending-text":{ "value": "{color.app-status.qualification-pending-text}","type": "color" },
       "booking-blocked-bg":        { "value": "{color.app-status.booking-blocked-bg}",        "type": "color" },

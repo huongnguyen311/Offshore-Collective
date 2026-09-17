@@ -33,7 +33,7 @@
 **Why relevant:** The Admin Portal already has a 3-tier urgency-flag system (Red/Orange/Standard on the Fleet Calendar and Priority Queue) and 3 distinct roles with different access (Admin, Contractor Mini-Portal, and implicitly Partner) already defined in the IA. A monochromatic base makes those flags actually pop instead of competing with decorative color elsewhere.
 **How to apply:**
 - Token level: a mostly neutral/grayscale token palette for admin chrome, with Red/Orange/Standard urgency colors as the *only* saturated semantic colors in the system — reserve brand color for primary actions only.
-- Component level: Fleet Calendar (A04) and Priority Queue urgency flags, Needs Your Action item badges, and towing "Pending Approval" state all draw from the same small semantic-color set — never introduce a new color for a new state without checking this set first.
+- Component level: Fleet Calendar (A04) and Priority Queue urgency flags, Needs Your Action item badges, and booking status badges all draw from the same small semantic-color set — never introduce a new color for a new state without checking this set first.
 - Layout level: Contractor Mini-Portal (C02) reuses the identical urgency-flag colors as A04, reinforcing that it's a restricted *view* of the same system, not a different product.
 **Reference:** [SaaS Dashboard Design Examples & Trends 2026](https://adminlte.io/blog/saas-dashboard-design-examples/)
 

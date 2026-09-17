@@ -1,6 +1,6 @@
 # Offshore Collective — Partner Mobile App Personas
 
-**Consumed inputs:** `03-design-brief-parsed.md` (Project Overview — target users), WBS booking-rule detail, qualification-gate mechanic, Rayglass 2400 towing workflow
+**Consumed inputs:** `03-design-brief-parsed.md` (Project Overview, target users), SOW booking-rule detail, qualification-gate mechanic, boat-ready notification behaviour (C.31)
 
 ---
 
@@ -37,18 +37,18 @@
 ---
 
 **Grant Ashworth, 63** [Edge Case]
-- **Role:** Co-owner on the Rayglass 2400 (the towing-capable boat), infrequent app user
-- **Location & usage context:** Uses the app rarely — maybe 3-4 times a year around his own bookings — often on a tablet at home rather than his phone, and dislikes multi-step processes
+- **Role:** Co-owner on Halcyon, infrequent app user
+- **Location & usage context:** Uses the app rarely, maybe 3 or 4 times a year around his own bookings, often on a tablet at home rather than his phone, and dislikes multi-step processes
 - **Tech comfort:** 2 — uses a smartphone mainly for calls, texts, and weather; finds unfamiliar app flows stressful and prefers calling Matt directly when confused
-- **Core goal:** Book a towing trip to a specific destination without the extra approval step feeling like a black box or a rejection
-- **Frustrations with current solutions:** Historically just called or texted Matt to arrange towing manually — the idea of "entering a destination and waiting for approval" in an app, with no phone call to confirm, is new and slightly unsettling to him
+- **Core goal:** Turn up on the day he booked and find the boat ready, without having to work out from the app whether anything is still outstanding
+- **Frustrations with current solutions:** Historically just called or texted Matt to check the boat was ready. Being told by an app, once, in a notification he may never see, is new and slightly unsettling to him
 - **Key behaviors:**
-  - Enters a towing destination at booking and then doesn't know what "held, pending approval" means unless it's stated in plain language
-  - Is the partner most likely to change his mind on a destination after submitting — which re-triggers approval, a rule he won't intuitively expect
-  - Least likely of the three personas to check the in-app Notification Center proactively — relies on push notifications firing, since he won't think to go looking
-- **Quote:** "I told the app where I'm towing to — now what? Am I booked or not?"
-- **Design implication:** The "held / pending approval" state (M08 → M10 towing flow) needs an unambiguous, persistent status label wherever the booking appears (Home, Booking Detail) — Grant must never have to wonder whether he's confirmed or not, and changing the destination after approval must clearly warn him it resets to pending before he does it.
-- [Assumption: Grant's age/profile and preference for phone calls over app flows are inferred to satisfy the required edge-case (lower tech comfort, different context) using the towing workflow as the mechanic that most exposes an unfamiliar, ambiguous-feeling system state — not stated in the WBS]
+  - Has push notifications switched off at OS level and does not know it, so the "boat is ready" push never reaches him
+  - Least likely of the three personas to open the Notification Center proactively, since he won't think to go looking
+  - Books rarely enough that he re-learns the rules each time, and is the partner most likely to be surprised by a rule that behaves differently from the one he remembers, such as an unclaimed weekend forfeiting its points on cancellation when he expects the 48-hour refund
+- **Quote:** "Is she in the water or not? I'd rather just ring someone."
+- **Design implication:** this persona is the whole argument for SOW C.31. A status that exists only as a push notification does not exist for Grant, so the boat-ready state has to be written onto the Dashboard boat card where he will see it next time he opens the app. The same logic drives the cancellation dialogs: each one states its own points outcome in full rather than assuming the partner remembers which rule applies to which booking type
+- [Assumption: Grant's age/profile and preference for phone calls over app flows are inferred to satisfy the required edge case (lower tech comfort, different context), using notification delivery as the mechanic that most exposes an unfamiliar, ambiguous-feeling system state. Not stated in the SOW]
 
 ---
 

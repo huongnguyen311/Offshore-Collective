@@ -27,7 +27,7 @@ ACTOR: Partner — Qualified
 
 MAIN FLOW:
 1. User opens Booking Calendar (M04) from the tab bar
-2. System displays the boat's calendar with available/booked/held/blocked dates and the Christmas Window dates pre-marked
+2. System displays the boat's calendar with available / booked / standby-available / unclaimed / blocked dates, and any C.7 named-holiday long weekend marked across its whole Fri-to-Mon span and named in the key below the grid. Christmas Window dates are not marked here: the window is a one-time admin draw, not partner-selectable, and is presented on M13
 3. User selects a date range from the available dates
 4. System checks the selection against all active booking rules (points balance, 60-day window, 2-booking/7-day caps, back-to-back block, long-weekend cap) in real time
 5. User taps to proceed with a valid selection
@@ -46,9 +46,12 @@ ALTERNATIVE FLOWS:
 - Case 2: Selection breaks a booking rule
   - At step 4: The selected dates would take the partner's points balance negative, exceed the 60-day advance window, exceed 2 held bookings or 7 consecutive days, fall within the 7-day back-to-back block, or exceed the long-weekend cap
   - System: Blocks the selection at Booking Blocked (M22), shows a plain-language message naming the specific rule and (for points) the exact points needed vs. remaining, and returns the user to M04 to adjust dates
-- Case 3: Rayglass 2400 towing destination
-  - At step 6: The boat is a Rayglass 2400
-  - System: After M08, inserts Towing Destination Entry (M10) before the booking can be confirmed — the booking dates are held, not yet confirmed, pending Matt's approval (see FLOW-TOW-01 for the full approval sub-flow)
+- Case 3: Selection falls inside a reopened weekend
+  - At step 3: The user taps a date carrying the unclaimed state (C.5)
+  - System: Selects from that day through to the end of the block rather than the single day tapped, and prices it from the unclaimed table by the day being claimed on (weekend 5/4/2, long weekend 7/6/4/2). It never prices per day, and never splits the block between two partners
+- Case 3b: Selection is a lone Friday
+  - At step 3: The user taps a Friday that is not part of an intact weekend or long weekend block
+  - System: Selects it but refuses to price it, disables Review Booking, and explains that Friday is never booked on its own (C.4). Adding Saturday and Sunday, or continuing to Monday, clears the block
 - Case 4: User navigates away before confirming
   - At step 8: User backgrounds the app or taps away from M08 without confirming
   - System: Discards the pending selection — no points are deducted and no booking is held; the dates return to available on M04
@@ -62,7 +65,7 @@ DIAGRAM:
 ```mermaid
 flowchart TD
     A[Partner taps Book tab → M04 Booking Calendar]
-    B[System shows available/booked/held/blocked dates]
+    B[System shows available / booked / blocked / standby / unclaimed / holiday dates]
     Q{Qualification status?}
     A --- Q
     Q -- Pending --- QG[M20 Qualification Pending Gate]
@@ -71,8 +74,8 @@ flowchart TD
     C --- D{Rule check passes?}
     D -- No --- E[M22 Booking Blocked → plain-language reason]
     E --- B
-    D -- Yes --- F{Boat is Rayglass 2400?}
-    F -- Yes --- G[M10 Towing Destination Entry → held pending approval]
+    D -- Yes --- F{Date carries the unclaimed state?}
+    F -- Yes --- G[Claim to end of block, repriced per C.5 table]
     F -- No --- H[M08 Review & Confirm → points breakdown shown]
     G --- H
     H --- I[User taps Confirm]
@@ -121,12 +124,12 @@ ALTERNATIVE FLOWS:
 - Case 4: Fuel reading within 20-litre tolerance
   - At step 11 (system-side, not user-visible): The reported litres differ slightly from the expected reading
   - System: Does not flag a shortfall if the difference is within 20 litres — only a discrepancy beyond that raises a Needs Your Action item
-- Case 5: Rayglass 2400 towing trip
-  - At step 3: The booking is a Rayglass 2400 towing trip
-  - System: Adds a mandatory towing disclaimer that the partner must acknowledge before the checklist can be submitted
+- Case 5: Checklist not submitted
+  - At step 2: The partner never opens the checklist
+  - System: Nothing blocks departure, there is no approval gate by design (A.9). The system records that no pre-departure check was submitted for that booking. For the post-use checklist the consequence is larger, since it is what starts the turnaround, so C.32 fires a push reminder around the expected return time and alerts Matt in Needs Your Action if it is still missing after a set window
 - Case 6: Post-Use Checklist (return trip)
   - Entry differs: User opens M09 or a "boat ready to return" notification after using the boat, navigating to Post-Use Checklist (M16) instead of M15
-  - System: Uses the identical 4 fuel fields + damage field, but also allows optional extra photos beyond the required set, shows specific heading/footer copy about photo usage, and submitting triggers the turnaround process (not covered further here — Admin Portal territory)
+  - System: Uses the identical 4 fuel fields + damage field, adds a mandatory engine-hours reading that feeds the Engine Servicing Registry (A.11/B.14), allows optional extra photos beyond the required set, shows specific heading/footer copy about photo usage, and submitting triggers the turnaround process (not covered further here — Admin Portal territory)
 
 UX NOTES:
 - Friction point: the fuel section's conditional fields (litres/reason/photo appearing only when "not full") must be visually obvious as newly-required, not easy to miss and get blocked at Submit.
@@ -157,14 +160,14 @@ DIAGRAM — Alternative Paths
 ```mermaid
 flowchart TD
     A2[Post-trip: user opens M09 or notification]
-    A2 --- B2[M16 Post-Use Checklist → same fuel + damage fields]
+    A2 --- B2[M16 Post-Use Checklist → same fuel + damage fields + engine hours]
     B2 --- C2[Optional extra photos + required heading/footer copy]
     C2 --- D2[User submits]
     D2 --- E2[Turnaround process starts — Admin Portal territory]
 
-    F2[M15 entry, boat is Rayglass 2400 towing trip]
-    F2 --- G2[Mandatory towing disclaimer shown]
-    G2 --- H2[User must acknowledge before Submit is enabled]
+    F2[Post-use checklist not submitted after the booking ends]
+    F2 --- G2[C.32 push reminder to the partner]
+    G2 --- H2[Still missing after the window → Needs Your Action alert to Matt]
 ```
 
 ---
@@ -294,61 +297,62 @@ flowchart TD
 
 ---
 
-## FLOW-TOW-01 — Towing Approval-Pending Flow
+## FLOW-STANDBY-01 — Standby Claim (Same Day, Free)
 
 GROUP: User App
-FLOW ID: FLOW-TOW-01
-FLOW NAME: Towing Approval-Pending Flow (Rayglass 2400 only)
-RELATED US: TBD
+FLOW ID: FLOW-STANDBY-01
+FLOW NAME: Standby Claim
+RELATED SOW ROWS: A.19, C.27, C.28, C.29, C.30
 
-ACTOR: Partner — Qualified, on the Rayglass 2400
+ACTOR: Partner — Qualified
+
+The only flow in the app where a partner gets time on the boat without spending points, and the only one that races the other five partners in real time.
 
 MAIN FLOW:
-1. User selects valid dates on Booking Calendar (M04) for a Rayglass 2400 trip
-2. System navigates to Booking Review & Confirm (M08), then to Towing Destination Entry (M10) since this boat is a 2400
-3. User enters a towing destination
-4. User confirms the booking
-5. System holds the booking dates — not yet confirmed — pending Matt's review, and clearly labels the status as "Pending Approval"
-6. System navigates to Booking Detail (M09), showing the held booking with the Pending Approval status clearly visible
-7. Matt reviews and approves the destination in the Admin Portal (outside this app)
-8. System confirms the held dates as a normal booking and updates the status on M09
-9. System sends the partner a notification that the booking is now confirmed
+1. At 7am the system checks whether any confirmed booking covers today for this boat (regular day, weekend block, long weekend, or Christmas Window)
+2. Nothing covers it, so the system opens today as a standby claim at zero points
+3. User opens the Booking Calendar (M04) and sees today marked standby-available, with a TODAY marker
+4. User taps the cell
+5. System navigates to Standby Claim (M28), showing 0 points and a pre-filled estimated departure time
+6. User adjusts the departure time if needed and taps Claim Today, Free
+7. System allocates the day on a first-confirmed basis and deducts nothing
+8. System immediately sends an SMS and an email to Tamaki Marine Park's booking contacts, including the departure time, rather than waiting for the nightly contractor email
+9. System navigates to Booking Detail (M09), showing the claim with a Claimed badge
 
-END: Booking shows as fully confirmed on M09, with points deducted at the point of confirmation
+END: Today is held for this partner at no point cost, with Tamaki Marine Park already told
 
 ALTERNATIVE FLOWS:
-- Case 1: Matt declines the destination
-  - At step 7: Matt declines instead of approving
-  - System: Releases the held dates back to the calendar on M04 for others to book, and notifies the partner that the request was declined
-- Case 2: Partner changes the destination after approval
-  - After step 8 (already approved and confirmed): User opens M09 and edits the towing destination
-  - System: Reverts the booking back to "Pending Approval" and requires Matt to approve again from scratch — the previously-confirmed status does not carry over
-- Case 3: Pre-departure checklist reached before approval resolves
-  - If departure approaches while still Pending Approval
-  - System: This flow assumes approval resolves before departure; the WBS does not define a specific "approval still pending at departure time" fallback — flagged as an open question, not invented here
-- Case 4: Partner doesn't check the app after submitting
-  - At step 6: A less proactive partner doesn't reopen the app to check status
-  - System: Relies on push notification delivery (step 9, or an equivalent decline notification) to reach them — if push is not enabled, the only way to see the status is by manually reopening M09
+- Case 1: Another partner claims first
+  - Between steps 5 and 6: another partner confirms the same day
+  - System: replaces the claim button with an inline notice before this partner can tap it, so a tap never fails after the fact. Single route back to M04
+- Case 2: Boat not yet turned around from yesterday
+  - At step 7: a post-use checklist exists for yesterday and Marine Detailing Co has not marked their job complete
+  - System: SMS to Matt immediately, plus a Needs Your Action entry, flagging that readiness needs manual confirmation (C.29). Matt coordinates with TMP and MDC and tells the partner directly. Nothing about the standard boat-ready notification changes
+- Case 3: Partner cancels the claim
+  - After step 9: user cancels from M09
+  - System: no points to refund or forfeit, but TMP is told to stand down, or to retrieve the boat if it is already launched (C.30). No post-use checklist is expected, and the boat's condition carries forward without a fresh checklist baseline
+- Case 4: Partner's balance is zero or negative
+  - At step 6
+  - System: the claim proceeds. Standby is free, so the hard block on a negative balance (C.4) does not apply
 
 UX NOTES:
-- Friction point: this is the flow most likely to feel ambiguous to a low-tech-comfort or infrequent user ("Am I booked or not?") — M09's status label for a held towing booking must be impossible to misread as either "confirmed" or "rejected" when it's actually "pending."
-- Improvement: Case 2 (destination change resets approval) is a rule a partner is unlikely to expect — a confirmation prompt ("Changing this will require Matt's approval again") before submitting the change would prevent an unpleasant surprise, worth carrying into SKILL 09 UX writing.
-- Assumption: Case 3 (what happens if approval is still pending very close to departure) is not defined in the WBS — flagged as a genuine open question, not resolved by assumption here.
-
-**Open question carried forward:** What happens if a Rayglass 2400 towing request is still Pending Approval when departure time arrives? (Not specified in WBS — recommend confirming with Matt before SKILL SC screen design locks in the M09 status states.)
+- The free price is the whole proposition, so it has to be stated in the button, not only in the body. A partner trained to think every day costs points will otherwise hesitate over a day that costs nothing.
+- The estimated departure time is the one thing the partner gives back in exchange. Framing it as a favour to Tamaki Marine Park, rather than as a required field, is why the help text explains what happens to the value.
+- Case 1 is the real design risk. Losing a race after tapping would feel like the app took something away; losing it before tapping reads as bad luck. The state change has to arrive before the tap.
 
 DIAGRAM:
 ```mermaid
 flowchart TD
-    A[M04 → dates selected, Rayglass 2400]
-    A --- B[M08 Review, then M10 Towing Destination Entry]
-    B --- C[User enters destination, confirms]
-    C --- D[M09 → status: Pending Approval, dates held]
-    D --- E{Matt's decision}
-    E -- Approve --- F[Dates confirmed, points deducted, partner notified]
-    E -- Decline --- G[Dates released back to M04, partner notified]
-    F --- H[User later edits destination]
-    H --- D
+    A[7am: no confirmed booking covers today]
+    A --- B[M04 today cell marked standby-available, TODAY]
+    B --- C[M28 Standby Claim: 0 points, departure time]
+    C --- D{Claimed first?}
+    D -- Another partner got it --- E[Inline notice, back to M04]
+    D -- This partner --- F[Day held, 0 points deducted]
+    F --- G[Immediate SMS + email to TMP]
+    G --- H[M09 status: Claimed]
+    F --- I{MDC job from yesterday still open?}
+    I -- Yes --- J[SMS to Matt + Needs Your Action, handled manually]
 ```
 
 ---
@@ -361,11 +365,11 @@ flowchart TD
 | User App | Pre/Post-Departure Checklist | Partner — Qualified | 13 | 6 | M09 Booking Detail | M09, checklist submitted |
 | User App | Cancel Booking | Partner — Qualified | 7 | 5 | M09 Booking Detail | M03 updated balance |
 | User App | Qualification-Gated Onboarding | Partner — Pending → Qualified | 8 | 4 | M02 Login | M04/M08 first booking underway |
-| User App | Towing Approval-Pending Flow | Partner — Qualified (2400) | 9 | 4 | M04 Booking Calendar | M09 confirmed (or declined/released) |
+| User App | Standby Claim | Partner — Qualified | 9 | 4 | M04 Booking Calendar (today cell) | M09 claim held at 0 points |
 
 ---
 
 ## Open Questions Carried Forward
-- What happens if a Rayglass 2400 towing request is still Pending Approval when departure time arrives? (FLOW-TOW-01, Case 3)
+- For a back-to-back turnaround, where the boat never leaves the water, should Marine Detailing Co's Mark Job Complete trigger the next partner's notification directly? Flagged 2026-09-14 on SOW rows B.32 and C.10, still under review with Matt. Until it is settled, "only TMP's Launch Confirmed notifies the partner" cannot be treated as final for that one case, and FLOW-CHECKLIST-01's hand-off step inherits the same uncertainty.
 
 Google Sheet export was not requested — the Mermaid diagrams above render natively in this Markdown file and would be lost in a Sheets export. Ask if a Sheets copy is wanted later.

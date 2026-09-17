@@ -70,7 +70,7 @@ Full Auto Layout / layer-tree / token-reference detail for all 3 in [`18-figma-s
 
 ## 5. Screen Index
 
-**Corrected (this pass):** the table below previously omitted 4 screens that were, in fact, already rendered (M11, M13, M27, Legal) and pointed only at the originally-published artifact link. All rows below now point to the local, current file. See `17-screen-design.md` for the full explanation.
+**Reconciled 2026-09-17:** the whole design pipeline was checked against the SOW's live Scope Details and Acceptance Criteria, skipping the struck rows. Screens for removed scope were deleted, screens for confirmed-but-undesigned scope were added, and several booking rules the prototype was enforcing incorrectly were fixed. See `17-screen-design.md` for the per-screen account.
 
 | Screen ID | Name | States covered | Preview |
 |---|---|---|---|
@@ -78,19 +78,22 @@ Full Auto Layout / layer-tree / token-reference detail for all 3 in [`18-figma-s
 | M03 | Home / Dashboard | loading, empty, error, offline, full | [screens-preview.html](screens-preview.html) |
 | M04 | Booking Calendar | loading, error, offline, no-permission, full | [screens-preview.html](screens-preview.html) |
 | M08 | Booking Review & Confirm | full, error, offline, success | [screens-preview.html](screens-preview.html) |
-| M22 | Booking Blocked | full (named-rule messages) | [screens-preview.html](screens-preview.html) |
+| M22 | Booking Blocked | full, 7 named-rule messages | [screens-preview.html](screens-preview.html) |
 | M20 | Qualification Pending Gate | full | [screens-preview.html](screens-preview.html) |
-| M09 | Booking Detail (towing) | full, loading, error, offline | [screens-preview.html](screens-preview.html) |
+| M09 | Booking Detail | full, loading, error, offline | [screens-preview.html](screens-preview.html) |
+| M17 | Cancel — Advance Booking | full (48-hour refund rule) | [screens-preview.html](screens-preview.html) |
 | M05 | Boat Rules | loading, error, offline; now includes the Christmas Window release rule | [screens-preview.html](screens-preview.html) |
 | M06 | Notification Center | loading, empty, partial, error, offline, full | [screens-preview.html](screens-preview.html) |
-| M07 | Profile | loading, error, offline, full | [screens-preview.html](screens-preview.html) |
+| M07 | Profile | loading, error, offline, full, **editing** (in-place edit of name/phone/email, incl. inline error) | [screens-preview.html](screens-preview.html) |
 | M15 | Pre-Departure Checklist | full field spec in `12-form-specs.md` | [screens-preview.html](screens-preview.html) |
-| M11 | Payments & Invoices | full, read-only | [screens-preview.html](screens-preview.html) |
-| M13 | Christmas Window Display | full, read-only, 3-year view | [screens-preview.html](screens-preview.html) |
+| M16 | Post-Use Checklist | full field spec in `12-form-specs.md`, incl. mandatory engine hours | [screens-preview.html](screens-preview.html) |
+| M28 | Standby Claim | full, loading, error, offline, taken-while-open, success | [screens-preview.html](screens-preview.html) |
+| M29 | Cancel — Unclaimed-Access / Standby | full (both C.30 variants) | [screens-preview.html](screens-preview.html) |
+| M13 | Christmas Window Display | full, 3-year view, with the partner-triggered release (A.12) | [screens-preview.html](screens-preview.html) |
 | M27 | Support Contact | full; persistent navbar icon on Home/Rules/Profile + Profile menu | [screens-preview.html](screens-preview.html) |
 | M25/M26 | Terms & Privacy (combined) | full (client legal copy pending) | [screens-preview.html](screens-preview.html) |
 
-**Remaining 11 of 27 mobile screens** — M01 Splash/Session Check, M10 Towing Destination Entry, M12 Invoice Detail, M14 Notification Detail, M16 Post-Use Checklist, M17 Cancel Booking, M18 Edit Profile, M19 Secondary Operator, M21 Empty state, and M23/M24 (inline error states, not full screens) — are fully defined by IA + component/token specs but were not individually rendered. No open design decision blocks building them; they reuse the same system.
+**Remaining mobile screens** — M01 Splash/Session Check and M23/M24 (inline error states, not full screens) — are fully defined by the IA plus the component and token specs but were not individually rendered. No open design decision blocks building them; they reuse the same system.
 
 Redlines: not separately produced — the token/spec docs above serve as the redline (every value is named, not eyeballed from an image).
 
@@ -109,8 +112,9 @@ See [`16-icon-asset-spec.md`](16-icon-asset-spec.md) Section 5 for the full expo
 | # | Item | Status | Default if unanswered |
 |---|---|---|---|
 | 1 | App-icon background color (navy vs. light) | **Open — no default given** | None — this is the one true blocker |
-| 2 | Exact character caps for 3 free-text fields (notFullReason, damageDescription, towing destination) | Open, has a recommended default | 500 / 500 / 200 characters respectively (`12-form-specs.md`) |
-| 3 | The original 19 client open-questions (Business Milestones, Reports/Export, reserve balance) | Resolved by InApps' own analysis, awaiting Matt's sign-off | `02-resolved-open-questions-scope.md`'s reasoned defaults — these are Admin Portal items and don't block Mobile App development regardless |
+| 2 | Exact character caps for 2 free-text fields (notFullReason, damageDescription) | Open, has a recommended default | 500 / 500 characters respectively (`12-form-specs.md`) |
+| 3 | Turnaround trigger for back-to-back bookings: should MDC's Mark Job Complete notify the next partner when the boat never leaves the water? | **Open** — flagged 2026-09-14 on SOW B.32 / C.10, still with Matt | None. "Only TMP's Launch Confirmed notifies" holds for every other case, but must not be treated as settled for this one |
+| 3b | The original client open-questions (Business Milestones, Reports/Export) | Answered by Matt 2026-09-14 and written into the SOW | Superseded. `02-resolved-open-questions-scope.md` holds InApps' earlier reasoned defaults and is now historical, not current scope |
 | 4 | Biometric login (Face ID/fingerprint) | Open, flagged in `03-design-brief-parsed.md` | Not built — current scope is credentials-only |
 | 5 | Whether a boat-photography treatment is wanted for a future Home-screen enhancement | Open, explicitly deferred | Not built for this release (`16-icon-asset-spec.md`) |
 
