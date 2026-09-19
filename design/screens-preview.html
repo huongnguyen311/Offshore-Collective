@@ -1798,7 +1798,7 @@
       <div class="screen-caption">
         <div class="screen-id">M02 · Entry</div>
         <div class="screen-name">Login</div>
-        <div class="screen-note">Credentials only, no biometric in scope. Both fields required (*); a blank field shows an inline error without naming which credential failed. Sign-in failure follows the same pattern.</div>
+        <div class="screen-note">Credentials only, no biometric. Both fields required; a blank field or a failed sign-in shows an inline error without naming which credential was wrong.</div>
       </div>
     </div>
 
@@ -1866,7 +1866,7 @@
       <div class="screen-caption">
         <div class="screen-id">M03 · Core</div>
         <div class="screen-name">Home / Dashboard</div>
-        <div class="screen-note">Signature Moment #1: Data Hero + Eyebrow Label. Points Balance and boat identity form one static account zone, separated from the variable Upcoming Bookings by a soft fade divider. Each trip card puts date/type on top and status badge below, so longer date ranges don't wrap. The C.31 ready status names the trip it belongs to, because a partner can hold 2 concurrent bookings and the launch is confirmed per booking. It has three states (third added 2026-09-19, C.31 comment on SOW row 94): ready, not ready yet, and absent. <b>Not ready yet</b> shows only while there is a booking today whose ready trigger has not fired, so the morning of a trip never renders as an empty row. Absent is now only what a partner with no booking today sees. <b>What sets the ready state depends on the turnaround path (confirmed 2026-09-18):</b> TMP's Confirm Launch (C05) on a haul-out, and MDC's Mark Job Complete (C04) on a back-to-back, where the boat never leaves the water and TMP has no step (C.10/C.31). It clears when the partner checks out or when the post-use checklist starts the turnaround. The sim below walks the haul-out path, so C05 is what restores it there.</div>
+        <div class="screen-note">Signature Moment #1: Data Hero + Eyebrow Label. Points balance and boat identity form one static zone above the variable bookings list. Trip cards put date and type above the badge so long ranges don't wrap. The C.31 ready status names its trip, since a partner can hold 2 at once, and has three states: ready, not ready yet (a booking today whose trigger has not fired), absent. Set by TMP's Confirm Launch on a haul-out, MDC's Mark Job Complete on a back-to-back (C.10); cleared at check-out or when the post-use checklist starts the turnaround.</div>
       </div>
     </div>
 
@@ -1935,7 +1935,7 @@
       <div class="screen-caption">
         <div class="screen-id">M03 · Core</div>
         <div class="screen-name">Home: Boat Not Ready Yet</div>
-        <div class="screen-note">Added 2026-09-19, C.31 third state. Shown on the morning of a trip while the ready trigger has not fired yet: MDC&rsquo;s Mark Job Complete on a back-to-back, TMP&rsquo;s Confirm Launch on a haul-out (C.10). Before this state the same moment rendered as an empty row, so the one partner C.31 exists for, the one whose push is switched off, could not tell &ldquo;not ready&rdquo; from &ldquo;nothing to say&rdquo;. The trigger condition is a booking today, not the turnaround itself: a partner with no booking today still sees nothing, because the boat&rsquo;s state is not their business until it is their day. Amber and a clock rather than a muted green tick, so the state is read by shape and label, not colour alone. No CTA and no turnaround detail: nothing is being asked of the partner, and C.31 gives them no contractor-facing view to send them to.</div>
+        <div class="screen-note">C.31 third state. Shows on the morning of a trip while the ready trigger has not fired. The condition is a booking today, not the turnaround: no booking today, no status. Amber and a clock rather than a muted tick, so it reads by shape and label, not colour. No CTA, because nothing is being asked of the partner.</div>
       </div>
     </div>
 
@@ -2004,7 +2004,7 @@
       <div class="screen-caption">
         <div class="screen-id">M03 · Core</div>
         <div class="screen-name">Home: Standby Claimed Today</div>
-        <div class="screen-note">Added 2026-09-17. A claimed standby day (A.19) is a booking like any other and has to sit in this list, sorted first because it is always today. Without the row, M28 exited to M09 once and the booking became unreachable the moment the partner tapped Home, which took the C.30 stand-down cancellation with it, the one dialog a standby claim genuinely needs. The badge reads Claimed rather than Confirmed because no points changed hands, and the trip costs 0, so the points hero is unchanged from the default Home. The boat card now reads <b>Boat not ready yet</b> (third state, added 2026-09-19): claiming standby creates a booking today, and C.31&rsquo;s ready trigger has not fired at the moment of claiming, which is exactly the condition the new state covers. It resolves to ready when the turnaround&rsquo;s last step is actioned, which for a same-day claim happens after the C.28 real-time alert, not at the moment of claiming. On a haul-out that step is TMP's Confirm Launch; on a back-to-back it is MDC's Mark Job Complete (C.10, confirmed 2026-09-18).</div>
+        <div class="screen-note">A claimed standby day (A.19) is a booking like any other and sorts first, since it is always today. Without the row, M28's booking and its C.30 stand-down dialog are unreachable from Home. The badge reads Claimed, not Confirmed, because no points changed hands. The boat card reads Boat not ready yet: claiming creates a booking today whose C.31 trigger has not fired.</div>
       </div>
     </div>
 
@@ -2050,7 +2050,7 @@
       <div class="screen-caption">
         <div class="screen-id">M21 · Core</div>
         <div class="screen-name">Home: Empty (No Upcoming Booking)</div>
-        <div class="screen-note">Signature Moment #2: line-art icon (interlocking squares, chevron toward Book) replaces the generic "no bookings" state. Points balance still renders normally; only the next-booking line/card is swapped.</div>
+        <div class="screen-note">Signature Moment #2: line-art icon with the chevron pointing at the Book tab, in place of a generic empty state. The points balance still renders; only the next-booking card is swapped.</div>
       </div>
     </div>
 
@@ -2104,7 +2104,7 @@
       <div class="screen-caption">
         <div class="screen-id">M04 · Core</div>
         <div class="screen-name">Booking Calendar</div>
-        <div class="screen-note">Signature Moment #3: rounded-square date glyphs echo the brand mark; boat identity reuses Home's header component. <b>Cut from seven states to five on 2026-09-17.</b> SOW A.6's AC names four (available, booked, blocked, standby); unclaimed is the fifth because it changes the price, which a partner can act on. Past plus beyond-the-60-day-window merged into one muted "not bookable" look. The measured reason: with seven tints all 36 fill pairs sat below 3:1, four states shared one fill, and two failed AA on their own numeral. States are stepped by lightness, from white through to solid navy for booked, and each light state carries a non-colour cue: solid border, dashed border, no border, 45-degree hatch, or a TODAY label. <b>Named holiday long weekend restored as a sixth state on 2026-09-17, per Matt's M04 comment.</b> One tint for every named holiday, never one per holiday, so the legend stays one line however many fall in a month. The fill cannot carry it on its own and that is measured, not assumed: info-100 sits at 1.24:1 against available, 1.01:1 against past and 1.10:1 against standby, and no light tint reaches 3:1, which is why the first attempt at this was cut. So the shape carries it: a 3px rule across the top of all four cells, which survives greyscale and colour-vision deficiency and says the right thing, that Fri to Mon is one indivisible unit (C.4). The note below the grid is now a key rather than a caption, each row wearing the same swatch the block wears above it, so the tint resolves to a holiday name instead of being one more colour to decode. Per Open Questions for Client #17, a named holiday that formed no long weekend that year (Waitangi here, falling midweek) takes no cell treatment at all and is named in the key as a single day, because styling it as a block would state a booking rule that is not true that year. The draw-only Christmas Window chip left the page legend at the same time: its cell style was never rendered on any calendar, and keeping it would have put two states on one fill. <b>Corner glyph narrowed from four states to two on 2026-09-17.</b> It now carries a meaning instead of being sprinkled across the grid: the glyph marks a date the partner cannot select, so booked and blocked keep it and standby and unclaimed lost it. Both of those are dates the partner can take, and both already carry a stronger cue that is also in the legend, a TODAY label for standby and a dashed border for unclaimed. Standby forced the change: fill, border, bold numeral, TODAY label and glyph put five green signals on one 41px cell, the same pile-up that had already cost that cell its inset ring.</div>
+        <div class="screen-note">Signature Moment #3: rounded-square date glyphs echo the brand mark; boat identity reuses Home's header. Six states: available, booked, blocked, standby, unclaimed, and named-holiday long weekend. They are stepped by lightness and each light state carries a non-colour cue (solid border, dashed border, no border, hatch, TODAY label), because no light tint reaches 3:1 against the others. Past and beyond-the-60-day-window share one muted not-bookable look. A named holiday long weekend is carried by a 3px rule across all four cells rather than by fill, which says Fri to Mon is one indivisible unit (C.4); a holiday that formed no long weekend that year takes no cell treatment and is named in the key as a single day. The corner glyph marks only dates the partner cannot select, so booked and blocked keep it and standby and unclaimed do not.</div>
       </div>
     </div>
 
@@ -2143,7 +2143,7 @@
       <div class="screen-caption">
         <div class="screen-id">M08 · Detail</div>
         <div class="screen-name">Booking Review &amp; Confirm</div>
-        <div class="screen-note">Estimated departure time, for TMP's planning only, not binding. Selected via three dropdowns (hour : minute :00/:30 : AM/PM), not free text, per feedback 2026-09-14. Primary CTA uses the standard button style (PRD v1.5 §6); numbers use tabular typography.</div>
+        <div class="screen-note">Estimated departure time, a planning reference for TMP, not binding. Three dropdowns (hour, :00/:30, AM/PM), not free text. Standard primary button; numbers tabular.</div>
       </div>
     </div>
 
@@ -2169,7 +2169,7 @@
       <div class="screen-caption">
         <div class="screen-id">M22 · System</div>
         <div class="screen-name">Booking Blocked: Insufficient Points</div>
-        <div class="screen-note">Names the specific rule and exact shortfall, never a generic block, per the WBS.</div>
+        <div class="screen-note">Names the specific rule and the exact shortfall, never a generic block.</div>
       </div>
     </div>
 
@@ -2195,7 +2195,7 @@
       <div class="screen-caption">
         <div class="screen-id">M22 · System</div>
         <div class="screen-name">Booking Blocked: 60-Day Window</div>
-        <div class="screen-note">Names the rule and states exactly when the partner can retry, per `14-ux-writing.md`.</div>
+        <div class="screen-note">Names the rule and states exactly when the partner can retry.</div>
       </div>
     </div>
 
@@ -2221,7 +2221,7 @@
       <div class="screen-caption">
         <div class="screen-id">M22 · System</div>
         <div class="screen-name">Booking Blocked: 2-Booking / 7-Day Cap</div>
-        <div class="screen-note">States both triggers (2 held bookings, or 7 consecutive days) plus how to unblock.</div>
+        <div class="screen-note">States both triggers, 2 held bookings or 7 consecutive days, and how to unblock.</div>
       </div>
     </div>
 
@@ -2247,7 +2247,7 @@
       <div class="screen-caption">
         <div class="screen-id">M22 · System</div>
         <div class="screen-name">Booking Blocked: 7-Day Back-to-Back</div>
-        <div class="screen-note">Names the rule and its purpose, matching the calm, explain-don't-just-block tone.</div>
+        <div class="screen-note">Names the rule and its purpose, in the explain-rather-than-refuse tone.</div>
       </div>
     </div>
 
@@ -2273,7 +2273,7 @@
       <div class="screen-caption">
         <div class="screen-id">M22 · System</div>
         <div class="screen-name">Booking Blocked: Long-Weekend Cap</div>
-        <div class="screen-note">States the cap (2) and window (rolling 12 months), and names the two C.7 routes that stay open to a partner at their cap, the 14-day release and an unclaimed claim. Blocking without those reads as a harder rule than the SOW sets.</div>
+        <div class="screen-note">States the cap (2) and the rolling 12-month window, plus the two C.7 routes still open at the cap: the 14-day release and an unclaimed claim. Blocking without them reads harder than the SOW is.</div>
       </div>
     </div>
 
@@ -2299,7 +2299,7 @@
       <div class="screen-caption">
         <div class="screen-id">M22 · System</div>
         <div class="screen-name">Booking Blocked: Friday Alone</div>
-        <div class="screen-note">SOW C.4 hard-blocks a standalone Friday under both the advance window and unclaimed access. No state covered this before, so a lone Friday would have priced as a 1-point single day. The copy offers the two ways forward rather than only refusing.</div>
+        <div class="screen-note">C.4 hard-blocks a standalone Friday, under both the advance window and unclaimed access. The copy offers the two ways forward rather than only refusing.</div>
       </div>
     </div>
 
@@ -2325,7 +2325,7 @@
       <div class="screen-caption">
         <div class="screen-id">M22 · System</div>
         <div class="screen-name">Booking Blocked: Named-Holiday Fairness</div>
-        <div class="screen-note">New copy for this rule (none existed in `14-ux-writing.md`); follows the same named-rule pattern as the other variants.</div>
+        <div class="screen-note">New copy for this rule, following the same named-rule pattern as the other variants.</div>
       </div>
     </div>
 
@@ -2359,7 +2359,7 @@
       <div class="screen-caption">
         <div class="screen-id">M17 · System</div>
         <div class="screen-name">Cancel: Advance Booking</div>
-        <div class="screen-note">The 48-hour refund rule (SOW A.8) appears here, at the moment of the decision, and nowhere else. It used to sit permanently under the buttons on M09, which stated a consequence for an action the partner had not taken yet and left the screen explaining itself instead of showing the booking. Every cancellation and release dialog now follows one shape: state only the outcome that applies right now, in points, and leave the dates out, they are on the screen behind the dialog. The hypothetical other branch is gone, since at the moment of the decision only one of the two is true. The two that break the 48-hour rule are M29.</div>
+        <div class="screen-note">The 48-hour refund rule (A.8) appears here, at the moment of the decision, and nowhere else. Every cancellation and release dialog states only the outcome that applies right now, in points, leaving the dates to the screen behind it. The two cancellations that break the 48-hour rule are M29.</div>
       </div>
     </div>
 
@@ -2393,7 +2393,7 @@
       <div class="screen-caption">
         <div class="screen-id">M29 · System</div>
         <div class="screen-name">Cancel: Unclaimed-Access Booking</div>
-        <div class="screen-note">SOW C.30, previously undesigned. An unclaimed-access booking has no meaningful advance-notice window to protect, so it forfeits its points whenever it is cancelled. The dialog says so plainly and explains why the 48-hour rule the partner already knows does not apply here, rather than silently taking the points.</div>
+        <div class="screen-note">C.30. An unclaimed-access booking has no advance-notice window to protect, so it forfeits its points whenever it is cancelled. The dialog says so, and says why the 48-hour rule does not apply here.</div>
       </div>
     </div>
 
@@ -2427,7 +2427,7 @@
       <div class="screen-caption">
         <div class="screen-id">M29 · System</div>
         <div class="screen-name">Cancel: Standby Claim</div>
-        <div class="screen-note">SOW C.30. The only cancellation with no points on either side, so the dialog leads with the operational consequence instead: TMP has to stand down or retrieve. No post-use checklist is expected on a cancelled standby claim, which is why this does not route into the checklist flow.</div>
+        <div class="screen-note">C.30. The only cancellation with no points on either side, so the dialog leads with the operational consequence: TMP stands down or retrieves. No post-use checklist is expected.</div>
       </div>
     </div>
 
@@ -2445,7 +2445,7 @@
       <div class="screen-caption">
         <div class="screen-id">M20 · System</div>
         <div class="screen-name">Qualification Pending Gate</div>
-        <div class="screen-note">For persona Priya's first session; reassures rather than blocks. Info-blue, not warning-amber, per the color system.</div>
+        <div class="screen-note">For a partner's first session; reassures rather than blocks. Info-blue, not warning-amber, per the colour system.</div>
       </div>
     </div>
 
@@ -2478,7 +2478,7 @@
       <div class="screen-caption">
         <div class="screen-id">M09 · Detail</div>
         <div class="screen-name">Booking Detail: Confirmed</div>
-        <div class="screen-note">Primary CTA is Return to Home, not the checklist. Pre-Departure sits below the card as a low-emphasis row, because the urgent prompt arrives 1 hour before the estimated departure time via the C.32 reminder, which deep-links to the same screen. IA lists both as entries into M15. The row disappears once the booking is Checked Out, which is the card below. Both actions sit in the pinned footer, matching M08, so the card can grow without pushing them off-screen. The 48-hour refund/forfeit split is not stated here: it appears in the confirmation dialog (M17), at the moment the partner actually decides.</div>
+        <div class="screen-note">Primary CTA is Return to Home. Pre-Departure sits below as a low-emphasis row, because the urgent prompt is the C.32 reminder an hour before departure, which deep-links to the same screen. The row disappears once the booking is Checked Out. Actions are pinned in the footer so the card can grow. The 48-hour rule is stated in M17, not here.</div>
       </div>
     </div>
 
@@ -2507,7 +2507,7 @@
       <div class="screen-caption">
         <div class="screen-id">M09 · Detail</div>
         <div class="screen-name">Booking Detail: Checked Out</div>
-        <div class="screen-note">The only drawn way into M16. Submitting Pre-Departure checks the partner out and swaps M09 into this state: the Pre-Departure row is gone, Cancel Booking is gone (the trip is already under way, so there is nothing left for C.30 to refund or forfeit), and the single footer CTA becomes Complete Post-Use Checklist. The C.32 post-use reminder in M06 deep-links to the same screen, so a partner who missed the push still has a route in. Added 2026-09-17: this state existed only as prose on the Confirmed card, which left M16, the trigger for the whole turnaround workflow, with no visible entry anywhere in the deck.</div>
+        <div class="screen-note">The only drawn way into M16. Submitting Pre-Departure checks the partner out: the Pre-Departure row goes, Cancel Booking goes (nothing left for C.30 to settle), and the footer CTA becomes Complete Post-Use Checklist. The C.32 post-use reminder deep-links here too.</div>
       </div>
     </div>
 
@@ -2622,7 +2622,7 @@
       <div class="screen-caption">
         <div class="screen-id">M05 · Core</div>
         <div class="screen-name">Boat Rules</div>
-        <div class="screen-note">A.5 asks for a plain-language summary of every booking rule, grouped by topic, so all of them are here: the six things a partner can book and what each costs, the timing limits, standby, the unclaimed rate tables from C.5, fairness, and both cancellation regimes. Fleet is Rayglass 3000 only. <b>Standby narrowed to Monday to Thursday on 2026-09-19.</b> The section label carries the rule, so it is read before any of the detail under it, and the weekend exclusion is stated with its reason and a destination: those days are not refused, they are priced by the C.5 tables directly below, which is why the two sections sit next to each other. <b>C.5 rate tables rebuilt on 2026-09-19</b> for the same-day rule: each row now carries two figures, before 7am and after, because the cost depends on whether the day being claimed has already started, not only on which day it is. A single figure per row would have been wrong for every claim made on the day. The after-7am column is the old rate minus that day, so the last row of each table resolves to Free. That is not standby by another name, which matters now standby is Monday to Thursday only (2026-09-19) and these are weekend days: it is the same arithmetic landing on the same price, and for a Saturday or Sunday it is the only route to a free day there is. Free is written as a word and in the success green, not as a 0, so it reads as an outcome rather than a quantity. The headline cost card moved from 2–5 to 0–5 pts to match.</div>
+        <div class="screen-note">A.5's plain-language summary of every rule, grouped by topic: what each booking type costs, timing limits, standby, the C.5 unclaimed rate tables, fairness, both cancellation regimes, and the Christmas Window. Fleet is Rayglass 3000 only. Standby runs Monday to Thursday, and the weekend exclusion is stated with its reason and its destination, the C.5 tables directly below. Those tables carry two figures per row, before 7am and after, because claiming on the day itself makes that day free. The last row of each resolves to Free, written as a word in the success green rather than as a 0.</div>
       </div>
     </div>
 
@@ -2668,7 +2668,7 @@
       <div class="screen-caption">
         <div class="screen-id">M06 · Core</div>
         <div class="screen-name">Notification Center</div>
-        <div class="screen-note">Covers each type named in SOW A.14: booking confirmed, boat ready, access opened, and the three release triggers (C.9). No payment-due entry exists, the platform raises no partner-facing invoice (A.14 AC). The checklist reminders come from C.32. <b>The qualification welcome (A.2) is new on 2026-09-18</b> and is deliberately not a row: it marks a milestone, so it gets a heading, a body and its own action into M04. Fires once per partner, never repeats. White with only the border and icon tinted, so no text loses contrast. <b>Every row is a deep-link, wired 2026-09-17.</b> Booking confirmed and boat ready open M09 for the trip named in the row; the pre-departure reminder opens M15 and the post-use reminder opens M16 directly, since the booking is checked out by the time C.32 fires that one (1 hour before the estimated return time, confirmed 2026-09-18) and M16 is what starts the whole turnaround; a reopened weekend opens M04 with the block already selected and repriced from the C.5 table. There is no separate notification-detail screen: A.14 scopes this feature as a list view, the message is one line and complete on the row, and a detail screen between the tap and the destination would add a build with no acceptance criterion behind it. The Christmas Window row is the single exception and is deliberately inert, see the note in the markup: C.8 opens a released window to the other five partners first-confirmed, and nothing in the app yet lets them take it.</div>
+        <div class="screen-note">Covers every type A.14 names: booking confirmed, boat ready, access opened, the three C.9 release triggers, and the C.32 checklist reminders. No payment-due entry exists; the platform raises no partner-facing invoice. The A.2 qualification welcome is not a row: it marks a milestone, so it takes a heading, a body and its own action into M04, fired once per partner. Every row is a deep-link and there is no notification-detail screen, since A.14 scopes this as a list view and the message is complete on the row. The Christmas Window row is deliberately inert: nothing in the app yet lets the other five partners take a released window (C.8).</div>
       </div>
     </div>
 
@@ -2715,7 +2715,7 @@
       <div class="screen-caption">
         <div class="screen-id">M07 · Core</div>
         <div class="screen-name">Profile (view)</div>
-        <div class="screen-note">Who the partner is and the three values that describe them share one card: name and boat on the left, the Edit control on the right, then qualification, phone and email as rows. Qualification is the first row because it is the one status that decides whether the rest of the app is usable at all, an unapproved partner cannot book. None of the three values is the partner's to change from here, phone having joined email on 2026-09-19: qualification comes from an admin sign-off, and Matt maintains phone and email on the shareholder record (B.19/A.16). Name is the one thing left that a partner edits themselves, which is why it is the only value on this card that changes shape in edit mode, and why the control reads <b>Edit name</b> rather than Edit (2026-09-19). A card-level Edit promised more than it delivered: a partner wanting to fix their phone number would tap it, find the phone unchanged, and tap Cancel, learning the rule only after a wasted round trip. The line about phone and email was removed on 2026-09-19 at the client's direction, so the card now states the two values and nothing about them. The route out is still on this screen, in the support name, phone and email in the footer (A.17), but it is no longer labelled as the way to change these fields. This was three stacked sections with two headings above them, which pushed the menu 150px down the screen for no gain: a card whose first line is the partner's own name does not also need a heading reading "Your details". Secondary operator below it is padlocked, view-only per A.16, with the route to change it stated rather than implied, and its heading now sits inside its card for the same reason. The rest is the secondary-menu hub for Christmas Window, Support, and the legal pages, keeping the tab bar at 4 items per the IA. The platform holds no financial data (C.26), so this menu has no money screen. The support name, phone, and email also sit in the app footer, which is where A.17 puts them.</div>
+        <div class="screen-note">One card holds who the partner is: the name at title size with the vessel beneath it, then qualification, phone and email as rows. Qualification leads because it decides whether the rest of the app works at all. None of the three is editable here: qualification is an admin sign-off, and Matt maintains phone and email on the shareholder record (B.19/A.16). The name is the only value a partner changes, which is why the pencil sits against it rather than at the card corner. Below it: the padlocked Secondary operator card, the menu hub for Christmas Window, Support and the legal pages, and the support contact in the footer (A.17). No money screen anywhere, because the platform holds no financial data (C.26).</div>
       </div>
     </div>
 
@@ -2766,7 +2766,7 @@
       <div class="screen-caption">
         <div class="screen-id">M07 · Core</div>
         <div class="screen-name">Profile (editing)</div>
-        <div class="screen-note">There is no separate edit screen. Tapping Edit turns the editable value into an input where it already sits, so the name stays at the top of the same card, at heading size, and only becomes typeable. Cancel restores the previous value, and warns first if it was changed; Save validates by Form 4's rules and returns to the view above. Name is shown mid-error here to document the inline pattern, and it is now the only field on the screen that can raise one. <b>Email became read-only on 2026-09-18, phone on 2026-09-19:</b> Matt maintains both on the shareholder record (B.19) and A.16 puts a self-service change out of scope, so an input here would offer something the platform will not accept. Note how little changes between the two cards: qualification, phone, email and the padlocked Secondary operator section are all identical in both modes, because none of them is the partner's to change. Save and Cancel stay, rather than the field saving itself when focus leaves it: a name sits on the shareholder record, and a silent save gives a partner who mistyped nothing to catch it with. <b>The pair was resized on 2026-09-19:</b> two full-width bars were sized for a form, and this is one name. They are now content-width and right-aligned, still 44pt tall, and Cancel dropped its outline because an outlined button beside a filled one argues it is an equal choice, which it is not. Edit mode visibly stops at that boundary, which is a clearer answer to "why can't I change this?" than any amount of helper text.</div>
+        <div class="screen-note">No separate edit screen: the name becomes an input where it already sits, at the same size. It is shown mid-error to document the inline pattern, and it is the only field that can raise one. Qualification, phone, email and the Secondary operator card are identical in both modes, because none of them is the partner's to change. Save and Cancel stay rather than the field saving itself on blur: a name sits on the shareholder record, and a silent save leaves a mistype with nothing to catch it. The pair is content-width and right-aligned, 44pt tall, with Cancel unoutlined.</div>
       </div>
     </div>
 
@@ -2820,7 +2820,7 @@
       <div class="screen-caption">
         <div class="screen-id">M07 · Core</div>
         <div class="screen-name">Profile (secondary operator set)</div>
-        <div class="screen-note">The same screen once a secondary operator exists. A.16 holds three values for this field, name, contact, and Powerboat Training NZ status. <b>Redrawn 2026-09-19.</b> All three were label/value rows, which turned a person into three settings and gave her name the same weight as her phone number, in a stack visually identical to the qualification/phone/email rows one card above. She now takes the same shape the partner's vessel takes on that card: a mark, a name, the number beneath it in mono. The screen ends up with one idea about how a named thing is shown, used twice, instead of two unrelated row stacks. The credential stays a labelled row with its badge, because it is the one value a partner opens this card to check, and folding it into the name block would read as decoration on a name rather than as a status that can change. The padlock and the closing line are the only difference from any other read-only block, and between them they carry the "ours to change, not yours" message that a heading full of admin vocabulary used to carry less well. <b>Copy corrected 2026-09-19:</b> both states said a secondary operator can take Halcyon out "on your behalf", which the client confirmed is wrong. They may only operate her with the partner aboard, so the empty state now says "when you are aboard" and the populated state says it too, because that is the state in which a partner is about to rely on it. The same answer removed the case for a Secondary Operator screen of its own: no login, no separate booking, one record per partner, so there is nothing a second screen would hold that this card does not.</div>
+        <div class="screen-note">The same screen once a secondary operator exists. A.16 holds three values: name, contact and Powerboat Training NZ status. The person takes the same shape the vessel takes above, a mark with the name over the number in mono, so the screen has one way of showing a named thing. The credential stays a labelled row with its badge, since it is the one value a partner opens this card to check. The copy carries the rule that matters here: they may operate Halcyon only when the partner is aboard.</div>
       </div>
     </div>
     <!-- ============ M15 PRE-DEPARTURE CHECKLIST ============ -->
@@ -2893,7 +2893,7 @@
       <div class="screen-caption">
         <div class="screen-id">M15 · Action</div>
         <div class="screen-name">Pre-Departure Checklist</div>
-        <div class="screen-note">Each step is its own card (Fuel Check, Damage Check, Return Time) with an icon header; litres/text fields use a ledger-line style. <b>The 20-litre tolerance is not stated to the partner (2026-09-18):</b> partners are expected to return the boat full, and publishing the threshold invites them to treat it as an acceptable shortfall. The check still runs, silently, on the backend (C.19). `12-form-specs.md` had already forbidden partner-visible tolerance messaging; these screens were contradicting their own spec until now. Progressive disclosure: litres and reason appear only if fuel isn't full, and damage description/photo only if damage is Yes. The fuel gauge photo sits outside that block, because it is asked for whether the tank is full or not. <b>It is the one field that never blocks submission (2026-09-18):</b> a partner who has already left the boat cannot photograph the gauge, so an absent photo submits with a soft notice and raises a "submitted without fuel photo" item for Matt (A.9/A.11). Every other field stays mandatory. Return time is for MDC's planning only, not binding, via three dropdowns in the boxed field style (not ledger-line).</div>
+        <div class="screen-note">Each step is its own card (Fuel Check, Damage Check, Return Time) with an icon header. The 20-litre tolerance is never stated to the partner; the check runs silently on the backend (C.19). Progressive disclosure: litres and reason only when fuel is not full, damage detail only when damage is Yes. The fuel gauge photo sits outside that block, asked for either way, and is the one field that never blocks submission: an absent photo submits with a soft notice and raises an item for Matt (A.9/A.11). Return time is MDC's planning reference only.</div>
       </div>
     </div>
 
@@ -2972,7 +2972,7 @@
       <div class="screen-caption">
         <div class="screen-id">M16 · Action</div>
         <div class="screen-name">Post-Use Checklist</div>
-        <div class="screen-note">Same card layout as Pre-Departure, plus a mandatory Engine Hours reading and an optional Photos card (PRD §4B copy). The fuel gauge photo carries the same waiver as M15, and the turnaround runs as normal without it. Submitting fires the turnaround workflow. Who notifies the next partner depends on the path: on a back-to-back turnaround MDC's Mark Job Complete does it directly, on a haul-out it is TMP's launch-confirmation action the evening before. A 10am backstop alert goes to Admin if not actioned.</div>
+        <div class="screen-note">Same layout as Pre-Departure, plus mandatory Engine Hours and an optional Photos card. The fuel gauge photo carries the same waiver. Submitting fires the turnaround: on a back-to-back MDC's Mark Job Complete notifies the next partner, on a haul-out it is TMP's launch confirmation the evening before, with a 10am backstop alert to Matt.</div>
       </div>
     </div>
 
@@ -3021,7 +3021,7 @@
       <div class="screen-caption">
         <div class="screen-id">M28 · Action</div>
         <div class="screen-name">Standby Claim</div>
-        <div class="screen-note">SOW A.19 / C.27, previously unbuilt. Reached only from the calendar's today cell, and only once 7am passes with nobody holding a confirmed booking. <b>Monday to Thursday only, added 2026-09-19:</b> the hero eyebrow carries the rule rather than repeating "today only", which the navbar, the date line and the button already say three times between them. The reason is in the body copy, because a partner told only that weekends are excluded will ask why, and the answer is not a rule the app enforces but a fact about the boat: it cannot be turned around between trips at a weekend. The copy then routes them somewhere real, to the unclaimed weekend rates, rather than leaving a refusal with no alternative. Zero points, so the balance rows read 5 / 0 / 5 rather than being hidden. Captures the same estimated departure time as a normal confirmation (A.8), because C.28 puts it in the real-time SMS and email to Tamaki Marine Park.</div>
+        <div class="screen-note">A.19 / C.27. Reached only from the calendar's today cell, Monday to Thursday, once 7am passes with nobody holding a confirmed booking. The eyebrow carries the Mon-to-Thu rule; the body gives the reason, no weekend turnaround, and sends the partner to the unclaimed weekend rates rather than refusing with nowhere to go. Zero points, so the balance rows read 5 / 0 / 5. Captures an estimated departure time for C.28's real-time alert to TMP.</div>
       </div>
     </div>
 
@@ -3070,7 +3070,7 @@
       <div class="screen-caption">
         <div class="screen-id">M13 · Action</div>
         <div class="screen-name">Christmas Window</div>
-        <div class="screen-note">One-time admin draw at delivery, so only Year 2 shows a window pick; Years 1 and 3 show "not part of your allocation." Your year is raised off the page on the card-featured elevation while the other two sit flat and tinted, so it reads first by depth; inside it the assigned window adds the calendar's info tint plus a checkmark, never colour alone. Release moved out of the header to a hairline footer inside that year card, where the point rule is stated before the action is offered and the button gets a full 44px target instead of a 28px inline one; the partner (not admin) triggers it: &gt;14 days out refunds points in full, under 14 forfeits them, and the dates open to the other 5 partners simultaneously.</div>
+        <div class="screen-note">One-time admin draw at delivery, so only Year 2 holds a window; the other years read not part of your allocation. Your year is raised on the card-featured elevation, and inside it the assigned window adds a tint plus a checkmark, never colour alone. Release sits in a hairline footer inside that year card, with the point rule stated before the action and a 44px target: more than 14 days out refunds in full, under 14 forfeits, and the dates open to the other 5 partners at once.</div>
       </div>
     </div>
 
@@ -3113,7 +3113,7 @@
       <div class="screen-caption">
         <div class="screen-id">M13 · System</div>
         <div class="screen-name">Release Christmas Week: Refund</div>
-        <div class="screen-note">State 1 of 2. More than 14 days out, so the points come back and nothing is at risk: navy icon, navy confirm button, no alarm language. The dialog states today's outcome only, never both branches, because at the moment of the decision only one of them is true. Dates are left out of the copy: they sit on the card behind the dialog and repeating them here only pushed the point rule further down.</div>
+        <div class="screen-note">State 1 of 2. More than 14 days out, so the points come back: navy icon, navy button, no alarm language. The dialog states today's outcome only, never both branches. Dates are left to the card behind it.</div>
       </div>
     </div>
 
@@ -3156,7 +3156,7 @@
       <div class="screen-caption">
         <div class="screen-id">M13 · System</div>
         <div class="screen-name">Release Christmas Week: Forfeit</div>
-        <div class="screen-note">State 2 of 2, same dialog inside 14 days of the window. Three things change and nothing else: the icon goes to the error tint, the copy says forfeited rather than refunded, and the confirm button carries the cost in its own label ("Release and Forfeit 14 pts") so the price is on the thing being pressed, not only in the paragraph above it. This is the same shape M29 uses for a forfeiting cancellation. Which state renders is decided by the date, not by the partner, so the two are never both reachable.</div>
+        <div class="screen-note">State 2 of 2, inside 14 days. Three changes only: error tint on the icon, forfeited instead of refunded, and the cost in the button's own label ("Release and Forfeit 14 pts"). Same shape M29 uses. The date decides which state renders, so the two are never both reachable.</div>
       </div>
     </div>
 
@@ -3179,7 +3179,7 @@
       <div class="screen-caption">
         <div class="screen-id">Support</div>
         <div class="screen-name">Support Contact</div>
-        <div class="screen-note">Static contact block, configurable from the Admin Portal; the partner can't edit it here.</div>
+        <div class="screen-note">Static contact block, configurable from the Admin Portal; the partner cannot edit it here.</div>
       </div>
     </div>
 
@@ -3198,7 +3198,7 @@
       <div class="screen-caption">
         <div class="screen-id">Legal</div>
         <div class="screen-name">Terms &amp; Privacy</div>
-        <div class="screen-note">Both pages display client-provided legal text in full; InApps builds the pages, not the legal content.</div>
+        <div class="screen-note">Both pages display client-provided legal text in full; InApps builds the pages, not the content.</div>
       </div>
     </div>
 
