@@ -207,6 +207,15 @@ The screen has one structural state the others do not: exactly one of the three 
 
 ---
 
+### M16 — Post-Use Checklist
+
+**Success** *(added 2026-09-19, closing the gap logged against M16 in `01-information-architecture.md`)*
+- A submitted state, not a toast: two facts have to survive the screen, that the trip is closed and that the turnaround has been started with the contractors, and neither was stated anywhere before.
+- Quiet, not celebratory. The partner has finished tidying up after a trip, not achieved something.
+- **Fuel acknowledgement (A.11):** one note, shown whenever the tank was reported as not full. Never shown on a full-tank submission, and never varied by how short the tank was. It carries no litres, no dollar figure, and nothing about whether a charge follows.
+- The note's visibility is keyed to the fuel answer, never to the tolerance result. Keying it to the tolerance would publish the 20-litre figure by implication, which C.19 forbids.
+- Single CTA back to Home. No path onward into anything else: the trip is over.
+
 ### M28 — Standby Claim
 
 This screen is unusual in that it can go stale between opening and submitting: standby is first-confirmed (SOW A.19), so another partner can take the day while this one is deciding. That race is the screen's real state problem, not loading.

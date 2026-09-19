@@ -249,6 +249,25 @@ Chars: 17 | "Free" in the button, because a partner who has learned that everyth
 | booking-blocked | `Blocked` | 7 | Short, unambiguous; full explanation lives in the M22 messages above, not repeated in the badge |
 | confirmed | `Confirmed` | 9 | Standard, matches the persistent-success semantic decided in `07-color-system.md` |
 
+## Post-Use Submitted (M16, SOW A.11)
+
+**Heading**
+> Trip closed
+
+Chars: 11 | Names what happened to the partner's thing, not what happened in the system. "Checklist submitted" describes the form; "Turnaround started" describes the contractors' day. The partner came here to finish a trip.
+
+**Body**
+> Thanks, that is everything we need. Halcyon is booked in for her turnaround and the team has been told.
+
+Chars: 106 | Two facts, in the order the partner cares about: nothing more is owed by them, and someone else has already picked it up. "The team", never the contractor's name, per the Naming Rule.
+
+**Fuel acknowledgement, shown only when the tank was reported as not full**
+> Fuel shortfall received. If anything needs sorting, we'll be in touch.
+
+Chars: 71 | Matt asked for "Fuel shortfall received, OC will make contact with you." The contact promise was made conditional, and that is the one deliberate departure. The line has to appear on **every** not-full submission, because one that appeared only past the 20-litre tolerance would let a partner infer the figure C.19 says is never stated. Appearing every time, the unconditional promise would be a lie to the partner five litres short, whom nobody will ring. Conditional, it is true either way and still says the thing Matt wanted said: we have it, and you will hear from us if it matters.
+
+Deliberately absent: the litres, any figure at all, and any statement about whether a charge follows. The partner typed the litres in themselves one screen ago; repeating the number back would add nothing and start a negotiation the app has no part in.
+
 ## Naming: Standby vs Unclaimed Weekend Access
 
 Two features, never one. They are easy to confuse from 2026-09-19, when a same-day claim under Unclaimed Weekend Access started landing at zero points: to a partner, both then look like nothing was booked and the day came free that morning. Every surface names the feature it belongs to.

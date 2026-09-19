@@ -496,6 +496,31 @@
   .app-footer-name{ font-size:15px; font-weight:600; color:var(--navy-800); }
   .app-footer-line{ display:block; font-family:var(--font-mono); font-size:12px; color:var(--neutral-600); margin-top:3px; }
 
+  /* ---- M16 submitted (A.11) ----------------------------------------------
+     Pre-departure has had a screen to land on since the deck was drawn; post-use
+     went straight back to Home, so the two things this submission actually does,
+     closing the trip and starting the turnaround, were only ever visible in the
+     sim note. This is that screen, and it is also the only place the A.11 fuel
+     acknowledgement can live. Quiet, not celebratory: the partner has just
+     finished tidying up after a trip, not achieved something. */
+  .done-mark{
+    width:56px; height:56px; border-radius:50%; margin:48px auto 22px;
+    background:var(--success-100); color:var(--success-700);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .done-mark svg{ width:26px; height:26px; }
+  .done-title{ font-family:var(--font-soft); font-weight:700; font-size:22px; letter-spacing:-0.01em; color:var(--navy-800); text-align:center; margin:0 0 10px; }
+  .done-body{ font-size:16px; color:var(--neutral-600); line-height:1.55; text-align:center; margin:0 22px 22px; }
+  /* The acknowledgement is a note, not an alert: nothing has gone wrong and nothing
+     is being asked. It never names a figure, and it never says whether a charge
+     follows, because the partner must not be able to read the 20-litre tolerance
+     off whether this line appeared (C.19). */
+  .done-note{
+    margin:0 18px; padding:13px 15px; border-radius:12px;
+    background:var(--navy-50); border:1px solid var(--navy-100);
+    font-size:15px; color:var(--neutral-700); line-height:1.5; text-align:center;
+  }
+
   /* ---- Standby claim (A.19) ---- */
   .standby-hero{
     display:flex; align-items:center; gap:14px; padding:18px; margin-bottom:18px;
@@ -1144,6 +1169,18 @@
             <button id="review-booking-btn" class="btn btn-primary" onclick="goToReview()" disabled>Review Booking</button>
             <button class="btn btn-ghost" onclick="clearCalSelection()">Clear Selection</button>
           </div>
+        </div>
+
+        <!-- PROTO: M16 SUBMITTED -->
+        <div class="proto-screen" data-screen="postdone" hidden>
+          <div class="navbar"><span class="navbar-icon"></span>Post-Use Checklist</div>
+          <div class="content">
+            <div class="done-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div>
+            <h2 class="done-title">Trip closed</h2>
+            <p class="done-body">Thanks, that is everything we need. Halcyon is booked in for her turnaround and the team has been told.</p>
+            <div class="done-note" id="postdone-fuel">Fuel shortfall received. If anything needs sorting, we&rsquo;ll be in touch.</div>
+          </div>
+          <div style="padding:0 18px 30px;"><button class="btn btn-primary" type="button" onclick="showScreen('home')">Back to Home</button></div>
         </div>
 
         <!-- PROTO: STANDBY CLAIM -->
@@ -3025,6 +3062,26 @@
       </div>
     </div>
 
+    <!-- ============ M16 SUBMITTED ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="navbar-icon"></span>Post-Use Checklist</div>
+          <div class="content">
+            <div class="done-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></div>
+            <h2 class="done-title">Trip closed</h2>
+            <p class="done-body">Thanks, that is everything we need. Halcyon is booked in for her turnaround and the team has been told.</p>
+            <div class="done-note" id="postdone-fuel">Fuel shortfall received. If anything needs sorting, we&rsquo;ll be in touch.</div>
+          </div>
+        <div style="padding:0 18px 30px;"><button class="btn btn-primary">Back to Home</button></div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M16 · Action</div>
+        <div class="screen-name">Post-Use: Submitted</div>
+        <div class="screen-note">Added 2026-09-19. Pre-departure has always had a screen to land on; post-use went straight back to Home, so the two things this submission does, closing the trip and starting the turnaround, were visible only in the sim note. The fuel line is the A.11 acknowledgement Matt asked for. It shows on every submission that reports the tank as not full, not only past the 20-litre tolerance, because a message that appeared only past the threshold would let a partner read the figure off its presence (C.19). That is also why it promises contact conditionally: a partner five litres short will not hear from anyone, and the app should not say otherwise. No litres, no dollar figure, nothing about whether a charge follows.</div>
+      </div>
+    </div>
+
     <!-- ============ M28 STANDBY CLAIM ============ -->
     <div class="screen-card">
       <div class="phone"><div class="screen">
@@ -4254,7 +4311,12 @@
     boatReady.ready = false;
     renderBookingDetail();
     renderBoatStatus();
-    showScreen('home');
+    // A.11: the acknowledgement rides on the fuel answer, not on the tolerance, so it shows
+    // whenever the tank was reported as not full and never reveals which side of 20 litres
+    // the reading fell on.
+    var note = document.getElementById('postdone-fuel');
+    if (note) note.hidden = segValue('post-tank') !== 'no';
+    showScreen('postdone');
     simNote('Turnaround started. The boat-ready status is gone from Home. This sim walks the haul-out path, so TMP\'s Confirm Launch is what brings it back.'
       + (noPhoto ? ' Submitted with no fuel gauge photo: Matt is flagged, and the turnaround runs as normal regardless.' : ''));
   }
