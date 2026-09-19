@@ -249,6 +249,20 @@ Chars: 17 | "Free" in the button, because a partner who has learned that everyth
 | booking-blocked | `Blocked` | 7 | Short, unambiguous; full explanation lives in the M22 messages above, not repeated in the badge |
 | confirmed | `Confirmed` | 9 | Standard, matches the persistent-success semantic decided in `07-color-system.md` |
 
+## Naming: Standby vs Unclaimed Weekend Access
+
+Two features, never one. They are easy to confuse from 2026-09-19, when a same-day claim under Unclaimed Weekend Access started landing at zero points: to a partner, both then look like nothing was booked and the day came free that morning. Every surface names the feature it belongs to.
+
+| Surface | Standby | Unclaimed Weekend Access |
+|---|---|---|
+| Calendar cell | green fill, `TODAY` label | dashed border, no TODAY treatment of its own |
+| Claim screen | M28, "Standby, Mon to Thu" | the standard booking flow, M08 |
+| Booking type | `Standby Claim` | `Unclaimed Weekend` / `Unclaimed Long Weekend` |
+| Status badge | `Claimed` | `Confirmed` |
+| Cancellation | M29, TMP stood down | M29, points forfeited |
+
+Never write "free day", "free claim" or "today, free" as a name for either. Free is a price both can reach, not a feature, and a label built on the price is the one label that stops telling them apart on the day it matters.
+
 ## Boat-Ready Status on Home (M03, SOW C.31)
 
 | State | Copy | Chars | Rationale |

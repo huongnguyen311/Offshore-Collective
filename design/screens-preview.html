@@ -465,15 +465,23 @@
      once 7am passes with nobody holding
      a confirmed booking. Marking that cell "today" keeps the same-day rule visible on the calendar
      itself, so the green never reads as a general "cheap dates" state spread across the month.
-     No inset ring: .today only ever lands on the .standby cell, so a ring would double that cell's
-     green edge for nothing. The TODAY label below carries the marker on its own, and since
+     No inset ring: a ring would double the standby cell's green edge for nothing. (.today no longer
+     lands only on .standby, see the TODAY rule below.) The TODAY label below carries the marker on its own, and since
      2026-09-17 it carries it alone: the corner glyph came off standby too, for the same reason the
      ring did. Fill, border, bold numeral, label and glyph was five green signals on one 41px cell. */
+  /* The TODAY marker was success-green on the reasoning that .today only ever lands on the
+     .standby cell. That stopped being true on 2026-09-19: standby is Monday to Thursday, but today
+     can be a Saturday or Sunday sitting inside an unclaimed block, and a same-day claim on one of
+     those can now cost nothing (C.5). A green TODAY on a dashed unclaimed cell would have dressed
+     an Unclaimed Weekend Access date in standby's colour on the one day the two look most alike,
+     which is exactly the blur the client asked us to avoid. So the marker is neutral by default and
+     only borrows the green when the cell really is standby. */
   .cal-cell.today::before{
     content:'TODAY'; position:absolute; top:2px; left:0; right:0;
     font-family:var(--font-soft); font-size:6.5px; font-weight:800; letter-spacing:0.08em;
-    color:var(--success-700); text-align:center;
+    color:var(--navy-600); text-align:center;
   }
+  .cal-cell.standby.today::before{ color:var(--success-700); }
 
   /* A.17 Support Contact: the SOW puts the static name/phone/email in the app footer, configurable
      from the Admin Portal (B.29). The dedicated Support screen satisfies "can see it", but not
@@ -2106,7 +2114,7 @@
       <div class="screen-caption">
         <div class="screen-id">M04 · Core</div>
         <div class="screen-name">Booking Calendar</div>
-        <div class="screen-note">Signature Moment #3: rounded-square date glyphs echo the brand mark; boat identity reuses Home's header. Six states: available, booked, blocked, standby, unclaimed, and named-holiday long weekend. They are stepped by lightness and each light state carries a non-colour cue (solid border, dashed border, no border, hatch, TODAY label), because no light tint reaches 3:1 against the others. Past and beyond-the-60-day-window share one muted not-bookable look. A named holiday long weekend is carried by a 3px rule across all four cells rather than by fill, which says Fri to Mon is one indivisible unit (C.4); a holiday that formed no long weekend that year takes no cell treatment and is named in the key as a single day. The corner glyph marks only dates the partner cannot select, so booked and blocked keep it and standby and unclaimed do not.</div>
+        <div class="screen-note">Signature Moment #3: rounded-square date glyphs echo the brand mark; boat identity reuses Home's header. Six states: available, booked, blocked, standby, unclaimed, and named-holiday long weekend. They are stepped by lightness and each light state carries a non-colour cue (solid border, dashed border, no border, hatch, TODAY label), because no light tint reaches 3:1 against the others. Past and beyond-the-60-day-window share one muted not-bookable look. A named holiday long weekend is carried by a 3px rule across all four cells rather than by fill, which says Fri to Mon is one indivisible unit (C.4); a holiday that formed no long weekend that year takes no cell treatment and is named in the key as a single day. The corner glyph marks only dates the partner cannot select, so booked and blocked keep it and standby and unclaimed do not. Standby and unclaimed stay visibly separate states and are never merged: a same-day unclaimed claim can also cost nothing (C.5), so on the one day they look alike the cell must still say which feature it is. The TODAY marker is neutral unless the cell is standby, for the same reason.</div>
       </div>
     </div>
 
