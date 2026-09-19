@@ -11,7 +11,7 @@
 **Update (2026-09-17):** the whole file was reconciled against the SOW's live Scope Details and Acceptance Criteria, skipping the struck rows. Screens for removed scope were deleted, screens for confirmed-but-undesigned scope were added, and several booking rules that the prototype was enforcing incorrectly were fixed. The counts below reflect that pass.
 
 The file has **two view modes** (toggled via its own Gallery/Prototype switch, `.view-toggle`):
-- **Gallery view — 26 screens**, static side-by-side phone frames, built with real content (not placeholder lorem) directly from the SOW, personas, and UX writing docs.
+- **Gallery view — 35 screen cards**, static side-by-side phone frames, built with real content (not placeholder lorem) directly from the SOW, personas, and UX writing docs.
 - **Prototype view — 14 linked screens** (`login`, `home`, `calendar`, `standby`, `review`, `confirmed`, `rules`, `alerts`, `profile`, `checklist`, `postcheck`, `christmas`, `support`, `legal`) navigable by tapping through real UI via the page's own `showScreen()` JS. This supersedes `21-design-qa.md`'s H3 finding that no clickable prototype exists.
 
 | Screen | IA ID | Demonstrates |

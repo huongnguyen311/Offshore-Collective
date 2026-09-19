@@ -2157,6 +2157,45 @@
       </div>
     </div>
 
+    <!-- ============ M08 BOOKING REVIEW: UNCLAIMED WEEKEND, ZERO POINTS ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="navbar-icon"></span><span class="back">‹</span>Review &amp; Confirm</div>
+        <div class="content">
+          <div class="card" style="margin-bottom:18px;">
+            <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg>Unclaimed Weekend</div>
+            <div class="section-sub">Sun 29 Mar, claimed today</div>
+            <div class="divider"></div>
+            <div class="row"><span class="row-label">Points available</span><span class="row-value big">5</span></div>
+            <div class="row"><span class="row-label">This booking uses</span><span class="row-value big">0</span></div>
+            <div class="row"><span class="row-label">Balance after</span><span class="row-value big">5</span></div>
+          </div>
+          <span class="field-label">Estimated departure time</span>
+          <div class="field-row">
+            <select class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">
+              <option>6</option><option>7</option><option>8</option><option selected>9</option><option>10</option><option>11</option>
+              <option>12</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+            <select class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">
+              <option selected>:00</option><option>:30</option>
+            </select>
+            <select class="field-box" style="font-family:var(--font-mono);font-variant-numeric:tabular-nums;">
+              <option selected>AM</option><option>PM</option>
+            </select>
+          </div>
+          <p style="font-size:16px;color:var(--neutral-500);line-height:1.5;margin:0 0 16px;">Estimate only, shared with us to plan your launch.</p>
+          <p style="font-size:16px;color:var(--neutral-600);line-height:1.6;">Nobody claimed this weekend, and you are claiming the last day of it after <b>7am</b>, so today costs nothing. Cancel it and the day goes back to your other <span style="font-family:var(--font-mono)">5</span> partners.</p>
+        </div>
+        <div style="padding:0 18px 30px;"><button class="btn btn-accent">Lock In This Date</button></div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M08 · Detail</div>
+        <div class="screen-name">Review: Unclaimed Weekend, No Points</div>
+        <div class="screen-note">Added 2026-09-19. A.6 now requires standby and Unclaimed Weekend Access to stay distinct even when both cost nothing, and this is the screen that proves it: the title says Unclaimed Weekend, the flow is the standard booking review, and the cost line reads 0 rather than being hidden. A standby claim at the same price is a different screen (M28) with its own title, its own CTA and its own cancellation rule. The one thing this screen must never do is drop the zero row to save space: a partner who cannot see what a booking cost has no way to tell which of the two they are looking at.</div>
+      </div>
+    </div>
+
     <!-- ============ M22 BOOKING BLOCKED ============ -->
     <div class="screen-card">
       <div class="phone"><div class="screen">
@@ -3032,6 +3071,40 @@
         <div class="screen-id">M28 · Action</div>
         <div class="screen-name">Standby Claim</div>
         <div class="screen-note">A.19 / C.27. Reached only from the calendar's today cell, Monday to Thursday, once 7am passes with nobody holding a confirmed booking. The eyebrow carries the Mon-to-Thu rule; the body gives the reason, no weekend turnaround, and sends the partner to the unclaimed weekend rates rather than refusing with nowhere to go. Zero points, so the balance rows read 5 / 0 / 5. Captures an estimated departure time for C.28's real-time alert to TMP.</div>
+      </div>
+    </div>
+
+    <!-- ============ M29 - System CANCEL: UNCLAIMED-ACCESS BOOKING, ZERO POINTS ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="navbar"><span class="navbar-icon"></span><span class="back">‹</span>Booking</div>
+        <div class="content" style="opacity:0.45;">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+              <div><div class="section-title">Unclaimed Weekend</div><div class="section-sub">Sun 29 Mar, today</div></div>
+              <span class="badge confirmed">Confirmed</span>
+            </div>
+            <div class="divider"></div>
+            <div class="row"><span class="row-label">Points used</span><span class="row-value">0</span></div>
+          </div>
+        </div>
+        <div class="modal-overlay">
+          <div class="modal-box">
+            <div class="modal-icon" style="background:var(--navy-100);color:var(--navy-700);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
+            <div class="modal-title">Cancel this day?</div>
+            <div class="modal-body">This day cost you nothing, so there is nothing to forfeit. It goes straight back to your other <span style="font-family:var(--font-mono)">5</span> partners.</div>
+            <div class="modal-actions">
+              <button class="btn" style="background:var(--error-700);color:#fff;">Cancel Booking</button>
+              <button class="btn btn-ghost">Keep Booking</button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M29 · System</div>
+        <div class="screen-name">Cancel: Unclaimed-Access, No Points</div>
+        <div class="screen-note">Added 2026-09-19. The same dialog once the claim cost nothing, which the C.5 same-day rule made possible. The card above it says 0 points used, so the forfeit copy on the sibling card would have read "your 0 points are gone", which is not a sentence. Same shape as the M13 release pair: one dialog, two states, each stating only the outcome that is true right now. This one still says which feature the booking belongs to in its title, because a zero-point unclaimed claim and a standby claim cost the same and are cancelled under different rules.</div>
       </div>
     </div>
 
