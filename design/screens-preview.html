@@ -1385,11 +1385,13 @@
               <div class="notif-icon tint-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4"/></svg></div>
               <div><div class="notif-title">Reminder: complete your Post-Use Checklist for <span style="font-family:var(--font-mono)">Sat 14 Mar</span></div><div class="notif-time">3 days ago</div></div>
             </div>
-            <!-- The one row with no destination: C.8 opens a released window to the other five on a
-                 first-confirmed basis, but nothing in the app lets them take it. M13 shows only your
-                 own window and M04 carries no Christmas state. Left untapped deliberately, pending
-                 Matt's call on where the claim lives. -->
-            <div class="notif-row">
+            <!-- Resolved 2026-09-19. This row had no destination, and the audit in
+                 01-information-architecture.md offered two ways to give it one: a seventh calendar
+                 state on M04, or a claimable block on M13. The client picked neither. A released
+                 window is not a special thing to be claimed, it is seven ordinary available dates,
+                 so the row deep-links to M04 like any other and the standard booking flow takes it
+                 from there (C.8/C.9). Nothing new was built to close this. -->
+            <div class="notif-row" onclick="openReleasedChristmas()" style="cursor:pointer;">
               <div class="notif-icon tint-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 8h18M6 8a3 3 0 016 0 3 3 0 016 0"/><path d="M5 8h14v3a2 2 0 01-2 2H7a2 2 0 01-2-2V8z"/></svg></div>
               <div><div class="notif-title">A Christmas Window just opened: <span style="font-family:var(--font-mono)">22–28 Dec</span> on Halcyon</div><div class="notif-time">4 days ago</div></div>
             </div>
@@ -2668,7 +2670,7 @@
       <div class="screen-caption">
         <div class="screen-id">M06 · Core</div>
         <div class="screen-name">Notification Center</div>
-        <div class="screen-note">Covers every type A.14 names: booking confirmed, boat ready, access opened, the three C.9 release triggers, and the C.32 checklist reminders. No payment-due entry exists; the platform raises no partner-facing invoice. The A.2 qualification welcome is not a row: it marks a milestone, so it takes a heading, a body and its own action into M04, fired once per partner. Every row is a deep-link and there is no notification-detail screen, since A.14 scopes this as a list view and the message is complete on the row. The Christmas Window row is deliberately inert: nothing in the app yet lets the other five partners take a released window (C.8).</div>
+        <div class="screen-note">Covers every type A.14 names: booking confirmed, boat ready, access opened, the three C.9 release triggers, and the C.32 checklist reminders. No payment-due entry exists; the platform raises no partner-facing invoice. The A.2 qualification welcome is not a row: it marks a milestone, so it takes a heading, a body and its own action into M04, fired once per partner. Every row is a deep-link and there is no notification-detail screen, since A.14 scopes this as a list view and the message is complete on the row. The Christmas Window row deep-links to M04 like every other: a released window is seven ordinary available dates, booked first-confirmed, with no claim screen and no calendar state of its own (C.8/C.9).</div>
       </div>
     </div>
 
@@ -4218,6 +4220,16 @@
   // C.9 release notification. The partner is being told that one specific block reopened, so the
   // calendar arrives with that block already selected and repriced from the C.5 table, rather than
   // opening cold and leaving them to hunt for the dashed cells.
+  // C.9 Christmas Window release. No claim screen exists and none is needed: once released, the
+  // seven days are ordinary available dates, so this lands on the calendar and the normal
+  // first-confirmed flow does the rest (C.8, confirmed 2026-09-19). The sample month here is March,
+  // so there are no December cells to bring into view; on a real calendar the deep-link opens on
+  // the released dates.
+  function openReleasedChristmas(){
+    showScreen('calendar');
+    simNote('A released Christmas Window is seven ordinary available dates. The notification opens the calendar on them, and they are booked like any other dates, first-confirmed. There is no claim screen.');
+  }
+
   function openReopenedWeekend(){
     showScreen('calendar');
     if (calMonthIndex !== 0) { calMonthIndex = 0; renderCalMonth(); }
