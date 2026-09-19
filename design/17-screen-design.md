@@ -18,6 +18,7 @@ The file has **two view modes** (toggled via its own Gallery/Prototype switch, `
 |---|---|---|
 | Login | M02 | Brand mark, credential-only auth |
 | Home / Dashboard | M03 | Signature Moment #1, Data Hero + Eyebrow Label; boat card carries the persistent ready status (SOW C.31) |
+| Home: Boat Not Ready Yet | M03 | C.31 third state (added 2026-09-19): booking today, ready trigger not yet fired. Warning tint + clock, with a reassurance line and no CTA |
 | Home — Empty (No Upcoming Booking) | M21 | Signature Moment #2, line-art rendering of the icon's chevron breaking free toward the Book tab; points balance still renders normally |
 | Booking Calendar | M04 | Signature Moment #3, rounded-square date-state glyphs; seven states including standby (today only) and unclaimed |
 | Booking Review & Confirm | M08 | Tabular points breakdown; estimated departure time captured here per A.8 |
@@ -27,7 +28,7 @@ The file has **two view modes** (toggled via its own Gallery/Prototype switch, `
 | Cancel — Advance Booking | M17 | A.8: 48-hour refund rule, stated in the dialog |
 | Boat Rules | M05 | Every booking rule grouped by topic, including the C.5 unclaimed rate tables and both cancellation regimes |
 | Notification Center | M06 | Each notification type named in A.14, plus the C.32 checklist reminder. No payment-due entry exists |
-| Profile | M07 | Rendered in both modes. One identity card (name, boat, Edit, then qualification / phone / email rows) which edits in place, then the padlocked "Secondary operator" card, view-only per A.16, rendered in both its empty and populated states. Also the secondary-menu hub; support contact sits in the footer (A.17) |
+| Profile | M07 | Rendered in both modes. One identity card (name at title size, the vessel as its own two-line unit beneath it, Edit name, then qualification / phone / email rows) which edits in place, then the padlocked "Secondary operator" card, view-only per A.16, rendered in both its empty and populated states. Also the secondary-menu hub; support contact sits in the footer (A.17) |
 | Pre-Departure Checklist | M15 | Progressive disclosure on the conditional fuel fields; estimated return time |
 | Post-Use Checklist | M16 | Same fields plus mandatory engine hours (A.11) and the optional photo card |
 | Standby Claim | M28 | Zero-point same-day claim (A.19), with the departure time C.28 sends to Tamaki Marine Park |

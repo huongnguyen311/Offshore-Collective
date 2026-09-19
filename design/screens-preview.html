@@ -270,8 +270,10 @@
     font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.02em;
   }
   /* C.31 Boat Ready Status, push fallback: the ready state is written onto the Dashboard boat card
-     at the same trigger point as the push (TMP Launch Confirmed), so a partner whose notifications
-     are switched off at OS level still sees it on their next open. Icon + text, never colour alone. */
+     at the same trigger point as the push, so a partner whose notifications are switched off at OS
+     level still sees it on their next open. That trigger depends on the turnaround path: TMP Launch
+     Confirmed on a haul-out, MDC Mark Job Complete on a back-to-back (C.10, confirmed 2026-09-18).
+     Icon + text, never colour alone. */
   .boat-id-body{ flex:1; min-width:0; }
   /* The status names the trip it belongs to. A partner can hold 2 concurrent bookings, so a bare
      "Ready for your trip" is ambiguous the moment there is more than one upcoming trip. TMP confirms
@@ -290,6 +292,20 @@
   .boat-id-ready-date{
     margin-left:7px; padding-left:8px; border-left:1px solid var(--success-500);
     font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.02em;
+  }
+
+  /* Third state, added 2026-09-19 per the C.31 comment on SOW row 94. Present/absent alone meant a
+     partner opening the app on the morning of their trip saw an empty row and could not tell the
+     difference between "not ready" and "nothing to say". This state fills that gap: it shows only
+     when there is a booking today and the ready trigger has not fired yet, and it clears the moment
+     it does. Same chip geometry, amber instead of green, clock instead of tick, so the two states
+     are separated by shape and label as well as colour (19-a11y-spec.md). Nothing is being asked of
+     the partner, so it carries a plain reassurance line, never a CTA, and never an explanation of
+     where the turnaround has got to: the partner has no contractor-facing view and C.31 adds none. */
+  .boat-id-ready.is-pending{ background:var(--warning-100); color:var(--warning-700); }
+  .boat-id-ready.is-pending .boat-id-ready-date{ border-left-color:var(--warning-500); }
+  .boat-id-pendingnote{
+    display:block; margin-top:5px; font-size:11px; color:var(--neutral-500); line-height:1.35;
   }
 
   /* ---- upcoming bookings — one modern, independently-tappable card per trip, not table rows in
@@ -380,7 +396,8 @@
      for the two states a partner cannot select (booked, blocked) rather than spread across four. */
   .cal-cell.available{ background:#ffffff; border:1px solid var(--neutral-200); color:var(--navy-700); }
   .cal-cell.booked{ background:var(--navy-700); border:1.5px solid var(--navy-700); color:#ffffff; font-weight:600; cursor:pointer; }
-  /* per SOW A.6/C.27: open to a free, same-day standby claim (Unlimited Standby Access) rather
+  /* per SOW A.6/C.27: open to a free, same-day standby claim (Unlimited Standby Access) on a
+     Monday to Thursday only (2026-09-19), rather
      than the standard advance-booking flow. */
   .cal-cell.standby{ background:#b6e9b8; border:1.5px solid var(--success-500); color:var(--success-700); font-weight:700; cursor:pointer; }
   /* hatch does the work here, so "unavailable" survives even in greyscale or at a glance */
@@ -442,7 +459,10 @@
   .cal-legend-chip.blocked{ background:var(--neutral-300); background-image:repeating-linear-gradient(45deg, rgba(9,11,14,0.16) 0 2px, transparent 2px 6px); }
   .cal-legend-chip.unclaimed{ background:#ffffff; border:1.5px dashed var(--navy-500); }
   .cal-legend-chip.holiday{ background:var(--info-100); border:1px solid var(--info-700); border-top-width:3px; }
-  /* A.19/C.27: standby only ever appears on the current date, once 7am passes with nobody holding
+  /* A.19/C.27: standby only ever appears on the current date, and only when that date is a Monday
+     to Thursday (confirmed 2026-09-19: Marine Detailing Co has no weekend turnaround
+     capacity, so Sat/Sun are never standby-eligible and stay on C.5 unclaimed weekend pricing),
+     once 7am passes with nobody holding
      a confirmed booking. Marking that cell "today" keeps the same-day rule visible on the calendar
      itself, so the green never reads as a general "cheap dates" state spread across the month.
      No inset ring: .today only ever lands on the .standby cell, so a ring would double that cell's
@@ -598,10 +618,20 @@
      screen has to show a small rate table, not a single "priced per day" line, which was wrong. */
   .rule-price-table{ background:#fff; border:1px solid var(--navy-100); border-radius:12px; padding:2px 12px; margin-bottom:8px; box-shadow:0 5px 14px -10px rgba(20,42,61,0.12); }
   .rule-price-head{ font-family:var(--font-soft); font-weight:700; font-size:12px; letter-spacing:0.02em; color:var(--navy-800); padding:10px 0 7px; }
-  .rule-price-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:8px 0; border-top:1px solid var(--navy-50); }
+  /* Two rates per row since 2026-09-19 (C.5 same-day rule): the cost now depends on the day you
+     claim AND on whether that day has already started, so one figure per row would be wrong for
+     half the claims a partner can make. Grid rather than flex, so both rate columns hold the same
+     axis all the way down and the mono numerals line up to be compared, which is the whole point
+     of showing them side by side rather than in two separate tables. */
+  .rule-price-cols{ display:grid; grid-template-columns:1fr 64px 64px; gap:10px; padding:0 0 4px; }
+  .rule-price-col{ font-family:var(--font-soft); font-size:11px; font-weight:700; color:var(--neutral-500); text-align:right; line-height:1.3; }
+  .rule-price-row{ display:grid; grid-template-columns:1fr 64px 64px; gap:10px; align-items:baseline; padding:8px 0; border-top:1px solid var(--navy-50); }
   .rule-price-when{ font-size:15px; color:var(--neutral-700); line-height:1.4; }
   .rule-price-when small{ display:block; font-size:13px; color:var(--neutral-500); }
-  .rule-price-pts{ font-family:var(--font-mono); font-weight:600; font-size:15px; color:var(--navy-800); font-variant-numeric:tabular-nums; flex:none; }
+  .rule-price-pts{ font-family:var(--font-mono); font-weight:600; font-size:15px; color:var(--navy-800); font-variant-numeric:tabular-nums; text-align:right; }
+  /* the free day reads as the same promise standby already makes, so it takes standby's colour
+     rather than a third treatment of its own. Text, never colour alone: the word is "Free". */
+  .rule-price-pts.free{ color:var(--success-700); }
   .rule-cost-card.free{ background:var(--success-100); border-color:var(--success-700); }
   .rule-cost-card.free .rule-cost-value{ color:var(--success-700); }
 
@@ -618,6 +648,18 @@
   .notif-icon.tint-warning svg{ color:var(--warning-700); }
   .notif-icon.tint-info{ background:var(--info-100); }
   .notif-icon.tint-info svg{ color:var(--info-700); }
+  /* A.2's qualification welcome (confirmed 2026-09-18). It is the only entry that marks a
+     milestone rather than a routine update, so it is a card with a heading, a body and its own
+     action, not a .notif-row. Success tint, because the thing being reported is an approval. */
+  /* Stays on white, per the Design Foundation: only the border and the icon carry the status
+     colour, so every glyph of text keeps the same contrast as the rest of the deck. */
+  .notif-welcome{ border:1.5px solid var(--success-500); background:#fff; border-radius:16px; padding:16px; margin:0 0 18px; }
+  .notif-welcome .notif-icon{ background:var(--success-100); margin-bottom:12px; }
+  .notif-welcome .notif-icon svg{ color:var(--success-700); }
+  .notif-welcome-title{ font-size:19px; font-weight:700; color:var(--navy-800); line-height:1.3; margin-bottom:6px; letter-spacing:-0.005em; }
+  .notif-welcome-body{ font-size:16px; color:var(--neutral-700); line-height:1.5; margin-bottom:14px; }
+  .notif-welcome-cta{ display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:0 18px; border:0; border-radius:12px; background:var(--navy-800); color:#fff; font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; }
+  .notif-welcome-foot{ font-family:var(--font-mono); font-size:11px; color:var(--neutral-500); margin-top:10px; }
   .notif-title{ font-size:15px; font-weight:600; color:var(--navy-800); margin-bottom:2px; }
   .notif-time{ font-family:var(--font-mono); font-size:11px; color:var(--neutral-500); }
 
@@ -645,6 +687,9 @@
   .field-box-mono{ font-family:var(--font-mono); }
   .field-error{ display:none; color:var(--error-700); font-size:12.5px; margin:-4px 0 12px; }
   .field-error.show{ display:block; }
+  /* A soft notice, not an error: the fuel gauge photo can legitimately be absent (A.9/A.11
+     waiver), so it must not read as a failure or use the error colour. */
+  .field-error.soft{ color:var(--warning-700); }
   .checklist-group{ margin-bottom:4px; }
   .checklist-sub{ margin-top:2px; }
   .seg-control{ display:flex; gap:3px; background:var(--navy-50); border:1.5px solid var(--navy-100); border-radius:12px; padding:3px; margin-bottom:16px; }
@@ -712,13 +757,36 @@
      qualification row, then a heading plus a details card) and ate half the screen before the
      first menu item. It is one card now: name and boat on the left, Edit on the right, the three
      read-only values as rows beneath. Same content, one container, roughly 130px shorter. */
-  .profile-id{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding-bottom:13px; border-bottom:1px solid var(--navy-100); }
+  .profile-id{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding-bottom:17px; border-bottom:1px solid var(--navy-100); }
   .profile-id-main{ flex:1; min-width:0; }
-  .profile-id .profile-name{ text-align:left; margin:0 0 2px; }
-  .profile-id .profile-role{ text-align:left; margin:0; }
+  /* The partner's own name is the title of this screen and was set at 18px, the same size as a
+     section heading three cards down, so the screen opened on nothing in particular. At 25px with
+     tightened tracking it carries the card, and the room beneath it is what makes it read as a
+     name rather than as a field label. Nothing else on M07 grew: the boldness is spent here. */
+  .profile-id .profile-name{ text-align:left; margin:0; font-size:25px; letter-spacing:-0.02em; line-height:1.15; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* The Edit control lost its words on 2026-09-19 and moved against the name. The label was doing
+     two jobs, saying that it edits and saying what it edits, and the second one is what position
+     can do instead: a pencil at the card's top right edits the card, a pencil beside a name edits
+     that name. The accessible name still carries the whole sentence, because a screen reader has
+     no position to read. */
+  .profile-name-row{ display:flex; align-items:center; gap:4px; min-width:0; }
   .profile-id .profile-name-input{ text-align:left; margin:0 0 6px; }
   .profile-id .field-error{ text-align:left; margin:-2px 0 8px; }
-  .profile-id .profile-edit-btn{ margin-top:-9px; }
+  /* Until 2026-09-19 the second line was "Halcyon &middot; Rayglass 3000", one grey 12px run with a
+     middle dot doing the joining. Two facts of different kinds were flattened into one meta string:
+     Halcyon is the vessel six partners own together and the word they say out loud; Rayglass 3000
+     is a spec. So the vessel takes a name treatment and the model takes the mono treatment the
+     Design Foundation already gives every number, stacked under the same boat mark the Home card
+     uses, at the same sizes and colours. The point is not novelty: it is that a partner's boat
+     looks like the same boat on both screens, and that the dot stops pretending a name and a model
+     number are the same kind of thing. navy-600 on white, 7.3:1, is the accessible pair Home
+     already proved; navy-400 would have looked lighter and failed at 3.2:1. */
+  .profile-vessel{ display:flex; align-items:center; gap:9px; margin-top:13px; }
+  .profile-vessel-mark{ display:flex; flex:none; }
+  .profile-vessel-mark svg{ width:19px; height:19px; color:var(--navy-700); }
+  .profile-vessel-body{ display:flex; flex-direction:column; min-width:0; }
+  .profile-vessel-name{ font-family:var(--font-soft); font-weight:700; font-size:16px; color:var(--navy-800); line-height:1.2; }
+  .profile-vessel-model{ font-family:var(--font-mono); font-size:11.5px; font-weight:600; letter-spacing:0.02em; color:var(--navy-600); margin-top:2px; }
   .profile-card{ padding:16px; }
   .profile-card .row{ padding:11px 0; }
   .profile-card .row:last-child{ padding-bottom:0; }
@@ -731,21 +799,44 @@
   /* A.16: the details the partner can change are the only ones with an Edit affordance; the
      padlocked Secondary operator card deliberately has none. */
   .profile-edit-btn{
-    display:inline-flex; align-items:center; gap:6px; background:none; border:none; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; flex:none;
+    background:none; border:none; cursor:pointer;
     /* 44pt target kept by the negative inline margin: the padding does the touch area, not the ink */
-    padding:11px 8px; margin:-11px -6px -11px 0;
-    font-family:var(--font-soft); font-weight:700; font-size:13px; color:var(--navy-700);
+    padding:13px; margin:-13px -9px -13px -4px; min-width:44px; min-height:44px;
+    color:var(--navy-600);
   }
-  .profile-edit-btn svg{ width:14px; height:14px; }
+  .profile-edit-btn svg{ width:17px; height:17px; }
   .profile-edit-btn:active{ color:var(--navy-900); }
   /* Edit mode is what-you-see-is-what-you-get: the name stays where the name was, top of the
      identity card at heading size, it just becomes typeable. Nothing moves between the modes. */
-  .profile-name-input{ font-family:var(--font-soft); font-weight:700; font-size:18px; margin:2px 0 6px; }
-  .profile-edit-actions{ display:flex; gap:10px; margin-top:6px; }
-  .profile-edit-actions .btn{ height:46px; font-size:15px; }
+  .profile-name-input{ font-family:var(--font-soft); font-weight:700; font-size:25px; letter-spacing:-0.02em; margin:0 0 6px; }
+  /* One field, so the commit pair is sized to the field rather than to the card: a compact Save
+     with a quiet Cancel beside it, right-aligned, instead of two full-width bars laid across the
+     middle of a profile. The height stays 44pt, only the width stopped being the whole screen.
+     Cancel drops its outline because an outlined button beside a filled one reads as a second
+     choice of equal weight, and it is not one: it is the way back from a change nobody has
+     committed yet. Redesigned 2026-09-19. */
+  .profile-edit-actions{ display:flex; justify-content:flex-end; align-items:center; gap:4px; margin-top:16px; }
+  .profile-edit-actions .btn{ width:auto; height:44px; padding:0 22px; font-size:15px; border-radius:12px; }
+  .profile-edit-actions .btn-ghost{ border:none; padding:0 16px; color:var(--navy-600); }
+  .profile-edit-actions .btn-primary{ box-shadow:0 6px 16px -8px rgba(20,42,61,0.5); }
   /* A.16 field, admin-held. The padlock in the heading carries the "you cannot change this"
      signal so the supporting line can explain what the field is for instead of repeating it. */
   .secop-empty{ font-size:15px; color:var(--neutral-500); }
+  /* Populated secondary operator, redrawn 2026-09-19. It was three label/value rows, which made a
+     person read as three settings and gave her name the same weight as her phone number. She is
+     the only human being on this screen besides the partner, so she takes the same shape the
+     partner's own vessel takes one card above: a mark, a name, and the number beneath it in mono.
+     Two blocks built the same way is the screen having one idea about how an entity is shown,
+     rather than two unrelated stacks of rows. The PTNZ credential stays a labelled row with a
+     badge, because that is the one value a partner opens this card to check, and a badge folded
+     into the name block would be read as decoration on a name rather than as a status. */
+  .secop-person{ display:flex; align-items:center; gap:10px; padding:13px 0 14px; border-bottom:1px solid var(--navy-100); }
+  .secop-person-mark{ display:flex; flex:none; }
+  .secop-person-mark svg{ width:19px; height:19px; color:var(--navy-700); }
+  .secop-person-body{ display:flex; flex-direction:column; min-width:0; }
+  .secop-person-name{ font-family:var(--font-soft); font-weight:700; font-size:16px; color:var(--navy-800); line-height:1.2; }
+  .secop-person-contact{ font-family:var(--font-mono); font-size:13px; font-weight:500; letter-spacing:0.02em; color:var(--navy-600); font-variant-numeric:tabular-nums; margin-top:3px; }
   .secop-note{ font-size:14px; color:var(--neutral-500); line-height:1.45; margin:10px 0 0; }
   .card .row + .secop-note{ margin-top:12px; }
   .menu-row{ display:flex; align-items:center; justify-content:space-between; padding:15px 4px; border-bottom:1px solid var(--navy-100); font-size:15px; color:var(--navy-700); }
@@ -945,7 +1036,9 @@
                 <div class="boat-id-model">Rayglass 3000</div>
               </div>
               <div class="boat-id-readyrow" id="home-boat-ready">
-                <span class="boat-id-ready"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12l4 4 10-10"/></svg>Ready for your trip<span class="boat-id-ready-date" id="home-boat-ready-date">Sat 14 Mar</span></span>
+                <span class="boat-id-ready" id="home-boat-ready-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12l4 4 10-10"/></svg>Ready for your trip<span class="boat-id-ready-date" id="home-boat-ready-date">Sat 14 Mar</span></span>
+                <span class="boat-id-ready is-pending" id="home-boat-pending-chip" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.2V12l3.1 2" stroke-linecap="round" stroke-linejoin="round"/></svg>Boat not ready yet<span class="boat-id-ready-date" id="home-boat-pending-date">Thu 12 Mar</span></span>
+                <span class="boat-id-pendingnote" id="home-boat-pending-note" hidden>We&rsquo;ll let you know as soon as it&rsquo;s ready.</span>
               </div>
             </div>
             <div class="section-title">Upcoming Bookings</div>
@@ -1060,7 +1153,7 @@
             <div class="standby-hero">
               <div class="standby-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div>
               <div>
-                <span class="standby-hero-label">Standby, today only</span>
+                <span class="standby-hero-label">Standby, Mon to Thu</span>
                 <div class="standby-hero-value">0 <small>points</small></div>
               </div>
             </div>
@@ -1078,7 +1171,7 @@
               </select>
             </div>
             <p style="font-size:16px;color:var(--neutral-500);line-height:1.5;margin:0 0 16px;">We’ll notify the team the moment you claim, so give them as much notice as you can.</p>
-            <p style="font-size:16px;color:var(--neutral-600);line-height:1.6;margin:0;">Today went unclaimed at 7am, so it is open to all six partners at no point cost. First to claim gets it. There is no yearly limit.</p>
+            <p style="font-size:16px;color:var(--neutral-600);line-height:1.6;margin:0;">Today went unclaimed at 7am, so it is open to all six partners at no point cost. First to claim gets it. There is no yearly limit. Standby runs <b>Monday to Thursday</b> only. Halcyon cannot be turned around between trips at a weekend, so Saturday and Sunday are never standby days: they stay on unclaimed weekend rates.</p>
           </div>
           <div style="padding:0 18px 30px;display:flex;flex-direction:column;gap:8px;">
             <button class="btn btn-accent" onclick="claimStandby()">Claim Today, Free</button>
@@ -1172,8 +1265,8 @@
               <div class="rule-cost-card"><span class="rule-cost-label">Weekend block <small style="color:var(--neutral-500)">Fri to Sun</small></span><span class="rule-cost-value">5 <small>pts</small></span></div>
               <div class="rule-cost-card"><span class="rule-cost-label">Long weekend <small style="color:var(--neutral-500)">Fri to Mon</small></span><span class="rule-cost-value">7 <small>pts</small></span></div>
               <div class="rule-cost-card highlight"><span class="rule-cost-label">Christmas Window <small style="color:var(--neutral-500)">7 days</small></span><span class="rule-cost-value">14 <small>pts</small></span></div>
-              <div class="rule-cost-card free"><span class="rule-cost-label">Standby <small style="color:var(--neutral-500)">today only</small></span><span class="rule-cost-value">0 <small>pts</small></span></div>
-              <div class="rule-cost-card"><span class="rule-cost-label">Unclaimed weekend</span><span class="rule-cost-value">2–5 <small>pts</small></span></div>
+              <div class="rule-cost-card free"><span class="rule-cost-label">Standby <small style="color:var(--neutral-500)">Mon to Thu</small></span><span class="rule-cost-value">0 <small>pts</small></span></div>
+              <div class="rule-cost-card"><span class="rule-cost-label">Unclaimed weekend</span><span class="rule-cost-value">0–5 <small>pts</small></span></div>
             </div>
 
             <div class="rule-section-label">Timing Limits</div>
@@ -1189,28 +1282,30 @@
               <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">2 long weekends every 12 months. Unclaimed ones you pick up do not count.</span></div>
             </div>
 
-            <div class="rule-section-label">Standby: Today, Free</div>
+            <div class="rule-section-label">Standby: Mon to Thu, Free</div>
             <div class="rule-checklist">
               <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Not claimed by <b>7am</b>? Today opens to all 6 of you, <b>free</b>.</span></div>
               <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">First to claim gets it. No yearly limit.</span></div>
-              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Today only, and never inside someone else’s booking.</span></div>
-              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">We tell the team as soon as you claim, so say when you’re heading out.</span></div>
+              <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Today only, <b>Monday to Thursday</b>, and never inside someone else’s booking.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Halcyon cannot be turned around at a weekend, so Saturday and Sunday go by the unclaimed rates below.</span></div>
             </div>
 
             <div class="rule-section-label">If a Weekend Goes Unclaimed</div>
-            <p class="rule-note">Unbooked by <b>midnight Friday</b>, a weekend reopens to everyone. You take it from the day you claim to the end of the block, so the later you claim, the less it costs.</p>
+            <p class="rule-note">Unbooked by <b>midnight Friday</b>, a weekend reopens to everyone. You take it from the day you claim to the end of the block, so the later you claim, the less it costs. Claim <b>after 7am on the day itself</b> and that day is free. Only the rest of the block costs points.</p>
             <div class="rule-price-table">
               <div class="rule-price-head">Weekend block</div>
-              <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri, Sat and Sun</small></span><span class="rule-price-pts">5 pts</span></div>
-              <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat and Sun</small></span><span class="rule-price-pts">4 pts</span></div>
-              <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun only</small></span><span class="rule-price-pts">2 pts</span></div>
+              <div class="rule-price-cols"><span></span><span class="rule-price-col">Before 7am</span><span class="rule-price-col">After 7am</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri, Sat and Sun</small></span><span class="rule-price-pts">5 pts</span><span class="rule-price-pts">4 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat and Sun</small></span><span class="rule-price-pts">4 pts</span><span class="rule-price-pts">2 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun only</small></span><span class="rule-price-pts">2 pts</span><span class="rule-price-pts free">Free</span></div>
             </div>
             <div class="rule-price-table">
               <div class="rule-price-head">Long weekend</div>
-              <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri to Mon</small></span><span class="rule-price-pts">7 pts</span></div>
-              <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat to Mon</small></span><span class="rule-price-pts">6 pts</span></div>
-              <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun and Mon</small></span><span class="rule-price-pts">4 pts</span></div>
-              <div class="rule-price-row"><span class="rule-price-when">Claim on Monday<small>Mon only</small></span><span class="rule-price-pts">2 pts</span></div>
+              <div class="rule-price-cols"><span></span><span class="rule-price-col">Before 7am</span><span class="rule-price-col">After 7am</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri to Mon</small></span><span class="rule-price-pts">7 pts</span><span class="rule-price-pts">6 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat to Mon</small></span><span class="rule-price-pts">6 pts</span><span class="rule-price-pts">4 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun and Mon</small></span><span class="rule-price-pts">4 pts</span><span class="rule-price-pts">2 pts</span></div>
+              <div class="rule-price-row"><span class="rule-price-when">Claim on Monday<small>Mon only</small></span><span class="rule-price-pts">2 pts</span><span class="rule-price-pts free">Free</span></div>
             </div>
             <p class="rule-note after">Saturday always comes with its Sunday. A reopened weekend is never split between two partners.</p>
 
@@ -1263,6 +1358,17 @@
         <div class="proto-screen" data-screen="alerts" hidden>
           <div class="navbar"><span class="navbar-icon"></span><button class="back-btn" onclick="showScreen('home')">‹</button>Notifications</div>
           <div class="content">
+            <!-- A.2: fires once, at the moment Matt confirms qualification in B.21. Deliberately
+                 not a .notif-row: Matt asked for something that reads and feels distinct from a
+                 routine entry, without being an elaborate build. It deep-links to M04, because
+                 the thing that just changed is that booking is available. -->
+            <div class="notif-welcome">
+              <div class="notif-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="notif-welcome-title">You're approved. The boat is yours.</div>
+              <div class="notif-welcome-body">Powerboat Training NZ qualification confirmed. <span style="font-family:var(--font-mono)">58</span> points for the year, and the calendar is open <span style="font-family:var(--font-mono)">60</span> days ahead.</div>
+              <button class="notif-welcome-cta" onclick="showScreen('calendar')">Book your first trip</button>
+              <div class="notif-welcome-foot">JUST NOW</div>
+            </div>
             <div class="notif-row" onclick="openPreDeparture(1)" style="cursor:pointer;">
               <div class="notif-icon tint-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4"/></svg></div>
               <div><div class="notif-title">Reminder: complete your Pre-Departure Checklist for <span style="font-family:var(--font-mono)">Sat 14 Mar</span></div><div class="notif-time">Just now</div></div>
@@ -1301,25 +1407,25 @@
             <div class="card profile-card" style="margin-bottom:18px;">
               <div class="profile-id">
                 <div class="profile-id-main">
-                  <div class="profile-name" id="prof-name-view" data-profile-view>David Kearney</div>
+                  <div class="profile-name-row" data-profile-view>
+                    <div class="profile-name" id="prof-name-view">David Kearney</div>
+                    <button class="profile-edit-btn" id="prof-edit-btn" type="button" aria-label="Edit your name" onclick="startProfileEdit()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+                  </div>
                   <input id="prof-name" class="field-box profile-name-input" data-profile-edit hidden type="text" value="David Kearney" aria-label="Name" oninput="clearProfileFieldError(this)">
                   <span class="field-error" id="prof-name-error">Enter your name</span>
-                  <div class="profile-role">Halcyon &middot; Rayglass 3000</div>
+                  <div class="profile-vessel"><span class="profile-vessel-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></span><span class="profile-vessel-body"><span class="profile-vessel-name">Halcyon</span><span class="profile-vessel-model">Rayglass 3000</span></span></div>
                 </div>
-                <button class="profile-edit-btn" id="prof-edit-btn" type="button" aria-label="Edit your details" data-profile-view onclick="startProfileEdit()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>Edit</button>
               </div>
               <div class="row"><span class="row-label">Qualification</span><span class="badge confirmed">Approved</span></div>
-              <div data-profile-view>
-                <div class="row"><span class="row-label">Phone</span><span class="row-value" id="prof-phone-view">021 555 0198</span></div>
-                <div class="row"><span class="row-label">Email</span><span class="row-value" id="prof-email-view" style="font-family:var(--font-body);font-weight:400;font-size:14px;">david.kearney@xtra.co.nz</span></div>
-              </div>
-              <div data-profile-edit hidden style="padding-top:14px;">
-                <span class="field-label">Phone<span class="field-required">*</span></span>
-                <input id="prof-phone" class="field-box field-box-mono" type="tel" inputmode="tel" value="021 555 0198" oninput="clearProfileFieldError(this)">
-                <span class="field-error" id="prof-phone-error">Enter a valid phone number</span>
-                <span class="field-label">Email<span class="field-required">*</span></span>
-                <input id="prof-email" class="field-box" type="email" inputmode="email" value="david.kearney@xtra.co.nz" oninput="clearProfileFieldError(this)">
-                <span class="field-error" id="prof-email-error">Enter a valid email address</span>
+              <!-- Phone and email both sit outside the view/edit blocks on purpose, so they render
+                   identically in both modes. Matt maintains both on the shareholder record (B.19),
+                   and A.16 puts a self-service change out of scope for either, phone joining email
+                   on 2026-09-19, so an input here would offer something the platform will not
+                   accept. Same boundary as Qualification above and the padlocked Secondary operator
+                   below. Name is the one value left on this card that is the partner's to change. -->
+              <div class="row"><span class="row-label">Phone</span><span class="row-value" id="prof-phone-view">021 555 0198</span></div>
+              <div class="row"><span class="row-label">Email</span><span class="row-value" id="prof-email-view" style="font-family:var(--font-body);font-weight:400;font-size:14px;">david.kearney@xtra.co.nz</span></div>
+              <div data-profile-edit hidden>
                 <div class="profile-edit-actions">
                   <button class="btn btn-ghost" type="button" onclick="cancelProfileEdit()">Cancel</button>
                   <button class="btn btn-primary" type="button" onclick="saveProfileEdit()">Save</button>
@@ -1328,7 +1434,7 @@
             </div>
             <div class="card" style="margin-bottom:16px;">
               <h2 class="card-head"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>Secondary operator</span><span class="secop-empty">None added</span></h2>
-              <p class="secop-note">Someone else can operate Halcyon on your behalf. Contact us to add one.</p>
+              <p class="secop-note">Someone else can operate Halcyon when you are aboard. Contact us to add one.</p>
             </div>
             <div class="menu-row" onclick="showScreen('christmas')" style="cursor:pointer;">Christmas Window <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
             <div class="menu-row" onclick="showScreen('support')" style="cursor:pointer;">Support <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
@@ -1367,13 +1473,12 @@
                   <span class="field-label">Litres reading<span class="field-required">*</span></span>
                   <input id="pre-litres" class="ledger-value" type="number" inputmode="numeric" value="142" aria-required="true" oninput="clearChecklistError(this)">
                   <span class="field-error" id="pre-litres-error" role="alert"></span>
-                  <p style="font-size:15px;color:var(--neutral-500);line-height:1.5;margin:-4px 0 16px;">Up to 20 litres: no action.<br>Over 20 litres: Admin notified.</p>
                   <span class="field-label">Why isn't it full?<span class="field-required">*</span></span>
                   <input id="pre-reason" class="ledger-text" type="text" value="Used half a tank on the way out" aria-required="true" oninput="clearChecklistError(this)">
                   <span class="field-error" id="pre-reason-error" role="alert"></span>
                 </div>
-                <span class="field-label">Photo of fuel gauge<span class="field-required">*</span></span>
-                <label class="photo-upload" id="pre-fuelphoto" onclick="togglePhoto(this)" role="button" tabindex="0" aria-required="true">
+                <span class="field-label">Photo of fuel gauge</span>
+                <label class="photo-upload" id="pre-fuelphoto" onclick="togglePhoto(this)" role="button" tabindex="0">
                   <span class="photo-upload-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg></span>
                   <span class="photo-upload-added" hidden>✓ Photo added</span>
                 </label>
@@ -1444,13 +1549,12 @@
                   <span class="field-label">Litres reading<span class="field-required">*</span></span>
                   <input id="post-litres" class="ledger-value" type="number" inputmode="numeric" value="138" aria-required="true" oninput="clearChecklistError(this)">
                   <span class="field-error" id="post-litres-error" role="alert"></span>
-                  <p style="font-size:15px;color:var(--neutral-500);line-height:1.5;margin:-4px 0 16px;">Up to 20 litres: no action.<br>Over 20 litres: Admin notified.</p>
                   <span class="field-label">Why isn't it full?<span class="field-required">*</span></span>
                   <input id="post-reason" class="ledger-text" type="text" value="Ran the tank down for the trip home" aria-required="true" oninput="clearChecklistError(this)">
                   <span class="field-error" id="post-reason-error" role="alert"></span>
                 </div>
-                <span class="field-label">Photo of fuel gauge<span class="field-required">*</span></span>
-                <label class="photo-upload" id="post-fuelphoto" onclick="togglePhoto(this)" role="button" tabindex="0" aria-required="true">
+                <span class="field-label">Photo of fuel gauge</span>
+                <label class="photo-upload" id="post-fuelphoto" onclick="togglePhoto(this)" role="button" tabindex="0">
                   <span class="photo-upload-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg></span>
                   <span class="photo-upload-added" hidden>✓ Photo added</span>
                 </label>
@@ -1662,7 +1766,7 @@
       <span class="proto-sim-label">Contractor portal, simulated</span>
       <button class="proto-sim-btn" type="button" onclick="mdcMarkComplete()">MDC: Mark Job Complete (C04)</button>
       <button class="proto-sim-btn" type="button" onclick="tmpConfirmLaunch()">TMP: Confirm Launch (C05)</button>
-      <p class="proto-sim-note" id="proto-sim-note">Submitting the Post-Use Checklist starts the turnaround and clears the boat-ready status. Use these to see which contractor action brings it back.</p>
+      <p class="proto-sim-note" id="proto-sim-note">Submitting the Post-Use Checklist starts the turnaround and clears the boat-ready status. Use these to see which contractor action brings it back. This sim walks the haul-out path, where that action is TMP's; on a back-to-back it is MDC's (C.10).</p>
     </div>
   </div>
 
@@ -1762,7 +1866,76 @@
       <div class="screen-caption">
         <div class="screen-id">M03 · Core</div>
         <div class="screen-name">Home / Dashboard</div>
-        <div class="screen-note">Signature Moment #1: Data Hero + Eyebrow Label. Points Balance and boat identity form one static account zone, separated from the variable Upcoming Bookings by a soft fade divider. Each trip card puts date/type on top and status badge below, so longer date ranges don't wrap. The C.31 ready status names the trip it belongs to, because a partner can hold 2 concurrent bookings and TMP confirms launch per booking. It has two states only, present or absent: it is set by TMP's Confirm Launch (C05), never by MDC's Mark Job Complete (C04), and it clears when the partner checks out or when the post-use checklist starts the turnaround.</div>
+        <div class="screen-note">Signature Moment #1: Data Hero + Eyebrow Label. Points Balance and boat identity form one static account zone, separated from the variable Upcoming Bookings by a soft fade divider. Each trip card puts date/type on top and status badge below, so longer date ranges don't wrap. The C.31 ready status names the trip it belongs to, because a partner can hold 2 concurrent bookings and the launch is confirmed per booking. It has three states (third added 2026-09-19, C.31 comment on SOW row 94): ready, not ready yet, and absent. <b>Not ready yet</b> shows only while there is a booking today whose ready trigger has not fired, so the morning of a trip never renders as an empty row. Absent is now only what a partner with no booking today sees. <b>What sets the ready state depends on the turnaround path (confirmed 2026-09-18):</b> TMP's Confirm Launch (C05) on a haul-out, and MDC's Mark Job Complete (C04) on a back-to-back, where the boat never leaves the water and TMP has no step (C.10/C.31). It clears when the partner checks out or when the post-use checklist starts the turnaround. The sim below walks the haul-out path, so C05 is what restores it there.</div>
+      </div>
+    </div>
+
+    <!-- ============ M03 HOME: BOAT NOT READY YET ============ -->
+    <div class="screen-card">
+      <div class="phone"><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+        <div class="content">
+          <div class="home-topbar"><span class="navbar-icon home-icon"></span><div class="home-topbar-actions">
+            <button class="support-btn" aria-label="Support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="4.6"/><path d="M7.2 7.2l2.5 2.5M16.8 7.2l-2.5 2.5M7.2 16.8l2.5-2.5M16.8 16.8l-2.5-2.5" stroke-linecap="round"/></svg></button>
+            <button class="bell-btn" aria-label="Notifications" style="position:relative;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 4-2 5-2 6h16c0-1-2-2-2-6z"/><path d="M10 20a2 2 0 004 0"/></svg>
+              <span class="bell-dot"></span>
+            </button>
+          </div></div>
+          <div class="points-hero-card"><div class="points-hero">
+            <span class="points-hero-eyebrow">Your Points Balance</span>
+            <div class="points-hero-value"><span class="points-hero-num">5</span></div>
+            <svg class="points-hero-wave" width="64" height="16" viewBox="0 0 64 16" fill="none">
+              <path d="M1 10c5-6 9-6 15 0s9 6 15 0 9-6 15 0 9 6 15 0" stroke="var(--navy-200)" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M1 6c5-6 9-6 15 0s9 6 15 0 9-6 15 0 9 6 15 0" stroke="var(--navy-700)" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <span class="points-hero-total">of <b>58</b> pts left this year</span>
+            <span class="points-hero-reset">Resets 12 Jun</span>
+          </div></div>
+          <div class="boat-id">
+            <div class="boat-id-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></div>
+            <div class="boat-id-body">
+              <div class="boat-id-name">Halcyon</div>
+              <div class="boat-id-model">Rayglass 3000</div>
+            </div>
+            <div class="boat-id-readyrow">
+              <span class="boat-id-ready is-pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.2V12l3.1 2" stroke-linecap="round" stroke-linejoin="round"/></svg>Boat not ready yet<span class="boat-id-ready-date">Thu 12 Mar</span></span>
+              <span class="boat-id-pendingnote">We&rsquo;ll let you know as soon as it&rsquo;s ready.</span>
+            </div>
+          </div>
+          <div class="section-title">Upcoming Bookings</div>
+          <div class="booking-card">
+            <div class="booking-card-top">
+              <div class="booking-card-date"><span class="booking-card-day">12</span><span class="booking-card-mon">Mar</span></div>
+              <div class="booking-card-info">
+                <div class="booking-card-type">Single Day</div>
+                <div class="booking-card-sub">Thu 12 Mar, today</div>
+              </div>
+            </div>
+            <div class="booking-card-status"><span class="badge confirmed">Confirmed</span></div>
+          </div>
+          <div class="booking-card">
+            <div class="booking-card-top">
+              <div class="booking-card-date"><span class="booking-card-day">20</span><span class="booking-card-mon">Mar</span></div>
+              <div class="booking-card-info">
+                <div class="booking-card-type">Weekend Block</div>
+                <div class="booking-card-sub">Fri 20 – Sun 22 Mar</div>
+              </div>
+            </div>
+            <div class="booking-card-status"><span class="badge confirmed">Confirmed</span></div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-7 8 7v9a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg><span class="tab-label">Home</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="tab-label">Book</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><span class="tab-label">Rules</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="tab-label">Profile</span></div>
+        </div>
+      </div></div>
+      <div class="screen-caption">
+        <div class="screen-id">M03 · Core</div>
+        <div class="screen-name">Home: Boat Not Ready Yet</div>
+        <div class="screen-note">Added 2026-09-19, C.31 third state. Shown on the morning of a trip while the ready trigger has not fired yet: MDC&rsquo;s Mark Job Complete on a back-to-back, TMP&rsquo;s Confirm Launch on a haul-out (C.10). Before this state the same moment rendered as an empty row, so the one partner C.31 exists for, the one whose push is switched off, could not tell &ldquo;not ready&rdquo; from &ldquo;nothing to say&rdquo;. The trigger condition is a booking today, not the turnaround itself: a partner with no booking today still sees nothing, because the boat&rsquo;s state is not their business until it is their day. Amber and a clock rather than a muted green tick, so the state is read by shape and label, not colour alone. No CTA and no turnaround detail: nothing is being asked of the partner, and C.31 gives them no contractor-facing view to send them to.</div>
       </div>
     </div>
 
@@ -1793,6 +1966,10 @@
             <div class="boat-id-body">
               <div class="boat-id-name">Halcyon</div>
               <div class="boat-id-model">Rayglass 3000</div>
+            </div>
+            <div class="boat-id-readyrow">
+              <span class="boat-id-ready is-pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.2V12l3.1 2" stroke-linecap="round" stroke-linejoin="round"/></svg>Boat not ready yet<span class="boat-id-ready-date">Thu 12 Mar</span></span>
+              <span class="boat-id-pendingnote">We&rsquo;ll let you know as soon as it&rsquo;s ready.</span>
             </div>
           </div>
           <div class="section-title">Upcoming Bookings</div>
@@ -1827,7 +2004,7 @@
       <div class="screen-caption">
         <div class="screen-id">M03 · Core</div>
         <div class="screen-name">Home: Standby Claimed Today</div>
-        <div class="screen-note">Added 2026-09-17. A claimed standby day (A.19) is a booking like any other and has to sit in this list, sorted first because it is always today. Without the row, M28 exited to M09 once and the booking became unreachable the moment the partner tapped Home, which took the C.30 stand-down cancellation with it, the one dialog a standby claim genuinely needs. The badge reads Claimed rather than Confirmed because no points changed hands, and the trip costs 0, so the points hero is unchanged from the default Home. No ready status yet: C.31 sets that only when TMP confirms launch, which for a same-day claim happens after the C.28 real-time alert, not at the moment of claiming.</div>
+        <div class="screen-note">Added 2026-09-17. A claimed standby day (A.19) is a booking like any other and has to sit in this list, sorted first because it is always today. Without the row, M28 exited to M09 once and the booking became unreachable the moment the partner tapped Home, which took the C.30 stand-down cancellation with it, the one dialog a standby claim genuinely needs. The badge reads Claimed rather than Confirmed because no points changed hands, and the trip costs 0, so the points hero is unchanged from the default Home. The boat card now reads <b>Boat not ready yet</b> (third state, added 2026-09-19): claiming standby creates a booking today, and C.31&rsquo;s ready trigger has not fired at the moment of claiming, which is exactly the condition the new state covers. It resolves to ready when the turnaround&rsquo;s last step is actioned, which for a same-day claim happens after the C.28 real-time alert, not at the moment of claiming. On a haul-out that step is TMP's Confirm Launch; on a back-to-back it is MDC's Mark Job Complete (C.10, confirmed 2026-09-18).</div>
       </div>
     </div>
 
@@ -2301,7 +2478,7 @@
       <div class="screen-caption">
         <div class="screen-id">M09 · Detail</div>
         <div class="screen-name">Booking Detail: Confirmed</div>
-        <div class="screen-note">Primary CTA is Return to Home, not the checklist. Pre-Departure sits below the card as a low-emphasis row, because the urgent prompt arrives closer to departure via the C.32 reminder, which deep-links to the same screen. IA lists both as entries into M15. The row disappears once the booking is Checked Out, which is the card below. Both actions sit in the pinned footer, matching M08, so the card can grow without pushing them off-screen. The 48-hour refund/forfeit split is not stated here: it appears in the confirmation dialog (M17), at the moment the partner actually decides.</div>
+        <div class="screen-note">Primary CTA is Return to Home, not the checklist. Pre-Departure sits below the card as a low-emphasis row, because the urgent prompt arrives 1 hour before the estimated departure time via the C.32 reminder, which deep-links to the same screen. IA lists both as entries into M15. The row disappears once the booking is Checked Out, which is the card below. Both actions sit in the pinned footer, matching M08, so the card can grow without pushing them off-screen. The 48-hour refund/forfeit split is not stated here: it appears in the confirmation dialog (M17), at the moment the partner actually decides.</div>
       </div>
     </div>
 
@@ -2354,8 +2531,8 @@
             <div class="rule-cost-card"><span class="rule-cost-label">Weekend block <small style="color:var(--neutral-500)">Fri to Sun</small></span><span class="rule-cost-value">5 <small>pts</small></span></div>
             <div class="rule-cost-card"><span class="rule-cost-label">Long weekend <small style="color:var(--neutral-500)">Fri to Mon</small></span><span class="rule-cost-value">7 <small>pts</small></span></div>
             <div class="rule-cost-card highlight"><span class="rule-cost-label">Christmas Window <small style="color:var(--neutral-500)">7 days</small></span><span class="rule-cost-value">14 <small>pts</small></span></div>
-            <div class="rule-cost-card free"><span class="rule-cost-label">Standby <small style="color:var(--neutral-500)">today only</small></span><span class="rule-cost-value">0 <small>pts</small></span></div>
-            <div class="rule-cost-card"><span class="rule-cost-label">Unclaimed weekend</span><span class="rule-cost-value">2–5 <small>pts</small></span></div>
+            <div class="rule-cost-card free"><span class="rule-cost-label">Standby <small style="color:var(--neutral-500)">Mon to Thu</small></span><span class="rule-cost-value">0 <small>pts</small></span></div>
+            <div class="rule-cost-card"><span class="rule-cost-label">Unclaimed weekend</span><span class="rule-cost-value">0–5 <small>pts</small></span></div>
           </div>
 
           <div class="rule-section-label">Timing Limits</div>
@@ -2371,28 +2548,30 @@
             <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">2 long weekends every 12 months. Unclaimed ones you pick up do not count.</span></div>
           </div>
 
-          <div class="rule-section-label">Standby: Today, Free</div>
+          <div class="rule-section-label">Standby: Mon to Thu, Free</div>
           <div class="rule-checklist">
             <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Not claimed by <b>7am</b>? Today opens to all 6 of you, <b>free</b>.</span></div>
             <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">First to claim gets it. No yearly limit.</span></div>
-            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Today only, and never inside someone else’s booking.</span></div>
-            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">We tell the team as soon as you claim, so say when you’re heading out.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Today only, <b>Monday to Thursday</b>, and never inside someone else’s booking.</span></div>
+            <div class="rule-check-item"><span class="rule-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg></span><span class="rule-check-text">Halcyon cannot be turned around at a weekend, so Saturday and Sunday go by the unclaimed rates below.</span></div>
           </div>
 
           <div class="rule-section-label">If a Weekend Goes Unclaimed</div>
-          <p class="rule-note">Unbooked by <b>midnight Friday</b>, a weekend reopens to everyone. You take it from the day you claim to the end of the block, so the later you claim, the less it costs.</p>
+          <p class="rule-note">Unbooked by <b>midnight Friday</b>, a weekend reopens to everyone. You take it from the day you claim to the end of the block, so the later you claim, the less it costs. Claim <b>after 7am on the day itself</b> and that day is free. Only the rest of the block costs points.</p>
           <div class="rule-price-table">
             <div class="rule-price-head">Weekend block</div>
-            <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri, Sat and Sun</small></span><span class="rule-price-pts">5 pts</span></div>
-            <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat and Sun</small></span><span class="rule-price-pts">4 pts</span></div>
-            <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun only</small></span><span class="rule-price-pts">2 pts</span></div>
+            <div class="rule-price-cols"><span></span><span class="rule-price-col">Before 7am</span><span class="rule-price-col">After 7am</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri, Sat and Sun</small></span><span class="rule-price-pts">5 pts</span><span class="rule-price-pts">4 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat and Sun</small></span><span class="rule-price-pts">4 pts</span><span class="rule-price-pts">2 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun only</small></span><span class="rule-price-pts">2 pts</span><span class="rule-price-pts free">Free</span></div>
           </div>
           <div class="rule-price-table">
             <div class="rule-price-head">Long weekend</div>
-            <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri to Mon</small></span><span class="rule-price-pts">7 pts</span></div>
-            <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat to Mon</small></span><span class="rule-price-pts">6 pts</span></div>
-            <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun and Mon</small></span><span class="rule-price-pts">4 pts</span></div>
-            <div class="rule-price-row"><span class="rule-price-when">Claim on Monday<small>Mon only</small></span><span class="rule-price-pts">2 pts</span></div>
+            <div class="rule-price-cols"><span></span><span class="rule-price-col">Before 7am</span><span class="rule-price-col">After 7am</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Friday<small>Fri to Mon</small></span><span class="rule-price-pts">7 pts</span><span class="rule-price-pts">6 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Saturday<small>Sat to Mon</small></span><span class="rule-price-pts">6 pts</span><span class="rule-price-pts">4 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Sunday<small>Sun and Mon</small></span><span class="rule-price-pts">4 pts</span><span class="rule-price-pts">2 pts</span></div>
+            <div class="rule-price-row"><span class="rule-price-when">Claim on Monday<small>Mon only</small></span><span class="rule-price-pts">2 pts</span><span class="rule-price-pts free">Free</span></div>
           </div>
           <p class="rule-note after">Saturday always comes with its Sunday. A reopened weekend is never split between two partners.</p>
 
@@ -2443,7 +2622,7 @@
       <div class="screen-caption">
         <div class="screen-id">M05 · Core</div>
         <div class="screen-name">Boat Rules</div>
-        <div class="screen-note">A.5 asks for a plain-language summary of every booking rule, grouped by topic, so all of them are here: the six things a partner can book and what each costs, the timing limits, standby, the unclaimed rate tables from C.5, fairness, and both cancellation regimes. Fleet is Rayglass 3000 only.</div>
+        <div class="screen-note">A.5 asks for a plain-language summary of every booking rule, grouped by topic, so all of them are here: the six things a partner can book and what each costs, the timing limits, standby, the unclaimed rate tables from C.5, fairness, and both cancellation regimes. Fleet is Rayglass 3000 only. <b>Standby narrowed to Monday to Thursday on 2026-09-19.</b> The section label carries the rule, so it is read before any of the detail under it, and the weekend exclusion is stated with its reason and a destination: those days are not refused, they are priced by the C.5 tables directly below, which is why the two sections sit next to each other. <b>C.5 rate tables rebuilt on 2026-09-19</b> for the same-day rule: each row now carries two figures, before 7am and after, because the cost depends on whether the day being claimed has already started, not only on which day it is. A single figure per row would have been wrong for every claim made on the day. The after-7am column is the old rate minus that day, so the last row of each table resolves to Free. That is not standby by another name, which matters now standby is Monday to Thursday only (2026-09-19) and these are weekend days: it is the same arithmetic landing on the same price, and for a Saturday or Sunday it is the only route to a free day there is. Free is written as a word and in the success green, not as a 0, so it reads as an outcome rather than a quantity. The headline cost card moved from 2–5 to 0–5 pts to match.</div>
       </div>
     </div>
 
@@ -2453,6 +2632,13 @@
         <div class="statusbar"><span>9:41</span><span>●●●</span></div>
         <div class="navbar"><span class="navbar-icon"></span><span class="back">‹</span>Notifications</div>
         <div class="content">
+          <div class="notif-welcome">
+            <div class="notif-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12l4 4L19 7"/></svg></div>
+            <div class="notif-welcome-title">You're approved. The boat is yours.</div>
+            <div class="notif-welcome-body">Powerboat Training NZ qualification confirmed. <span style="font-family:var(--font-mono)">58</span> points for the year, and the calendar is open <span style="font-family:var(--font-mono)">60</span> days ahead.</div>
+            <button class="notif-welcome-cta">Book your first trip</button>
+            <div class="notif-welcome-foot">JUST NOW</div>
+          </div>
           <div class="notif-row">
             <div class="notif-icon tint-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4"/></svg></div>
             <div><div class="notif-title">Reminder: complete your Pre-Departure Checklist for <span style="font-family:var(--font-mono)">Sat 14 Mar</span></div><div class="notif-time">Just now</div></div>
@@ -2482,7 +2668,7 @@
       <div class="screen-caption">
         <div class="screen-id">M06 · Core</div>
         <div class="screen-name">Notification Center</div>
-        <div class="screen-note">Covers each type named in SOW A.14: booking confirmed, boat ready, access opened, and the three release triggers (C.9). No payment-due entry exists, the platform raises no partner-facing invoice (A.14 AC). The checklist reminders come from C.32. <b>Every row is a deep-link, wired 2026-09-17.</b> Booking confirmed and boat ready open M09 for the trip named in the row; the pre-departure reminder opens M15 and the post-use reminder opens M16 directly, since C.32 fires that one only after the trip has ended and M16 is what starts the whole turnaround; a reopened weekend opens M04 with the block already selected and repriced from the C.5 table. There is no separate notification-detail screen: A.14 scopes this feature as a list view, the message is one line and complete on the row, and a detail screen between the tap and the destination would add a build with no acceptance criterion behind it. The Christmas Window row is the single exception and is deliberately inert, see the note in the markup: C.8 opens a released window to the other five partners first-confirmed, and nothing in the app yet lets them take it.</div>
+        <div class="screen-note">Covers each type named in SOW A.14: booking confirmed, boat ready, access opened, and the three release triggers (C.9). No payment-due entry exists, the platform raises no partner-facing invoice (A.14 AC). The checklist reminders come from C.32. <b>The qualification welcome (A.2) is new on 2026-09-18</b> and is deliberately not a row: it marks a milestone, so it gets a heading, a body and its own action into M04. Fires once per partner, never repeats. White with only the border and icon tinted, so no text loses contrast. <b>Every row is a deep-link, wired 2026-09-17.</b> Booking confirmed and boat ready open M09 for the trip named in the row; the pre-departure reminder opens M15 and the post-use reminder opens M16 directly, since the booking is checked out by the time C.32 fires that one (1 hour before the estimated return time, confirmed 2026-09-18) and M16 is what starts the whole turnaround; a reopened weekend opens M04 with the block already selected and repriced from the C.5 table. There is no separate notification-detail screen: A.14 scopes this feature as a list view, the message is one line and complete on the row, and a detail screen between the tap and the destination would add a build with no acceptance criterion behind it. The Christmas Window row is the single exception and is deliberately inert, see the note in the markup: C.8 opens a released window to the other five partners first-confirmed, and nothing in the app yet lets them take it.</div>
       </div>
     </div>
 
@@ -2495,10 +2681,9 @@
           <div class="card profile-card" style="margin-bottom:18px;">
             <div class="profile-id">
               <div class="profile-id-main">
-                <div class="profile-name">David Kearney</div>
-                <div class="profile-role">Halcyon &middot; Rayglass 3000</div>
+                <div class="profile-name-row"><div class="profile-name">David Kearney</div><button class="profile-edit-btn" type="button" aria-label="Edit your name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button></div>
+                <div class="profile-vessel"><span class="profile-vessel-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></span><span class="profile-vessel-body"><span class="profile-vessel-name">Halcyon</span><span class="profile-vessel-model">Rayglass 3000</span></span></div>
               </div>
-              <button class="profile-edit-btn" type="button" aria-label="Edit your details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>Edit</button>
             </div>
             <div class="row"><span class="row-label">Qualification</span><span class="badge confirmed">Approved</span></div>
             <div class="row"><span class="row-label">Phone</span><span class="row-value">021 555 0198</span></div>
@@ -2506,7 +2691,7 @@
           </div>
           <div class="card" style="margin-bottom:16px;">
             <h2 class="card-head"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>Secondary operator</span><span class="secop-empty">None added</span></h2>
-            <p class="secop-note">Someone else can operate Halcyon on your behalf. Contact us to add one.</p>
+            <p class="secop-note">Someone else can operate Halcyon when you are aboard. Contact us to add one.</p>
           </div>
           <div class="menu-row">Christmas Window <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
           <div class="menu-row">Support <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
@@ -2530,7 +2715,7 @@
       <div class="screen-caption">
         <div class="screen-id">M07 · Core</div>
         <div class="screen-name">Profile (view)</div>
-        <div class="screen-note">Who the partner is and the three values that describe them share one card: name and boat on the left, the Edit control on the right, then qualification, phone and email as rows. Qualification is the first row because it is the one status that decides whether the rest of the app is usable at all, an unapproved partner cannot book. This was three stacked sections with two headings above them, which pushed the menu 150px down the screen for no gain: a card whose first line is the partner's own name does not also need a heading reading "Your details". Secondary operator below it is padlocked, view-only per A.16, with the route to change it stated rather than implied, and its heading now sits inside its card for the same reason. The rest is the secondary-menu hub for Christmas Window, Support, and the legal pages, keeping the tab bar at 4 items per the IA. The platform holds no financial data (C.26), so this menu has no money screen. The support name, phone, and email also sit in the app footer, which is where A.17 puts them.</div>
+        <div class="screen-note">Who the partner is and the three values that describe them share one card: name and boat on the left, the Edit control on the right, then qualification, phone and email as rows. Qualification is the first row because it is the one status that decides whether the rest of the app is usable at all, an unapproved partner cannot book. None of the three values is the partner's to change from here, phone having joined email on 2026-09-19: qualification comes from an admin sign-off, and Matt maintains phone and email on the shareholder record (B.19/A.16). Name is the one thing left that a partner edits themselves, which is why it is the only value on this card that changes shape in edit mode, and why the control reads <b>Edit name</b> rather than Edit (2026-09-19). A card-level Edit promised more than it delivered: a partner wanting to fix their phone number would tap it, find the phone unchanged, and tap Cancel, learning the rule only after a wasted round trip. The line about phone and email was removed on 2026-09-19 at the client's direction, so the card now states the two values and nothing about them. The route out is still on this screen, in the support name, phone and email in the footer (A.17), but it is no longer labelled as the way to change these fields. This was three stacked sections with two headings above them, which pushed the menu 150px down the screen for no gain: a card whose first line is the partner's own name does not also need a heading reading "Your details". Secondary operator below it is padlocked, view-only per A.16, with the route to change it stated rather than implied, and its heading now sits inside its card for the same reason. The rest is the secondary-menu hub for Christmas Window, Support, and the legal pages, keeping the tab bar at 4 items per the IA. The platform holds no financial data (C.26), so this menu has no money screen. The support name, phone, and email also sit in the app footer, which is where A.17 puts them.</div>
       </div>
     </div>
 
@@ -2542,26 +2727,22 @@
           <div class="card profile-card" style="margin-bottom:18px;">
             <div class="profile-id">
               <div class="profile-id-main">
-                <input class="field-box profile-name-input" type="text" value="David Kearney" aria-label="Name">
-                <div class="profile-role">Halcyon &middot; Rayglass 3000</div>
+                <input class="field-box profile-name-input error" type="text" value="" aria-label="Name">
+                <span class="field-error show">Enter your name</span>
+                <div class="profile-vessel"><span class="profile-vessel-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></span><span class="profile-vessel-body"><span class="profile-vessel-name">Halcyon</span><span class="profile-vessel-model">Rayglass 3000</span></span></div>
               </div>
             </div>
             <div class="row"><span class="row-label">Qualification</span><span class="badge confirmed">Approved</span></div>
-            <div style="padding-top:14px;">
-              <span class="field-label">Phone<span class="field-required">*</span></span>
-              <input class="field-box field-box-mono" type="tel" value="021 555 0198">
-              <span class="field-label">Email<span class="field-required">*</span></span>
-              <input class="field-box error" type="email" value="david.kearney@xtra">
-              <span class="field-error show">Enter a valid email address</span>
-              <div class="profile-edit-actions">
-                <button class="btn btn-ghost" type="button">Cancel</button>
-                <button class="btn btn-primary" type="button">Save</button>
-              </div>
+            <div class="row"><span class="row-label">Phone</span><span class="row-value">021 555 0198</span></div>
+            <div class="row"><span class="row-label">Email</span><span class="row-value" style="font-family:var(--font-body);font-weight:400;font-size:14px;">david.kearney@xtra.co.nz</span></div>
+            <div class="profile-edit-actions">
+              <button class="btn btn-ghost" type="button">Cancel</button>
+              <button class="btn btn-primary" type="button">Save</button>
             </div>
           </div>
           <div class="card" style="margin-bottom:16px;">
             <h2 class="card-head"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>Secondary operator</span><span class="secop-empty">None added</span></h2>
-            <p class="secop-note">Someone else can operate Halcyon on your behalf. Contact us to add one.</p>
+            <p class="secop-note">Someone else can operate Halcyon when you are aboard. Contact us to add one.</p>
           </div>
           <div class="menu-row">Christmas Window <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
           <div class="menu-row">Support <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
@@ -2585,7 +2766,7 @@
       <div class="screen-caption">
         <div class="screen-id">M07 · Core</div>
         <div class="screen-name">Profile (editing)</div>
-        <div class="screen-note">There is no separate edit screen. Tapping Edit turns the same three values into inputs where they already sit, so the name stays at the top of the same card, at heading size, and only becomes typeable. Cancel restores the previous values, and warns first if anything was changed; Save validates by Form 4's rules and returns to the view above. The email here is shown mid-error to document the inline pattern. Note what has not changed between the two cards: the qualification row at the top and the padlocked Secondary operator section below are identical in both modes, because neither is the partner's to change. Edit mode visibly stops at that boundary, which is a clearer answer to "why can't I change this?" than any amount of helper text.</div>
+        <div class="screen-note">There is no separate edit screen. Tapping Edit turns the editable value into an input where it already sits, so the name stays at the top of the same card, at heading size, and only becomes typeable. Cancel restores the previous value, and warns first if it was changed; Save validates by Form 4's rules and returns to the view above. Name is shown mid-error here to document the inline pattern, and it is now the only field on the screen that can raise one. <b>Email became read-only on 2026-09-18, phone on 2026-09-19:</b> Matt maintains both on the shareholder record (B.19) and A.16 puts a self-service change out of scope, so an input here would offer something the platform will not accept. Note how little changes between the two cards: qualification, phone, email and the padlocked Secondary operator section are all identical in both modes, because none of them is the partner's to change. Save and Cancel stay, rather than the field saving itself when focus leaves it: a name sits on the shareholder record, and a silent save gives a partner who mistyped nothing to catch it with. <b>The pair was resized on 2026-09-19:</b> two full-width bars were sized for a form, and this is one name. They are now content-width and right-aligned, still 44pt tall, and Cancel dropped its outline because an outlined button beside a filled one argues it is an equal choice, which it is not. Edit mode visibly stops at that boundary, which is a clearer answer to "why can't I change this?" than any amount of helper text.</div>
       </div>
     </div>
 
@@ -2597,10 +2778,9 @@
           <div class="card profile-card" style="margin-bottom:18px;">
             <div class="profile-id">
               <div class="profile-id-main">
-                <div class="profile-name">David Kearney</div>
-                <div class="profile-role">Halcyon &middot; Rayglass 3000</div>
+                <div class="profile-name-row"><div class="profile-name">David Kearney</div><button class="profile-edit-btn" type="button" aria-label="Edit your name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button></div>
+                <div class="profile-vessel"><span class="profile-vessel-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V21M6 14a6 6 0 0012 0M4 14h2M18 14h2"/></svg></span><span class="profile-vessel-body"><span class="profile-vessel-name">Halcyon</span><span class="profile-vessel-model">Rayglass 3000</span></span></div>
               </div>
-              <button class="profile-edit-btn" type="button" aria-label="Edit your details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>Edit</button>
             </div>
             <div class="row"><span class="row-label">Qualification</span><span class="badge confirmed">Approved</span></div>
             <div class="row"><span class="row-label">Phone</span><span class="row-value">021 555 0198</span></div>
@@ -2608,10 +2788,15 @@
           </div>
           <div class="card" style="margin-bottom:16px;">
             <h2 class="card-head"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>Secondary operator</span></h2>
-            <div class="row"><span class="row-label">Name</span><span class="row-value" style="font-family:var(--font-body);font-weight:500;">Sarah Kearney</span></div>
-            <div class="row"><span class="row-label">Contact</span><span class="row-value">021 555 0177</span></div>
+            <div class="secop-person">
+              <span class="secop-person-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6"/></svg></span>
+              <span class="secop-person-body">
+                <span class="secop-person-name">Sarah Kearney</span>
+                <span class="secop-person-contact">021 555 0177</span>
+              </span>
+            </div>
             <div class="row"><span class="row-label">Powerboat Training NZ</span><span class="badge confirmed">Certified</span></div>
-            <p class="secop-note">Contact us to change any of these.</p>
+            <p class="secop-note">They can operate Halcyon when you are aboard. Contact us to change any of these.</p>
           </div>
           <div class="menu-row">Christmas Window <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
           <div class="menu-row">Support <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
@@ -2635,7 +2820,7 @@
       <div class="screen-caption">
         <div class="screen-id">M07 · Core</div>
         <div class="screen-name">Profile (secondary operator set)</div>
-        <div class="screen-note">The same screen once a secondary operator exists. A.16 holds three values for this field, name, contact, and Powerboat Training NZ status, and none of them had ever been drawn: the section only had an empty state. All three are rows rather than prose, so the partner can check the ticket status at a glance, which is the one thing they are likely to come here for. The padlock and the closing line are the only difference from any other read-only block, and between them they carry the "ours to change, not yours" message that a heading full of admin vocabulary used to carry less well.</div>
+        <div class="screen-note">The same screen once a secondary operator exists. A.16 holds three values for this field, name, contact, and Powerboat Training NZ status. <b>Redrawn 2026-09-19.</b> All three were label/value rows, which turned a person into three settings and gave her name the same weight as her phone number, in a stack visually identical to the qualification/phone/email rows one card above. She now takes the same shape the partner's vessel takes on that card: a mark, a name, the number beneath it in mono. The screen ends up with one idea about how a named thing is shown, used twice, instead of two unrelated row stacks. The credential stays a labelled row with its badge, because it is the one value a partner opens this card to check, and folding it into the name block would read as decoration on a name rather than as a status that can change. The padlock and the closing line are the only difference from any other read-only block, and between them they carry the "ours to change, not yours" message that a heading full of admin vocabulary used to carry less well. <b>Copy corrected 2026-09-19:</b> both states said a secondary operator can take Halcyon out "on your behalf", which the client confirmed is wrong. They may only operate her with the partner aboard, so the empty state now says "when you are aboard" and the populated state says it too, because that is the state in which a partner is about to rely on it. The same answer removed the case for a Secondary Operator screen of its own: no login, no separate booking, one record per partner, so there is nothing a second screen would hold that this card does not.</div>
       </div>
     </div>
     <!-- ============ M15 PRE-DEPARTURE CHECKLIST ============ -->
@@ -2655,13 +2840,12 @@
               <div class="checklist-sub" data-show-when="no">
                 <span class="field-label">Litres reading</span>
                 <div class="ledger-value">142</div>
-                <p style="font-size:15px;color:var(--neutral-500);line-height:1.5;margin:-4px 0 16px;">Up to 20 litres: no action.<br>Over 20 litres: Admin notified.</p>
                 <span class="field-label">Why isn't it full?</span>
                 <div class="ledger-text">Used half a tank on the way out</div>
-                <span class="field-label">Photo of fuel gauge</span>
-                <div style="height:90px;border:1.5px dashed var(--navy-300);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:0;color:var(--navy-400);">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg>
-                </div>
+              </div>
+              <span class="field-label">Photo of fuel gauge</span>
+              <div style="height:90px;border:1.5px dashed var(--navy-300);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:0;color:var(--navy-400);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg>
               </div>
             </div>
           </div>
@@ -2709,7 +2893,7 @@
       <div class="screen-caption">
         <div class="screen-id">M15 · Action</div>
         <div class="screen-name">Pre-Departure Checklist</div>
-        <div class="screen-note">Each step is its own card (Fuel Check, Damage Check, Return Time) with an icon header; litres/text fields use a ledger-line style. Progressive disclosure: litres/reason/photo appear only if fuel isn't full; description/photo only if damage is Yes. Return time is for MDC's planning only, not binding, via three dropdowns in the boxed field style (not ledger-line).</div>
+        <div class="screen-note">Each step is its own card (Fuel Check, Damage Check, Return Time) with an icon header; litres/text fields use a ledger-line style. <b>The 20-litre tolerance is not stated to the partner (2026-09-18):</b> partners are expected to return the boat full, and publishing the threshold invites them to treat it as an acceptable shortfall. The check still runs, silently, on the backend (C.19). `12-form-specs.md` had already forbidden partner-visible tolerance messaging; these screens were contradicting their own spec until now. Progressive disclosure: litres and reason appear only if fuel isn't full, and damage description/photo only if damage is Yes. The fuel gauge photo sits outside that block, because it is asked for whether the tank is full or not. <b>It is the one field that never blocks submission (2026-09-18):</b> a partner who has already left the boat cannot photograph the gauge, so an absent photo submits with a soft notice and raises a "submitted without fuel photo" item for Matt (A.9/A.11). Every other field stays mandatory. Return time is for MDC's planning only, not binding, via three dropdowns in the boxed field style (not ledger-line).</div>
       </div>
     </div>
 
@@ -2730,13 +2914,12 @@
               <div class="checklist-sub" data-show-when="no">
                 <span class="field-label">Litres reading</span>
                 <div class="ledger-value">138</div>
-                <p style="font-size:15px;color:var(--neutral-500);line-height:1.5;margin:-4px 0 16px;">Up to 20 litres: no action.<br>Over 20 litres: Admin notified.</p>
                 <span class="field-label">Why isn't it full?</span>
                 <div class="ledger-text">Ran the tank down for the trip home</div>
-                <span class="field-label">Photo of fuel gauge</span>
-                <div style="height:90px;border:1.5px dashed var(--navy-300);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:0;color:var(--navy-400);">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg>
-                </div>
+              </div>
+              <span class="field-label">Photo of fuel gauge</span>
+              <div style="height:90px;border:1.5px dashed var(--navy-300);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:0;color:var(--navy-400);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg>
               </div>
             </div>
           </div>
@@ -2789,7 +2972,7 @@
       <div class="screen-caption">
         <div class="screen-id">M16 · Action</div>
         <div class="screen-name">Post-Use Checklist</div>
-        <div class="screen-note">Same card layout as Pre-Departure, plus a mandatory Engine Hours reading and an optional Photos card (PRD §4B copy). Submitting fires the turnaround workflow: MDC's clean is hand-off only, never notifies the next partner; only TMP's launch-confirmation action (the evening before) does. A 10am backstop alert goes to Admin if not actioned.</div>
+        <div class="screen-note">Same card layout as Pre-Departure, plus a mandatory Engine Hours reading and an optional Photos card (PRD §4B copy). The fuel gauge photo carries the same waiver as M15, and the turnaround runs as normal without it. Submitting fires the turnaround workflow. Who notifies the next partner depends on the path: on a back-to-back turnaround MDC's Mark Job Complete does it directly, on a haul-out it is TMP's launch-confirmation action the evening before. A 10am backstop alert goes to Admin if not actioned.</div>
       </div>
     </div>
 
@@ -2810,7 +2993,7 @@
           <div class="standby-hero">
             <div class="standby-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div>
             <div>
-              <span class="standby-hero-label">Standby, today only</span>
+              <span class="standby-hero-label">Standby, Mon to Thu</span>
               <div class="standby-hero-value">0 <small>points</small></div>
             </div>
           </div>
@@ -2828,7 +3011,7 @@
             </select>
           </div>
           <p style="font-size:16px;color:var(--neutral-500);line-height:1.5;margin:0 0 16px;">We’ll notify the team the moment you claim, so give them as much notice as you can.</p>
-          <p style="font-size:16px;color:var(--neutral-600);line-height:1.6;margin:0;">Today went unclaimed at 7am, so it is open to all six partners at no point cost. First to claim gets it. There is no yearly limit.</p>
+          <p style="font-size:16px;color:var(--neutral-600);line-height:1.6;margin:0;">Today went unclaimed at 7am, so it is open to all six partners at no point cost. First to claim gets it. There is no yearly limit. Standby runs <b>Monday to Thursday</b> only. Halcyon cannot be turned around between trips at a weekend, so Saturday and Sunday are never standby days: they stay on unclaimed weekend rates.</p>
         </div>
         <div style="padding:0 18px 30px;display:flex;flex-direction:column;gap:8px;">
           <button class="btn btn-accent">Claim Today, Free</button>
@@ -2838,7 +3021,7 @@
       <div class="screen-caption">
         <div class="screen-id">M28 · Action</div>
         <div class="screen-name">Standby Claim</div>
-        <div class="screen-note">SOW A.19 / C.27, previously unbuilt. Reached only from the calendar's today cell, and only once 7am passes with nobody holding a confirmed booking. Zero points, so the balance rows read 5 / 0 / 5 rather than being hidden. Captures the same estimated departure time as a normal confirmation (A.8), because C.28 puts it in the real-time SMS and email to Tamaki Marine Park.</div>
+        <div class="screen-note">SOW A.19 / C.27, previously unbuilt. Reached only from the calendar's today cell, and only once 7am passes with nobody holding a confirmed booking. <b>Monday to Thursday only, added 2026-09-19:</b> the hero eyebrow carries the rule rather than repeating "today only", which the navbar, the date line and the button already say three times between them. The reason is in the body copy, because a partner told only that weekends are excluded will ask why, and the answer is not a rule the app enforces but a fact about the boat: it cannot be turned around between trips at a weekend. The copy then routes them somewhere real, to the unclaimed weekend rates, rather than leaving a refusal with no alternative. Zero points, so the balance rows read 5 / 0 / 5 rather than being hidden. Captures the same estimated departure time as a normal confirmation (A.8), because C.28 puts it in the real-time SMS and email to Tamaki Marine Park.</div>
       </div>
     </div>
 
@@ -3123,19 +3306,17 @@
 
 
   /* ---- M07 profile, in-place editing (A.16) --------------------------------
-     There is no separate Edit Profile screen. Tapping Edit turns the three
-     values the partner owns into inputs where they already sit, and nothing
-     else on the screen moves. The padlocked Secondary operator card is
-     deliberately untouched by this: A.16 keeps that field with us, off-platform, and the
-     qualification row above is an admin sign-off, so the mode change has to stop at
-     both boundaries and be seen to stop there. */
+     There is no separate Edit Profile screen. Tapping Edit turns the one value the
+     partner owns into an input where it already sits, and nothing else on the screen
+     moves. Phone joined email as admin-maintained on 2026-09-19, so name is all that
+     is left: the padlocked Secondary operator card, the phone and email rows and the
+     qualification sign-off above are all held by Matt on the shareholder record (B.19),
+     and the mode change has to stop at that boundary and be seen to stop there. */
   var profileOriginal = null;
 
   function profileFields(){
     return {
-      name:  document.getElementById('prof-name'),
-      phone: document.getElementById('prof-phone'),
-      email: document.getElementById('prof-email')
+      name: document.getElementById('prof-name')
     };
   }
 
@@ -3146,7 +3327,7 @@
 
   function clearProfileErrors(){
     var f = profileFields();
-    [f.name, f.phone, f.email].forEach(function(input){ clearProfileFieldError(input); });
+    [f.name].forEach(function(input){ clearProfileFieldError(input); });
   }
 
   function setProfileMode(editing){
@@ -3158,7 +3339,7 @@
 
   function startProfileEdit(){
     var f = profileFields();
-    profileOriginal = { name: f.name.value, phone: f.phone.value, email: f.email.value };
+    profileOriginal = { name: f.name.value };
     clearProfileErrors();
     setProfileMode(true);
     // Focus lands in the first field, not on the card, so the mode change is announced
@@ -3170,9 +3351,7 @@
   function profileIsDirty(){
     if (!profileOriginal) return false;
     var f = profileFields();
-    return f.name.value !== profileOriginal.name
-        || f.phone.value !== profileOriginal.phone
-        || f.email.value !== profileOriginal.email;
+    return f.name.value !== profileOriginal.name;
   }
 
   function cancelProfileEdit(){
@@ -3188,9 +3367,7 @@
   function exitProfileEdit(restore){
     var f = profileFields();
     if (restore && profileOriginal) {
-      f.name.value  = profileOriginal.name;
-      f.phone.value = profileOriginal.phone;
-      f.email.value = profileOriginal.email;
+      f.name.value = profileOriginal.name;
     }
     profileOriginal = null;
     clearProfileErrors();
@@ -3210,16 +3387,10 @@
     }
 
     check(f.name, f.name.value.trim().length > 0, 'Enter your name');
-    // Loose on purpose, per Form 4: partners may hold overseas numbers, so this counts
-    // digits rather than enforcing an NZ pattern.
-    check(f.phone, (f.phone.value.match(/\d/g) || []).length >= 7, 'Enter a valid phone number');
-    check(f.email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim()), 'Enter a valid email address');
 
     if (firstInvalid) { firstInvalid.focus(); return; }
 
-    document.getElementById('prof-name-view').textContent  = f.name.value.trim();
-    document.getElementById('prof-phone-view').textContent = f.phone.value.trim();
-    document.getElementById('prof-email-view').textContent = f.email.value.trim();
+    document.getElementById('prof-name-view').textContent = f.name.value.trim();
     exitProfileEdit(false);
   }
 
@@ -3290,8 +3461,12 @@
       { id: pre + '-tank',        kind: 'seg',   msg: 'Let us know if the tank is full' },
       { id: pre + '-litres',      kind: 'text',  msg: 'Enter the litres reading from the gauge', when: tankNotFull },
       { id: pre + '-reason',      kind: 'text',  msg: 'Tell us why the tank isn\'t full',        when: tankNotFull },
-      // required whether or not the tank is full, which is why it sits outside the conditional block
-      { id: pre + '-fuelphoto',   kind: 'photo', msg: 'Add a photo of the fuel gauge' },
+      // Asked for whether or not the tank is full, which is why it sits outside the conditional
+      // block. Soft since 2026-09-18: a partner who has already left the boat cannot photograph
+      // the gauge, so an absent photo never blocks submission, it raises a "submitted without
+      // fuel photo" flag for Matt instead (A.9/A.11).
+      { id: pre + '-fuelphoto',   kind: 'photo', soft: true,
+        msg: 'No fuel gauge photo. If you have already left the boat, submit without it, we will let Matt know.' },
       { id: pre + '-damage',      kind: 'seg',   msg: 'Let us know if there\'s any damage' },
       { id: pre + '-damage-desc', kind: 'text',  msg: 'Describe the damage',          when: hasDamage },
       { id: pre + '-damagephoto', kind: 'photo', msg: 'Add a photo of the damage',    when: hasDamage }
@@ -3342,6 +3517,12 @@
       if (el && err) showChecklistError(el, err, null);
     });
   }
+  // True when the fuel gauge photo was left off, which is allowed. Read after a successful submit
+  // so the sim can show the flag that reaches Matt.
+  function fuelPhotoMissing(pre){
+    var el = document.getElementById(pre + '-fuelphoto');
+    return !!el && !el.classList.contains('filled');
+  }
   function validateChecklist(pre){
     var firstMissing = null;
     checklistFields(pre).forEach(function(f){
@@ -3350,6 +3531,14 @@
       var required = !f.when || f.when();
       var ok = !required || checklistFilled(f, el);
       showChecklistError(el, err, ok ? null : f.msg);
+      // A soft field states its consequence and lets the submit through, so it is neither an
+      // error nor a focus target. Everything else still blocks.
+      if (err) err.classList.toggle('soft', !!f.soft);
+      if (f.soft) {
+        el.classList.remove('error');
+        el.removeAttribute('aria-invalid');
+        return;
+      }
       if (!ok && !firstMissing) firstMissing = el;
     });
     // §6: focus lands on the first field in visual order that is still missing, so the partner is
@@ -3608,6 +3797,17 @@
   //   Long weekend (Fri→Mon):   Fri 7 pts · Sat 6 pts · Sun 4 pts (carries Mon) · Mon 2 pts
   // Saturday is never sold without its Sunday, and the block never splits across two partners, both
   // of which fall out of the claim-to-the-end rule rather than needing a separate guard.
+  //
+  // SAME-DAY RULE, added 2026-09-19. A claim made after 7am on the day itself makes that day free,
+  // with the rest of the block charged at the standard rate. Because each figure above already
+  // means "what the remainder of the block costs from this day on", the after-7am price for a day
+  // is exactly the figure on the row below it: drop today, keep the rest. So
+  //   Weekend block:  Fri 4 · Sat 2 · Sun free        Long weekend:  Fri 6 · Sat 4 · Sun 2 · Mon free
+  // The last day of a block resolving to free is the same promise standby already makes: a day that
+  // has started with nobody on it costs nothing. M05 shows both columns.
+  // Not modelled in this prototype, deliberately: the branch turns on wall-clock time, which this
+  // page does not keep, and no unclaimed day in the sample month falls on today, so there is no
+  // reachable case to render. Pricing below is the before-7am column only.
   var UNCLAIMED_RATES = {
     weekend: { 5: 5, 6: 4, 0: 2 },
     long:    { 5: 7, 6: 6, 0: 4, 1: 2 }
@@ -3639,7 +3839,7 @@
       }
       calUpdateSelection(day, run.end);
       var left = run.end - day + 1;
-      showCalNote('block', 'This ' + (run.long ? 'long weekend' : 'weekend') + ' went unclaimed, so it reopened to everyone at a lower rate. You take it from the day you claim through to the end of the block, so ' + (left === 1 ? 'one day' : left + ' days') + ' here. The rate drops again with each day that passes.');
+      showCalNote('block', 'This ' + (run.long ? 'long weekend' : 'weekend') + ' went unclaimed, so it reopened to everyone at a lower rate. You take it from the day you claim through to the end of the block, so ' + (left === 1 ? 'one day' : left + ' days') + ' here. The rate drops again with each day that passes, and claiming after 7am on the day itself makes that day free.');
       return;
     }
 
@@ -3825,7 +4025,7 @@
     // A.19 Standby Claim: the same booking record as any other, but claimed same-day at zero
     // points, which is why C.30 gives it its own cancellation path (nothing to forfeit, but TMP
     // still has to be told to stand down or retrieve).
-    3: { type: 'Standby Claim', date: 'Thu 12 Mar, today', start: 'Thu 12 Mar', pointsUsed: 0, pointsAvail: 5, preDepartureDone: false, kind: 'standby', claimed: false }
+    3: { type: 'Standby Claim', date: 'Thu 12 Mar, today', start: 'Thu 12 Mar', pointsUsed: 0, pointsAvail: 5, preDepartureDone: false, kind: 'standby', claimed: false, today: true }
   };
   var activeBookingId = 1;
   function renderBookingDetail(){
@@ -3869,6 +4069,9 @@
   function claimStandby(){
     HOME_BOOKINGS[3].claimed = true;
     renderHomeBookings();
+    // the claim makes today a trip day, so Home stops being silent about the boat: the C.31 row
+    // switches to "Boat not ready yet" until the turnaround's last step is actioned.
+    renderBoatStatus();
     openBookingDetail(3);
   }
 
@@ -3876,7 +4079,12 @@
   // retrieve, so the row leaves Home the moment the dialog is confirmed.
   function giveUpStandby(){
     HOME_BOOKINGS[3].claimed = false;
+    // TMP is standing the boat down or retrieving it, so a ready status that named this claim is
+    // no longer true. Without this the row would keep saying "ready" for a trip that no longer
+    // exists, which the third state made visible rather than caused.
+    if (String(boatReady.bookingId) === '3') boatReady.ready = false;
     renderHomeBookings();
+    renderBoatStatus();
     closeModal('cancel-standby');
     showScreen('home');
     simNote('Standby given up. TMP is told to stand down or retrieve, and today is open to the other five partners again.');
@@ -3890,18 +4098,48 @@
   }
   function openStandbyClaim(){ showScreen('standby'); }
 
-  // SOW C.31 boat-ready status. It belongs to one booking, not to the boat in the abstract: TMP
-  // confirms launch the evening before a specific trip, so the label carries that trip's date.
-  // Two states only, present or absent, per 19-a11y-spec.md: no muted third reading.
+  // SOW C.31 boat-ready status. It belongs to one booking, not to the boat in the abstract: the
+  // last turnaround step is actioned against a specific trip, so the label carries that trip's
+  // date. On a haul-out that step is TMP's launch confirmation the evening before; on a
+  // back-to-back it is MDC's Mark Job Complete (C.10).
+  // Three states since 2026-09-19 (C.31 comment on SOW row 94): ready, not ready yet, absent.
+  // "Not ready yet" is keyed to there being a booking TODAY, not to the turnaround: a partner
+  // with no trip today is told nothing, because the boat's state is not theirs to track until it
+  // is their day. That keeps absent meaningful instead of turning it into a permanent third chip.
   var boatReady = { ready: true, bookingId: 1 };
 
+  // The booking that makes today a trip day, or null. A standby claim only counts once it is
+  // claimed, since an unclaimed standby day is not a booking at all (A.19).
+  function bookingTodayId(){
+    for (var id in HOME_BOOKINGS){
+      var b = HOME_BOOKINGS[id];
+      if (b.today && (b.kind !== 'standby' || b.claimed)) return id;
+    }
+    return null;
+  }
+
+  // Today's trip wins the row. The ready flag belongs to one booking, so on a trip day the only
+  // honest reading of the row is that day's trip: ready if the trigger fired for it, not ready yet
+  // otherwise. A ready status left over from a different trip must not sit on top of today, which
+  // is the exact ambiguity the third state was added to remove.
   function renderBoatStatus(){
     var row = document.getElementById('home-boat-ready');
     if (!row) return;
-    var b = HOME_BOOKINGS[boatReady.bookingId];
-    var show = boatReady.ready && !!b;
-    row.hidden = !show;
-    if (show) document.getElementById('home-boat-ready-date').textContent = b.start;
+    var readyChip = document.getElementById('home-boat-ready-chip');
+    var pendChip = document.getElementById('home-boat-pending-chip');
+    var pendNote = document.getElementById('home-boat-pending-note');
+    var todayId = bookingTodayId();
+    var named = HOME_BOOKINGS[boatReady.bookingId];
+    var subject = todayId ? HOME_BOOKINGS[todayId] : named;
+    var isReady = todayId
+      ? (boatReady.ready && String(boatReady.bookingId) === String(todayId))
+      : (boatReady.ready && !!named);
+    row.hidden = !isReady && !todayId;
+    readyChip.hidden = !isReady;
+    pendChip.hidden = !(todayId && !isReady);
+    pendNote.hidden = pendChip.hidden;
+    if (isReady) document.getElementById('home-boat-ready-date').textContent = subject.start;
+    if (todayId && !isReady) document.getElementById('home-boat-pending-date').textContent = subject.start;
   }
 
   function simNote(msg){
@@ -3911,35 +4149,41 @@
 
   // Checking out consumes the ready status: the boat is no longer waiting for that trip, it is on
   // it. Without this the label would still name a trip already under way while a second booking is
-  // sitting behind it. Not spelled out in the SOW, which only names the trigger that sets the
-  // status (C05), never the one that ends it.
+  // sitting behind it. Not spelled out in the SOW, which names the triggers that SET the status
+  // (C05 on a haul-out, C04 on a back-to-back, per C.10/C.31) but never the one that ends it.
   function submitPreDeparture(){
     if (!validateChecklist('pre')) return;
+    var noPhoto = fuelPhotoMissing('pre');
     HOME_BOOKINGS[activeBookingId].preDepartureDone = true;
     if (boatReady.bookingId === activeBookingId) boatReady.ready = false;
     renderBookingDetail();
     renderBoatStatus();
     showScreen('confirmed');
-    simNote('Checked out. The ready status is consumed by the trip it named, and returns when TMP confirms launch for the next one.');
+    simNote('Checked out. The ready status is consumed by the trip it named. On this haul-out path it returns when TMP confirms launch for the next trip; on a back-to-back it would return on the MDC Mark Job Complete step.'
+      + (noPhoto ? ' Submitted with no fuel gauge photo, so Matt gets a "submitted without fuel photo" item in Needs Your Action.' : ''));
   }
 
   // Submitting M16 is what starts the turnaround, so the boat stops being ready for anyone.
   function submitPostUse(){
     if (!validateChecklist('post')) return;
+    var noPhoto = fuelPhotoMissing('post');
     HOME_BOOKINGS[activeBookingId].preDepartureDone = false;
     boatReady.ready = false;
     renderBookingDetail();
     renderBoatStatus();
     showScreen('home');
-    simNote('Turnaround started. The boat-ready status is gone from Home, and only TMP\'s Confirm Launch can bring it back.');
+    simNote('Turnaround started. The boat-ready status is gone from Home. This sim walks the haul-out path, so TMP\'s Confirm Launch is what brings it back.'
+      + (noPhoto ? ' Submitted with no fuel gauge photo: Matt is flagged, and the turnaround runs as normal regardless.' : ''));
   }
 
-  // C04: hand-off between contractors only. Deliberately changes nothing a partner can see.
+  // C04: hand-off only on the haul-out path this sim walks. On a back-to-back turnaround
+  // (boat never leaves the water) this same action notifies the next partner directly, and
+  // TMP has no step at all, per SOW B.32/C.10 confirmed 2026-09-18.
   function mdcMarkComplete(){
-    simNote('MDC marked the clean complete. Nothing changes for the partner: this is an internal hand-off to TMP, and it never notifies the next partner.');
+    simNote('MDC marked the clean complete. On this haul-out path nothing changes for the partner, it is an internal hand-off to TMP. On a back-to-back turnaround this same action would notify the next partner directly.');
   }
 
-  // C05: the single trigger for both the push and the persistent status, per SOW C.31.
+  // C05: on the haul-out path, the trigger for both the push and the persistent status, per SOW C.31.
   function tmpConfirmLaunch(){
     boatReady.ready = true;
     boatReady.bookingId = activeBookingId;
@@ -3956,9 +4200,11 @@
     showScreen('checklist');
   }
 
-  // C.32's post-use reminder only ever fires for a trip that has already ended, so the deep-link
-  // lands on M16 itself, not on M09. The booking is checked out by definition at that point, which
-  // is why this sets the state rather than assuming Home was visited first.
+  // C.32's post-use reminder fires 1 hour before the booking's estimated return time (confirmed
+  // 2026-09-18), so it can land while the partner is still on the water, heading back. The
+  // deep-link still goes to M16 rather than M09: the booking is checked out by definition once
+  // pre-departure is submitted, and M16 is the only thing the reminder is asking for. That is
+  // why this sets the state rather than assuming Home was visited first.
   function openPostUse(id){
     if (id) activeBookingId = id;
     HOME_BOOKINGS[activeBookingId].preDepartureDone = true;

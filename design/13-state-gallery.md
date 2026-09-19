@@ -51,6 +51,13 @@
 - CTA: taps through to M04 Booking Calendar (already specified in the IA, satisfying the mandatory-CTA rule).
 - The points balance (Data Hero) still renders normally in the empty state — only the next-booking line is replaced; the balance is never itself an "empty" concept.
 
+**Boat-ready status (three states, SOW C.31)**
+- Added 2026-09-19 per the C.31 comment on SOW row 94, replacing a present/absent pair. Built as part of the boat card, not as a screen-level state, so it composes with every state below.
+- `ready`: "Ready for your trip" + trip date, tick icon, success tint. Set by the last turnaround step for that trip: MDC's Mark Job Complete on a back-to-back, TMP's Confirm Launch on a haul-out (C.10).
+- `not-ready-yet`: "Boat not ready yet" + trip date, clock icon, warning tint, plus the line "We'll let you know as soon as it's ready." Condition: there is a booking today and that trigger has not fired. No CTA: nothing is being asked of the partner, and there is no partner-facing view of the turnaround to link to.
+- `absent`: no row. Condition: no booking today. This is the only case left where the card says nothing, which is what stops the row becoming permanent furniture.
+- Not a loading state: it reflects a real-world trigger, not a fetch, so it never renders as a skeleton and never times out into the error state.
+
 **Error**
 - Type: server (points balance or booking data fails to load). Message: "Couldn't load your dashboard right now." Recovery: Retry button, re-fetches without a full app restart.
 - What's preserved: nothing to preserve (Home has no in-progress user input).
@@ -114,6 +121,13 @@
 
 **Loading**
 - Pattern: skeleton, with placeholder blocks for the identity card (name, boat, then the qualification, phone and email rows) and the "Secondary operator" card. The Edit control is not drawn until the real values are in, so nothing invites a tap into a card that has no content yet.
+
+**Edit mode** *(SOW A.16)*
+- One field: `name`, as an input in place at the top of the identity card. Qualification, phone, email and the whole Secondary operator card render exactly as they do in view mode (phone joined email as admin-maintained on 2026-09-19).
+- No explanatory line beneath the phone and email rows: one was specified and then removed on 2026-09-19 at the client's direction. The rows state the values and nothing else, in both modes.
+- The control that opens this mode is an unlabelled pencil sitting against the name itself, not at the card corner. It governs one field and its position is what says so.
+- Cancel/Save appear beneath the card. Cancel with an unsaved change raises the discard confirmation; Cancel with nothing changed exits silently.
+- Error: empty name, inline beneath the input. It is the only error this screen can produce.
 
 **Secondary operator, not set** *(the default for most partners)*
 - "None added", followed by one line saying what the field is for and how to add one: "Someone else can operate Halcyon on your behalf. Contact us to add one."
@@ -240,7 +254,7 @@ All durations/easings reference `tokens/foundations.json` — no new raw values 
 |---|---|
 | M03 Home | A brand-new partner (persona Priya) lands on M03 immediately after first sign-in with qualification still Pending — the points balance still renders (58 points, full allocation) even though booking is locked at M04; this is intentional, so she can see what she's working with while waiting on Matt. |
 | M06 Notification Center | First-run empty state copy (above) is written for a partner who has genuinely never received a notification — distinct from a returning user's ordinary "no new notifications right now" case, which would show the existing (now-read) list rather than the empty state at all. |
-| M28 Standby Claim | No first-run difference. A partner can claim standby from their first day qualified, and there is no cap or history that changes the screen over time (SOW A.19). |
+| M28 Standby Claim | No first-run difference. A partner can claim standby from their first day qualified, and there is no cap or history that changes the screen over time (SOW A.19). The screen is only reachable Monday to Thursday (2026-09-19), so a partner qualified on a Friday first sees it the following Monday at the earliest. |
 
 ---
 

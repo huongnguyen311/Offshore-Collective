@@ -45,6 +45,30 @@ Chars: 114 | Gives her something useful to do with the wait, and nudges toward M
 
 ---
 
+## Qualification Approved Welcome (M06, SOW A.2)
+
+Confirmed by Matt 2026-09-18: a dedicated one-time notification fires the moment qualification is approved, and it must read and feel distinct from a routine entry. This is the direct answer to M20's "Almost there", so the two are written as a pair, and it is the one notification that resolves the anxiety M20 names rather than reporting an operational fact.
+
+**Heading**
+> You're approved. The boat is yours.
+Chars: 35 | Two short sentences rather than one, so the approval lands before the invitation. "The boat is yours" uses the ownership language that is actually true here, these are co-owners, not customers, and the CTA below carries the "to book" part so the heading does not have to. Deliberately larger than a row title, because Matt asked for something that feels like a milestone. Wraps to 2 lines at 19px in a 329px card, which is what makes it read as a headline rather than a row.
+
+**Body**
+> Powerboat Training NZ qualification confirmed. 58 points for the year, and the calendar is open 60 days ahead.
+Chars: 110 | Shortened from 182 on request (2026-09-18), measured in the browser: 3 lines instead of 5, card height 295px instead of 368px. Two things were cut, both because something else already says them. "so every part of the app is now open to you" went, because the heading's "You're approved" states it. "Your ... is" went from the opening clause, so it reads as the status line it actually is. What stays is the phrase that closes the loop on M20's "We're confirming your Powerboat Training NZ certification", so the partner recognises this as the answer to that screen, plus the two numbers that decide what they can do next, both in mono per the type system. No exclamation mark and no welcome-aboard language: the tone rule here is functional and restrained, and a 40s-to-60s co-owner reads celebration as marketing.
+
+**Action**
+> Book your first trip
+Chars: 19 | Names the action, not the destination, and "first" is accurate exactly once, which suits a notification that fires exactly once. Routes to M04, since booking access is the thing that just changed.
+
+**Timestamp**
+> JUST NOW
+Chars: 8 | Same mono treatment as every other entry's timestamp, which is the one respect in which this entry does behave like the rest of the list.
+
+**Not written, and why:** no dismiss control and no second step. Matt's note asks for one message, not an elaborate build, and the entry ages out of relevance on its own as the list fills beneath it.
+
+---
+
 ## Booking Blocked (M22) — rule-violation messages
 
 Each message must name the specific rule per the WBS requirement — never a generic "can't book this."
@@ -196,16 +220,18 @@ Chars: 13 | Possessive, matching the "Your week" label on the assigned window.
 ## Standby Claim Screen (M28)
 
 **Zero-cost hero label**
-> Standby, today only
-Chars: 19 | Names both conditions that make the offer real: it is free, and it is gone tomorrow.
+> Standby, Mon to Thu
+Chars: 19 | Carries the eligibility rule (confirmed 2026-09-19), which is the one thing on this screen a partner cannot work out for themselves. It replaced "Standby, today only": same length, but the navbar ("Claim Today"), the date line ("Thu 12 Mar, today") and the button ("Claim Today, Free") already say same-day three times between them, so the eyebrow was the only line spending itself on a fact the screen had covered.
 
 **Departure-time help text**
 > We’ll notify the team the moment you claim, so give them as much notice as you can.
 Chars: 83 | Explains why the app is asking, rather than just asking. The partner is doing someone a favour, not filling in a required field. Says "the team" rather than naming Tamaki Marine Park, which is a name the partner cannot act on.
 
 **Body**
-> Nobody booked today by 7am, so it is open to all six partners, free. First to claim gets it, and there is no limit on how many standby days you take in a year.
-Chars: 157 | States the 7am trigger, the free price, the first-confirmed basis and the absence of a cap, which are the four things SOW A.19 makes true and none of which a partner would assume.
+> Nobody booked today by 7am, so it is open to all six partners, free. First to claim gets it, and there is no limit on how many standby days you take in a year. Standby runs Monday to Thursday only. Halcyon cannot be turned around between trips at a weekend, so Saturday and Sunday are never standby days: they stay on unclaimed weekend rates.
+Chars: 157 for the first three sentences | States the 7am trigger, the free price, the first-confirmed basis and the absence of a cap, which are the four things SOW A.19 makes true and none of which a partner would assume. The Monday-to-Thursday sentences were added 2026-09-19 and carry a reason and a destination, not just the limit: the reason, because a partner told only that weekends are out will ask why and the answer is a fact about the boat rather than a rule; the destination, because Saturday and Sunday are not refused, they are priced by C.5, and a limit with nowhere to go reads as the app being unhelpful.
+
+> **Drift to fix:** the built screen still opens "Today went unclaimed at 7am, so it is open to all six partners at no point cost. First to claim gets it. There is no yearly limit." Same four facts, different words, and it predates this entry. The new sentences were added to both, identically, rather than quietly rewriting the screen to match here.
 
 **CTA**
 > Claim Today, Free
@@ -222,6 +248,16 @@ Chars: 17 | "Free" in the button, because a partner who has learned that everyth
 | qualification-pending | `Pending` | 7 | Shorter than "Qualification Pending" for badge-size constraints; full context is already given by the screen it appears on (Home, Profile) |
 | booking-blocked | `Blocked` | 7 | Short, unambiguous; full explanation lives in the M22 messages above, not repeated in the badge |
 | confirmed | `Confirmed` | 9 | Standard, matches the persistent-success semantic decided in `07-color-system.md` |
+
+## Boat-Ready Status on Home (M03, SOW C.31)
+
+| State | Copy | Chars | Rationale |
+|---|---|---|---|
+| ready | `Ready for your trip` + trip date | 19 | Names the trip, not the boat, because a partner can hold 2 concurrent bookings and the trigger fires per booking |
+| not ready yet | `Boat not ready yet` + trip date | 18 | Matt's own words, kept verbatim. Says the one thing the partner needs on the morning of a trip, without a time estimate the platform cannot honestly give: nothing in scope tracks how far through a turnaround a contractor is |
+| not ready yet, supporting line | `We'll let you know as soon as it's ready.` | 41 | Tells the partner no action is theirs. Without it, a status with no CTA reads as a problem to chase, and the only thing to chase would be Matt's phone |
+
+Deliberately not written: any wording that names the contractor, the turnaround step, or an expected time. The partner has no view of any of it (C.31 adds none), so naming it would raise a question the app cannot answer.
 
 ## Points Balance Eyebrow Label (ties to `09-typography-system.md`)
 
@@ -267,12 +303,14 @@ Chars: 18 | Named for what it holds, not for who administers it. "Managed by Off
 Chars: 10 | Not "Not set", which reads like a form the partner failed to finish. Most partners will never add one, so the empty state must not feel like an outstanding task.
 
 **Empty state supporting line**
-> Someone else can operate Halcyon on your behalf. Contact us to add one.
+> Someone else can operate Halcyon when you are aboard. Contact us to add one.
 
-Chars: 70 | What the field is for, then how to get one, in two short sentences. "Contact us", never a name, per the Naming Rule below. An earlier draft also explained that we confirm the operator's Powerboat Training NZ status first; that is our process, not a step the partner takes, and it made a two-line block into a four-line one. A partner who adds an operator hears about the check from us.
+Chars: 75 | What the field is for, then how to get one, in two short sentences. It read "on your behalf" until 2026-09-19, which stated the opposite of the rule the client then confirmed: a secondary operator may only operate Halcyon with the partner on board. "On your behalf" means in your place, so the line was promising a partner they could send someone in their stead, which is the single most expensive thing this block could get wrong. "Add one" also carries the cap without spending a sentence on it: one per partner (2026-09-19). "Contact us", never a name, per the Naming Rule below. An earlier draft also explained that we confirm the operator's Powerboat Training NZ status first; that is our process, not a step the partner takes, and it made a two-line block into a four-line one. A partner who adds an operator hears about the check from us.
 
 **Populated state, closing line**
-> Contact us to change any of these.
+> They can operate Halcyon when you are aboard. Contact us to change any of these.
+
+The rule is repeated here, not only in the empty state, because this is the state a partner reads just before relying on it. A partner with no operator is reading about a hypothetical; a partner looking at a name and a Certified badge is deciding what that person can do on Saturday.
 
 Chars: 34 | "any of these" rather than "this", because three values are shown and a partner may want to change only the phone number.
 

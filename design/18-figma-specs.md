@@ -42,8 +42,8 @@ CalendarDateCell/
 |---|---|---|
 | default (available) | `color.calendar.available-bg`, no border, no StateGlyph | Tappable |
 | booked | `color.calendar.booked-bg` (solid navy fill), stroke `color.calendar.booked-border`, DayNumber inverts to white, StateGlyph visible | Tappable → navigates to M09 |
-| standby | `color.calendar.standby-bg`, 1.5pt stroke `color.calendar.standby-border`, **no StateGlyph**, plus a `TODAY` label above the DayNumber | Tappable → navigates to M28 |
-| unclaimed | `color.calendar.available-bg` (identical fill to available, by design), **dashed** stroke `color.calendar.unclaimed-border`, **no StateGlyph** | Tappable → selects to the end of the block, repriced per C.5 |
+| standby | `color.calendar.standby-bg`, 1.5pt stroke `color.calendar.standby-border`, **no StateGlyph**, plus a `TODAY` label above the DayNumber | Tappable → navigates to M28. Mon to Thu only (2026-09-19); never applied to a Fri, Sat or Sun cell |
+| unclaimed | `color.calendar.available-bg` (identical fill to available, by design), **dashed** stroke `color.calendar.unclaimed-border`, **no StateGlyph** | Tappable → selects to the end of the block, repriced per C.5. After 7am on the day itself that day prices at zero and the rest of the block at the standard rate |
 | not-bookable | `color.calendar.not-bookable-bg`, muted `DayNumber` color, **no stroke**, no StateGlyph | Past: not tappable. Beyond the 60-day window: tappable only to surface the explanation |
 | blocked | `color.calendar.blocked-bg` + 45° hatch fill, `DayNumber` in `color.calendar.blocked-text`, StateGlyph visible (the shared "cannot select" mark it carries with booked) | **Not tappable**, `aria-disabled="true"` [equivalent: Android `clickable=false`, iOS `isUserInteractionEnabled=false`] |
 | named-holiday-long-weekend | `color.calendar.holiday-block-bg`, 1pt stroke `color.calendar.holiday-block-border` on all four sides with the **top edge at 3pt**, no StateGlyph | Tappable → selects the whole Fri-to-Mon span at once and prices it as one Long Weekend, labelled with the holiday name (C.7) |

@@ -45,9 +45,17 @@ On tab change (to Book): focus moves to the M04 heading, per Section 6.
 
 **Contrast:** Data Hero (`color.text.brand` on `color.bg.default`) and body text all pass AA per `07-color-system.md`; no new combinations introduced on this screen.
 
-**Boat-ready status (SOW C.31):** this status exists precisely because a push notification may never reach the partner, so it must carry a text label ("Ready for your trip") alongside its tick icon and success tint, and be part of the boat card's single announced unit. It must never be conveyed by the green fill alone. When the boat is not ready the label is absent entirely rather than rendered in a muted state, so there is no ambiguous third reading.
+**Boat-ready status (SOW C.31):** this status exists precisely because a push notification may never reach the partner, so it must carry a text label alongside its icon and tint, and be part of the boat card's single announced unit. It must never be conveyed by fill colour alone. It has three states since 2026-09-19 (third state added per the C.31 comment on SOW row 94):
 
-The label names the trip it belongs to ("Ready for your trip Sat 14 Mar", date in `font.mono`). A partner can hold 2 concurrent bookings and TMP confirms launch per booking, so an undated label is ambiguous as soon as there is a second upcoming trip. The date sits inside the same announced unit rather than in a separate element, so the screen reader still reads boat and status as one phrase. Set only by TMP's Confirm Launch (C05), never by MDC's Mark Job Complete (C04, internal hand-off); cleared when the partner checks out or when the post-use checklist starts the turnaround.
+| State | Label | Icon | Tint | When |
+|---|---|---|---|---|
+| Ready | "Ready for your trip" + trip date | tick | success | the trip's ready trigger has fired |
+| Not ready yet | "Boat not ready yet" + trip date, plus the line "We'll let you know as soon as it's ready." | clock | warning | there is a booking today and its ready trigger has not fired |
+| Absent | no row at all | none | none | no booking today |
+
+The two visible states differ in wording and icon shape, not only in tint, so they survive a monochrome or colour-blind reading. The original ban still holds in its real form: "not ready" is never a muted or greyed rendering of "ready", it is its own labelled state or nothing at all. Absence now means only "you have no trip today", which is why it is safe to leave silent.
+
+The label names the trip it belongs to ("Ready for your trip Sat 14 Mar", date in `font.mono`). A partner can hold 2 concurrent bookings and TMP confirms launch per booking, so an undated label is ambiguous as soon as there is a second upcoming trip. The date sits inside the same announced unit rather than in a separate element, so the screen reader still reads boat and status as one phrase: "Halcyon, Rayglass 3000, ready for your trip Sat 14 Mar", or "Halcyon, Rayglass 3000, boat not ready yet, Thu 12 Mar, we'll let you know as soon as it's ready". The ready state is set by the last step of the turnaround, and which step that is depends on the path: TMP's Confirm Launch (C05) on a haul-out, MDC's Mark Job Complete (C04) on a back-to-back, where the boat never leaves the water and TMP has no step at all (C.10, confirmed 2026-09-18; this corrects an earlier reading of C04 as an internal hand-off on every path). It is cleared when the partner checks out or when the post-use checklist starts the turnaround. On a trip day the row always describes that day's trip: a ready status belonging to a different booking is never shown on top of today, which is the ambiguity the third state exists to remove.
 
 ---
 
@@ -156,8 +164,8 @@ On reaching the end of the loaded list (infinite scroll): "Loading more notifica
 **Focus order — view mode:**
 ```
 1. Screen heading ("Profile")
-2. Name + boat (announced as one unit, not two separate stops). There is no avatar: initials in a coloured square carried no information a screen reader could use and no information the name below it did not already give
-3. Edit (button, `aria-label="Edit your details"`, opens edit mode in place; does not navigate)
+2. Name + boat (announced as one unit, not two separate stops: "David Kearney, Halcyon, Rayglass 3000"). There is no avatar: initials in a coloured square carried no information a screen reader could use and no information the name below it did not already give. The boat mark drawn beside the vessel from 2026-09-19 is decorative and must carry `aria-hidden`: it repeats what the two lines next to it already say, and announcing it would split one unit into two stops
+3. Edit (icon button, no visible label, `aria-label="Edit your name"`, opens edit mode in place; does not navigate). It follows the name in the DOM as well as on screen, so the value and the control that changes it are adjacent in the swipe order
 4. Qualification status row
 5. Phone row
 6. Email row
@@ -173,7 +181,7 @@ On reaching the end of the loaded list (infinite scroll): "Loading more notifica
 16. Tab bar
 ```
 
-The Edit button precedes the three values it governs, so a screen-reader user meets the control before the values rather than discovering afterwards that the block was editable. It sits inside the same card as the name, and since the compaction on 2026-09-17 removed the visible "Your details" heading, the button carries `aria-label="Edit your details"` so its accessible name still says what it edits.
+The Edit control now *follows* the name rather than preceding it, because it lost its visible label on 2026-09-19 and is an unlabelled pencil: sighted users read its scope from the fact that it sits against the name, and the swipe order has to reproduce that adjacency rather than announce a bare control first. Its accessible name, "Edit your name", is therefore doing all the work for anyone who cannot see where it sits, and must never be shortened to "Edit".
 
 **Focus order — edit mode:**
 ```
@@ -181,8 +189,8 @@ The Edit button precedes the three values it governs, so a screen-reader user me
 2. Name (text input) ← focus lands here when Edit is activated, caret at end of value
 3. Boat ("Halcyon, Rayglass 3000")
 4. Qualification status row (unchanged, still static)
-5. Phone (tel input)
-6. Email (email input)
+5. Phone row (static, not an input)
+6. Email row (static, not an input)
 7. Cancel (button)
 8. Save (button)
 9. Group heading: "Secondary operator" (unchanged, still padlocked)
@@ -207,14 +215,14 @@ Heading level 1: "Profile"
 
 The editable group no longer carries a visible heading: it is the card that opens with the partner's own name, and the Edit button's `aria-label` names it instead. The padlocked group keeps its heading, moved inside its card, because that heading is what marks the boundary between what the partner can change and what they cannot.
 
-**Note:** in view mode, items 4, 5, 6, 8, 9 and 15 are static content, not controls. They appear in the swipe order (so the information is reachable) but must not be exposed with a `button` role, and Tab must skip them on an external keyboard. Three points deserve care here. The secondary-operator helper text (9) is the one place a partner is most likely to reach for a control that does not exist, so it must never be given one: A.16 puts that change with Matt, off-platform. The "Secondary operator" heading (7) is now the only heading separating what the partner can edit from what they cannot, so it must be exposed as a heading (level 2), not as plain text, even though it sits inside its card rather than above it, or the distinction is lost to a screen reader. Its padlock is decorative to the eye but load-bearing to the ear: it must reach a screen reader as part of the heading's accessible name ("Secondary operator, not editable"), never as a bare `img` with no label and never as a separate stop. And the phone and email rows (5, 6) must stay static in view mode even though they are editable via item 3: making the row itself a control as well would give the same action two different names.
+**Note:** in view mode, items 4, 5, 6, 8, 9 and 15 are static content, not controls. They appear in the swipe order (so the information is reachable) but must not be exposed with a `button` role, and Tab must skip them on an external keyboard. Three points deserve care here. The secondary-operator helper text (9) is the one place a partner is most likely to reach for a control that does not exist, so it must never be given one: A.16 puts that change with Matt, off-platform. The "Secondary operator" heading (7) is now the only heading separating what the partner can edit from what they cannot, so it must be exposed as a heading (level 2), not as plain text, even though it sits inside its card rather than above it, or the distinction is lost to a screen reader. Its padlock is decorative to the eye but load-bearing to the ear: it must reach a screen reader as part of the heading's accessible name ("Secondary operator, not editable"), never as a bare `img` with no label and never as a separate stop. And the phone and email rows (5, 6) are static in both modes, not only in view mode: neither is editable from this screen at all (email from 2026-09-18, phone from 2026-09-19), so neither may ever be exposed as a control. A line explaining where those values are maintained was specified on 2026-09-19 and removed the same day, so the rows are announced as bare label-and-value pairs. This is the one regression in the screen's accessibility worth naming: a screen-reader user who wants a new phone number on file now hears no route at all, and the support contact in the footer (item 15) is the only one there is.
 
 The phone number and email in the footer are the only static items that may become controls: if they are made tappable, each becomes its own labelled link.
 
 **Screen-reader flow:**
 ```
 On load: "Profile, heading level 1. David Kearney, Halcyon, Rayglass 3000.
-          Edit your details, button, collapsed.
+          Edit your name, button, collapsed.
           Qualification, Approved.
           Phone, 021 555 0198. Email, david dot kearney at xtra dot co dot nz.
           Secondary operator, not editable, heading level 2. None added.
@@ -222,13 +230,13 @@ On load: "Profile, heading level 1. David Kearney, Halcyon, Rayglass 3000.
           Christmas Window, button. Support, button. Terms and Privacy, button. Sign out, button. Delete Account, button.
           Support. Offshore Collective, Owner Support. 021 555 0142. support at offshorecollective dot co dot nz."
 
-On activating Edit: "Editing your details. Name, edit text, David Kearney."
+On activating Edit: "Editing your name. Name, edit text, David Kearney."
                     (focus is in the name field; the rest of the screen is unchanged and
-                     re-reads exactly as above apart from Phone and Email now being edit fields)
+                     re-reads exactly as above, including the phone and email rows)
 
-On a failed Save:   "Phone, edit text, invalid entry, Enter a valid phone number."
+On a failed Save:   "Name, edit text, invalid entry, Enter your name."
 
-On Save:            "Edit your details, button, collapsed."
+On Save:            "Edit your name, button, collapsed."
                     (focus is back on Edit, and the rows below read the new values)
 ```
 

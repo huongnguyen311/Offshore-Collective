@@ -75,9 +75,12 @@ flowchart TD
     D -- No --- E[M22 Booking Blocked → plain-language reason]
     E --- B
     D -- Yes --- F{Date carries the unclaimed state?}
-    F -- Yes --- G[Claim to end of block, repriced per C.5 table]
+    F -- Yes --- G{Claiming after 7am on the day itself?}
+    G -- Yes --- G1[That day free, rest of block at standard rate]
+    G -- No --- G2[Claim to end of block, repriced per C.5 table]
     F -- No --- H[M08 Review & Confirm → points breakdown shown]
-    G --- H
+    G1 --- H
+    G2 --- H
     H --- I[User taps Confirm]
     I --- J[Points deducted, new balance shown]
     J --- K[M09 Booking Detail → confirmed]
@@ -100,12 +103,12 @@ MAIN FLOW:
 3. User taps to start the checklist, navigating to Pre-Departure Checklist (M15)
 4. System displays the fuel section: is the tank full (yes/no)
 5. User selects "No"
-6. System reveals two additional required fields: litres reading and reason-if-not-full, plus a required photo of the fuel gauge
+6. System reveals two additional required fields: litres reading and reason-if-not-full, plus the photo of the fuel gauge, which is asked for either way and never blocks submission (Case 3b)
 7. User enters the litres reading, types a reason, and uploads a photo
 8. System displays the damage section: any damage (yes/no)
 9. User selects "No" (damage fields stay hidden since not required)
 10. User taps Submit
-11. System checks that all four fuel fields and the damage yes/no are filled in
+11. System checks that the tank full/litres/reason fields and the damage yes/no are filled in; the fuel gauge photo is not part of that check
 12. System uploads the photo at full resolution (no compression) and submits the checklist
 13. System returns the user to M09 — no approval gate blocks departure
 
@@ -114,22 +117,25 @@ END: Checklist submitted, partner can depart immediately; if a fuel shortfall or
 ALTERNATIVE FLOWS:
 - Case 1: Tank is full
   - At step 5: User selects "Yes" for tank full
-  - System: Skips the litres-reading and reason fields — only the full-resolution photo of the fuel gauge remains required
+  - System: Skips the litres-reading and reason fields — the full-resolution photo of the fuel gauge is still asked for, since it is wanted whether the tank is full or not, but it does not block the submit (Case 3b)
 - Case 2: Damage reported
   - At step 9: User selects "Yes" for damage
   - System: Reveals required description and photo fields; checklist cannot submit until both are filled
 - Case 3: Required field left blank
-  - At step 10: User taps Submit with any of the 4 fuel fields or the damage yes/no missing
+  - At step 10: User taps Submit with the tank full/litres/reason fields or the damage yes/no missing
   - System: Blocks submission and highlights the missing field(s) — checklist cannot be submitted until all are complete
+- Case 3b: Fuel gauge photo left off (confirmed 2026-09-18)
+  - At step 10: User taps Submit with no fuel gauge photo attached, having already left the boat, so the gauge can no longer be photographed
+  - System: Submits anyway. The photo never blocks, a soft notice states the consequence, every other field stays mandatory, the submission is flagged "submitted without fuel photo" in Matt's Needs Your Action feed (B.1), and on the post-use checklist the turnaround workflow proceeds normally. The app has no location signal to verify the partner has left, so the absent photo is what carries the waiver, see `12-form-specs.md` §2b
 - Case 4: Fuel reading within 20-litre tolerance
   - At step 11 (system-side, not user-visible): The reported litres differ slightly from the expected reading
   - System: Does not flag a shortfall if the difference is within 20 litres — only a discrepancy beyond that raises a Needs Your Action item
 - Case 5: Checklist not submitted
   - At step 2: The partner never opens the checklist
-  - System: Nothing blocks departure, there is no approval gate by design (A.9). The system records that no pre-departure check was submitted for that booking. For the post-use checklist the consequence is larger, since it is what starts the turnaround, so C.32 fires a push reminder around the expected return time and alerts Matt in Needs Your Action if it is still missing after a set window
+  - System: Nothing blocks departure, there is no approval gate by design (A.9). The system records that no pre-departure check was submitted for that booking. For the post-use checklist the consequence is larger, since it is what starts the turnaround, so C.32 fires a push reminder 1 hour before the estimated return time and alerts Matt in Needs Your Action if it is still missing 2 hours after that time (timings confirmed by Matt 2026-09-18; the pre-departure reminder fires 1 hour before the estimated departure time captured at booking)
 - Case 6: Post-Use Checklist (return trip)
   - Entry differs: User opens M09 or a "boat ready to return" notification after using the boat, navigating to Post-Use Checklist (M16) instead of M15
-  - System: Uses the identical 4 fuel fields + damage field, adds a mandatory engine-hours reading that feeds the Engine Servicing Registry (A.11/B.14), allows optional extra photos beyond the required set, shows specific heading/footer copy about photo usage, and submitting triggers the turnaround process (not covered further here — Admin Portal territory)
+  - System: Uses the identical 4 fuel fields + damage field, adds a mandatory engine-hours reading that feeds the Engine Servicing Registry (A.11/B.14), allows optional extra photos beyond the required set, carries the same fuel gauge photo waiver as pre-departure (Case 3b) with the turnaround still starting normally when the photo is absent, shows specific heading/footer copy about photo usage, and submitting triggers the turnaround process (not covered further here — Admin Portal territory)
 
 UX NOTES:
 - Friction point: the fuel section's conditional fields (litres/reason/photo appearing only when "not full") must be visually obvious as newly-required, not easy to miss and get blocked at Submit.
@@ -309,8 +315,9 @@ ACTOR: Partner — Qualified
 The only flow in the app where a partner gets time on the boat without spending points, and the only one that races the other five partners in real time.
 
 MAIN FLOW:
-1. At 7am the system checks whether any confirmed booking covers today for this boat (regular day, weekend block, long weekend, or Christmas Window)
-2. Nothing covers it, so the system opens today as a standby claim at zero points
+1. Today is a Monday, Tuesday, Wednesday or Thursday. Standby never runs Friday to Sunday (confirmed 2026-09-19): Marine Detailing Co has no weekend turnaround capacity, so those days stay on Unclaimed Weekend Access pricing (C.5) instead
+2. At 7am the system checks whether any confirmed booking covers today for this boat (regular day, weekend block, long weekend, or Christmas Window)
+3. Nothing covers it, so the system opens today as a standby claim at zero points
 3. User opens the Booking Calendar (M04) and sees today marked standby-available, with a TODAY marker
 4. User taps the cell
 5. System navigates to Standby Claim (M28), showing 0 points and a pre-filled estimated departure time
@@ -344,7 +351,9 @@ DIAGRAM:
 ```mermaid
 flowchart TD
     A[7am: no confirmed booking covers today]
-    A --- B[M04 today cell marked standby-available, TODAY]
+    A --- A1{Today is Mon to Thu?}
+    A1 -- No --- A2[No standby cell; weekend stays on C.5 unclaimed pricing]
+    A1 -- Yes --- B[M04 today cell marked standby-available, TODAY]
     B --- C[M28 Standby Claim: 0 points, departure time]
     C --- D{Claimed first?}
     D -- Another partner got it --- E[Inline notice, back to M04]
@@ -370,6 +379,6 @@ flowchart TD
 ---
 
 ## Open Questions Carried Forward
-- For a back-to-back turnaround, where the boat never leaves the water, should Marine Detailing Co's Mark Job Complete trigger the next partner's notification directly? Flagged 2026-09-14 on SOW rows B.32 and C.10, still under review with Matt. Until it is settled, "only TMP's Launch Confirmed notifies the partner" cannot be treated as final for that one case, and FLOW-CHECKLIST-01's hand-off step inherits the same uncertainty.
+- ~~For a back-to-back turnaround, where the boat never leaves the water, should Marine Detailing Co's Mark Job Complete trigger the next partner's notification directly?~~ **Answered by Matt 2026-09-18: yes.** On a back-to-back turnaround MDC's Mark Job Complete notifies the next partner directly, and TMP has no step, since there is no launch to confirm. TMP's Launch Confirmed remains the trigger on the haul-out path only. Written into SOW B.32, B.33 and C.10, so "only TMP's Launch Confirmed notifies the partner" is now a haul-out rule, not a universal one.
 
 Google Sheet export was not requested — the Mermaid diagrams above render natively in this Markdown file and would be lost in a Sheets export. Ask if a Sheets copy is wanted later.
